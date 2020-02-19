@@ -1,0 +1,52 @@
+#!/bin/bash
+
+# Work around a Lilypond bug in which LP ignores $LILYPOND_DATADIR,
+# because it overwrites the input value of that environment variable
+# with a value derived from the path of its binary.
+#
+# The way LP works out the path of its binary is from its own argv[0],
+# and if that's not an absolute path, it will search $PATH for it. So
+# the only way to make the search fail is to give it an argv[0] that
+# isn't a valid command at all. Then it will use your given data
+# directory.
+#
+# An extra wrinkle is that the Debian package of Lilypond wraps the
+# binary with a 2-line shell script that sets up LD_LIBRARY_PATH. The
+# shell script invokes the real binary by 'exec'. So _this_ wrapper
+# script has to be written in shell as well, so that it can source the
+# Debian wrapper to get its LD_LIBRARY_PATH setup, but cover 'exec'
+# with an alias that drops in my special argv[0].
+#
+# You can tell this script is *working* if Lilypond prints the error
+# message "programming error: cannot find absolute argv0" at startup.
+#
+# See also: https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=951801
+
+# Extract the intended data directory from the front of our own argv.
+export LILYPOND_DATADIR="$1"
+shift
+
+# Find the Lilypond binary.
+lilypond=$(which lilypond)
+
+# Check for the Debian package setup, which has a binary lilypond.real
+# alongside a shell script lilypond.
+if test -x "${lilypond}.real" &&
+   test "x#!" = "x$(head -c2 "${lilypond}")"; then
+    debian=true
+else
+    debian=false
+fi
+
+# The main function to run a program with a custom argv[0].
+exec_with_bogus_argv_0() {
+    command exec -a _nonexistent_command_name_ "$@"
+}
+
+if $debian; then
+    shopt -s expand_aliases
+    alias exec=exec_with_bogus_argv_0
+    source "${lilypond}"
+else
+    exec_with_bogus_argv_0 "${lilypond}" "$@"
+fi
