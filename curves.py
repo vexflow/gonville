@@ -63,8 +63,11 @@ class Curve:
             return
         other, oend, half, special = self.welds[end]
 
-        ourepri = max(1, thispri)
-        ourdpri = max(self.weldpri, thispri)
+        ourepri = 1
+        ourdpri = self.weldpri
+        if thispri is not None:
+            ourepri = max(ourepri, thispri)
+            ourdpri = max(ourdpri, thispri)
         otherepri = 1
         otherdpri = other.weldpri
 
@@ -229,9 +232,9 @@ class CircleInvolute(Curve):
             # is displaced from that centre by an amount which changes
             # linearly with angle from s1 to s2. Store all that.
             self.params = (r, cx2, cy2, phi, theta, s1, s2-s1, mx)
-        except ZeroDivisionError, e:
+        except ZeroDivisionError as e:
             self.params = None # it went pear-shaped
-        except TypeError, e:
+        except TypeError as e:
             self.params = None # it went pear-shaped
 
     def transform(self, matrix, full):
@@ -670,7 +673,7 @@ class ExponentialInvolute(Curve):
             self.inparams = (x1, y1, dx1, dy1, x2, y2, dx2, dy2, mx)
             self.set_params()
             self.tk_refresh()
-            end = (self.dragpt-1)/2
+            end = (self.dragpt-1) // 2
             self.weld_update(end, 2)
             return 1
 

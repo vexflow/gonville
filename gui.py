@@ -1,9 +1,9 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 import sys
 import string
 
-from Tkinter import *
+from tkinter import *
 
 from curves import *
 
@@ -62,9 +62,9 @@ def key(event):
                 curve.unweld(end)
     elif event.char == 'S':
         # Indent to match the typical indent level in glyphs.py.
-        print "    # Saved data from gui.py"
+        print("    # Saved data from gui.py")
         for cid, curve in cont.curves.items():
-            print "    c%d = %s" % (cid, curve.serialise())
+            print("    c%d = %s" % (cid, curve.serialise()))
         for cid1, curve1 in cont.curves.items():
             for cid2, curve2 in cont.curves.items():
                 if cid2 < cid1:
@@ -74,18 +74,18 @@ def key(event):
                     curve1.welds[end1][0] == curve2:
                         end2 = curve1.welds[end1][1]
                         if curve1.welds[end1][3] != None:
-                            print "    c%d.weld_to(%d, c%d, %d, %d, %s)" % (cid1, end1, cid2, end2, curve1.welds[end1][2], repr(curve1.welds[end1][3]))
+                            print("    c%d.weld_to(%d, c%d, %d, %d, %s)" % (cid1, end1, cid2, end2, curve1.welds[end1][2], repr(curve1.welds[end1][3])))
                         elif curve1.welds[end1][2] != 0:
-                            print "    c%d.weld_to(%d, c%d, %d, %d)" % (cid1, end1, cid2, end2, curve1.welds[end1][2])
+                            print("    c%d.weld_to(%d, c%d, %d, %d)" % (cid1, end1, cid2, end2, curve1.welds[end1][2]))
                         else:
-                            print "    c%d.weld_to(%d, c%d, %d)" % (cid1, end1, cid2, end2)
-        print "    # End saved data"
+                            print("    c%d.weld_to(%d, c%d, %d)" % (cid1, end1, cid2, end2))
+        print("    # End saved data")
     elif event.char == 'L':
         for curve in cont.curves.values():
             curve.cleanup()
         cont.curves = {}
         cont.curveid = 0
-        print "Paste saved curve data in, including the \"# End\" line:"
+        print("Paste saved curve data in, including the \"# End\" line:")
         while 1:
             x = sys.stdin.readline()
             if x == "":
@@ -94,9 +94,9 @@ def key(event):
                 x = x[1:]
             if x[:5] == "# End":
                 break
-            exec x
+            exec(x)
     elif event.char == 'T' or event.char == '\x14':
-        print "Enter a transformation matrix:"
+        print("Enter a transformation matrix:")
         x = sys.stdin.readline()
         matrix = eval(x)
         for curve in cont.curves.values():

@@ -1,24 +1,13 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 import sys
 import os
 import string
-import types
 import math
 import time
 import base64
+import subprocess
 from curves import *
-
-try:
-    # New Python 2.6 way of spawning subprocesses
-    import subprocess
-    def popen2(command):
-        p = subprocess.Popen(command, shell=True, stdin=subprocess.PIPE, \
-                                 stdout=subprocess.PIPE, close_fds=True)
-        return (p.stdin, p.stdout)
-except ImportError, e:
-    # Old-style fallback, deprecated in 2.6
-    from os import popen2
 
 class GlyphContext:
     def __init__(self):
@@ -55,7 +44,7 @@ class GlyphContext:
                 t = it / float(self.curve_res-1)
                 x, y = curve.compute_point(t)
                 nib = curve.compute_nib(t)
-                if type(nib) == types.TupleType:
+                if type(nib) == tuple:
                     radius, angle, fdist, bdist = nib
                     c = cos(angle)
                     s = -sin(angle)
@@ -64,20 +53,20 @@ class GlyphContext:
                 elif nib != 0:
                     out = out + "newpath %g %g %g 0 360 arc fill\n" % (x, y, nib)
         e = self.extra
-        if not (type(e) == types.TupleType or type(e) == types.ListType):
+        if not (type(e) == tuple or type(e) == list):
             e = (e,)
         for ee in e:
-            if type(ee) == types.StringType:
+            if type(ee) == str:
                 out = out + ee + "\n"
             else:
                 out = out + ee.makeps()
         out = out + "\ngrestore\n"
         return out
     def testdraw(self):
-        print "gsave clippath flattenpath pathbbox 0 exch translate"
-        print "1 -1 scale pop pop pop"
-        print self.makeps()
-        print "grestore showpage"
+        print("gsave clippath flattenpath pathbbox 0 exch translate")
+        print("1 -1 scale pop pop pop")
+        print(self.makeps())
+        print("grestore showpage")
 
 # Python doesn't have the ?: operator, bah.
 def qc(cond,t,f):
@@ -110,10 +99,12 @@ def utf7_encode(s):
     return out
 
 # 2x2 matrix multiplication.
-def matmul((a,b,c,d),(e,f,g,h)):
+def matmul(m1, m2):
+    (a,b,c,d), (e,f,g,h) = (m1, m2)
     return (a*e+b*g, a*f+b*h, c*e+d*g, c*f+d*h)
 # 2x2 matrix inversion.
-def matinv((a,b,c,d)):
+def matinv(m):
+    (a,b,c,d) = m
     det = a*d-b*c
     return (d/det, -b/det, -c/det, a/det)
 
@@ -145,7 +136,7 @@ def follow_curveset_nib(c,x,y,t,theta,carray,i,n,r):
 def blob(curve, end, whichside, radius, shrink, nibradius=None):
     if nibradius == None:
         nibradius = curve.compute_nib(end)
-        assert type(nibradius) != types.TupleType
+        assert type(nibradius) != tuple
     x, y = curve.compute_point(end)
     dx, dy = curve.compute_direction(end)
     if end == 0:
@@ -183,8 +174,7 @@ def blob(curve, end, whichside, radius, shrink, nibradius=None):
 def clippath(elements):
     coords = []
     for e in elements:
-        if type(e) == types.InstanceType:
-            # Curve.
+        if isinstance(e, Curve):
             for it in range(e.cont.curve_res):
                 t = it / float(e.cont.curve_res-1)
                 coords.append(e.compute_point(t))
@@ -282,11 +272,10 @@ def get_ps_path(char, debug=None):
     else:
         tee1 = " | tee z1.%s" % debug
         tee2 = " | tee z2.%s" % debug
-    fin, fout = popen2("gs -sDEVICE=pbm -sOutputFile=- -g%dx%d -r%d -dBATCH -dNOPAUSE -q -%s | potrace -b ps -c -q -W 1in -H 1in -r 4000 -M 1000 -O 1 -o - -%s" % (xsize*res, ysize*res, 72*res, tee1, tee2))
-    fin.write("0 %d translate 1 -1 scale\n" % ysize)
-    fin.write(char.makeps())
-    fin.write("showpage")
-    fin.close()
+    p = subprocess.Popen("gs -sDEVICE=pbm -sOutputFile=- -g%dx%d -r%d -dBATCH -dNOPAUSE -q -%s | potrace -b ps -c -q -W 1in -H 1in -r 4000 -M 1000 -O 1 -o - -%s" % (xsize*res, ysize*res, 72*res, tee1, tee2), shell=True,
+                         stdin=subprocess.PIPE, stdout=subprocess.PIPE, close_fds=True)
+    p.stdin.write(("0 %d translate 1 -1 scale\n" % ysize + char.makeps() + "showpage").encode("ASCII"))
+    p.stdin.close()
     # Now we read and parse potrace's PostScript output. This is easy
     # enough if we've configured potrace to output as simply as
     # possible (which we did) and are also ignoring most of the fiddly
@@ -301,11 +290,11 @@ def get_ps_path(char, debug=None):
     output = "newpath"
     scale = 4.0 / char.trace_res
     while 1:
-        s = fout.readline()
+        s = p.stdout.readline().decode("ASCII")
         if s == "": break
         if s[:1] == "%":
             continue # comment
-        ss = string.split(s)
+        ss = s.split()
         for word in ss:
             if word[:1] in "-0123456789":
                 psstack.append(float(word))
@@ -365,7 +354,8 @@ def get_ps_path(char, debug=None):
                     path.append(('c',) + c)
             elif word == "closepath":
                 path.append(('cp',))
-    fout.close()
+    p.stdout.close()
+    p.wait()
     bbox = None, None, None, None
     for c in path:
         if c[0] != 'cp':
@@ -4592,7 +4582,7 @@ def writesfd(filepfx, fontname, encodingname, encodingsize, outlines, glyphlist)
         yat = lambda y: yrt(y) - char.origin[1]
         xt = lambda x: xat(x) - xat(ox)
         yt = lambda y: yat(y) - yat(oy)
-        if len(glyph) > 9 and glyph[9].has_key("xw"):
+        if len(glyph) > 9 and "xw" in glyph[9]:
             width = xt(glyph[9]["xw"]) # explicitly specified width
         else:
             width = xt(bbox[2]) # mostly default to RHS of bounding box
@@ -4641,16 +4631,16 @@ elif len(args) == 2 and (args[0] == "-testps" or args[0] == "-testpsunscaled"):
         yat = lambda y: yrt(y) - char.origin[1]
     else:
         xat = yat = lambda x: x
-    print "%% bbox: %g %g %g %g" % (xat(bbox[0]), yat(bbox[1]), xat(bbox[2]), yat(bbox[3]))
+    print("%% bbox: %g %g %g %g" % (xat(bbox[0]), yat(bbox[1]), xat(bbox[2]), yat(bbox[3])))
     for c in path:
         if c[0] == 'm':
-            print "%g %g moveto" % (xat(c[1]), yat(c[2]))
+            print("%g %g moveto" % (xat(c[1]), yat(c[2])))
         elif c[0] == 'l':
-            print "  %g %g lineto" % (xat(c[3]), yat(c[4]))
+            print("  %g %g lineto" % (xat(c[3]), yat(c[4])))
         elif c[0] == 'c':
-            print "  %g %g %g %g %g %g curveto" % (xat(c[3]), yat(c[4]), xat(c[5]), yat(c[6]), xat(c[7]), yat(c[8]))
+            print("  %g %g %g %g %g %g curveto" % (xat(c[3]), yat(c[4]), xat(c[5]), yat(c[6]), xat(c[7]), yat(c[8])))
         elif c[0] == 'cp':
-            print "closepath"
+            print("closepath")
 
 elif len(args) == 1 and args[0] == "-mus":
     # Generate a Postscript prologue suitable for use with 'mus' in
@@ -5009,7 +4999,7 @@ elif len(args) == 1 and args[0][:5] == "-lily":
         for g in lilyglyphlist:
             gid = g[0]
             char = eval(gid)
-            if not outlines.has_key(gid):
+            if gid not in outlines:
                 outlines[gid] = get_ps_path(char)
 
         # PAINFUL HACK! Add invisible droppings above and below the
@@ -5053,17 +5043,17 @@ elif len(args) == 1 and args[0][:5] == "-lily":
             g = list(lilyglyphlist[i])
             gid = g[0]
             if len(g) > 7:
-                dict = g[7]
-                for k, v in dict.items():
+                prop = g[7]
+                for k, v in prop.items():
                     if k[0] == "x":
                         v = eval(gid+"."+v) * 40
                     elif k[0] == "y":
                         v = (1000 - eval(gid+"."+v)) * 40
                     else:
                         raise "Error!"
-                    dict[k] = v
+                    prop[k] = v
             else:
-                dict = {}
+                prop = {}
             x0, y0, x1, y1 = outlines[gid][0]
             # Allow manual overriding of the glyph's logical
             # bounding box as written into the LILC table (used to
@@ -5073,31 +5063,31 @@ elif len(args) == 1 and args[0][:5] == "-lily":
             # font format proper). If this happens, the attachment
             # points are given in terms of the overridden bounding
             # box.
-            x0 = dict.get("x0", x0)
-            x1 = dict.get("x1", x1)
-            y0 = dict.get("y0", y0)
-            y1 = dict.get("y1", y1)
+            x0 = prop.get("x0", x0)
+            x1 = prop.get("x1", x1)
+            y0 = prop.get("y0", y0)
+            y1 = prop.get("y1", y1)
             outlines[gid] = ((x0,y0,x1,y1),outlines[gid][1])
             xo = g[3]
-            if type(xo) == types.StringType:
+            if type(xo) == str:
                 xo = eval(gid+"."+xo) * 40
             else:
                 xo = x0 + (x1-x0) * xo
             g[3] = xo
             yo = g[4]
-            if type(yo) == types.StringType:
+            if type(yo) == str:
                 yo = (1000 - eval(gid+"."+yo)) * 40
             else:
                 yo = y0 + (y1-y0) * yo
             g[4] = yo
             xa = g[5]
-            if type(xa) == types.StringType:
+            if type(xa) == str:
                 xa = eval(gid+"."+xa) * 40
             else:
                 xa = x0 + (x1-x0) * xa
             g[5] = xa
             ya = g[6]
-            if type(ya) == types.StringType:
+            if type(ya) == str:
                 ya = (1000 - eval(gid+"."+ya)) * 40
             else:
                 ya = y0 + (y1-y0) * ya
@@ -5137,7 +5127,7 @@ elif len(args) == 1 and args[0][:5] == "-lily":
         for dir in "lilyfonts", "lilyfonts/type1", "lilyfonts/otf", "lilyfonts/svg":
             try:
                 os.mkdir(dir)
-            except OSError, e:
+            except OSError as e:
                 pass # probably already existed, which we don't mind
 
         for size in sizes:
@@ -5167,15 +5157,15 @@ elif len(args) == 1 and args[0][:5] == "-lily":
             "Generate($2)' gonvillealpha%d.sfd lilyfonts/svg/gonvillealpha%d.svg") % ((size,)*5))
             try:
                 os.symlink("gonvillealpha%d.pfa" % size, "lilyfonts/type1/feta-alphabet%d.pfa" % size)
-            except OSError, e:
+            except OSError as e:
                 pass # probably already existed, which we don't mind
             try:
                 os.symlink("gonvillealpha%d.pfb" % size, "lilyfonts/type1/feta-alphabet%d.pfb" % size)
-            except OSError, e:
+            except OSError as e:
                 pass # probably already existed, which we don't mind
             try:
                 os.symlink("gonvillealpha%d.svg" % size, "lilyfonts/svg/feta-alphabet%d.svg" % size)
-            except OSError, e:
+            except OSError as e:
                 pass # probably already existed, which we don't mind
         for subid in range(1,subids):
             system(("fontforge -lang=ff -c 'Open($1); CorrectDirection(); " + \
@@ -5195,7 +5185,7 @@ elif len(args) == 1 and args[0][:5] == "-lily":
         for i in range(576):
             char = scaledbrace(525 * (151./150)**i)
             gid = "brace%d" % i
-            exec "%s = char" % gid
+            exec("%s = char" % gid)
             outlines[gid] = get_ps_path(char)
             x0, y0, x1, y1 = outlines[gid][0]
             yh = (y0+y1)/2.0
@@ -5236,7 +5226,7 @@ elif len(args) == 1 and args[0][:5] == "-lily":
             os.symlink("gonville-brace.svg", "lilyfonts/svg/aybabtu.svg")
             os.symlink("gonville-brace.otf", "lilyfonts/otf/emmentaler-brace.otf")
             os.symlink("gonville-brace.svg", "lilyfonts/svg/emmentaler-brace.svg")
-        except OSError, e:
+        except OSError as e:
             pass # probably already existed, which we don't mind
         for subid in range(subids):
             system(("fontforge -lang=ff -c 'Open($1); CorrectDirection(); " + \
@@ -5449,11 +5439,11 @@ elif len(args) == 1 and args[0] == "-simple":
     for i in range(len(glyphlist)):
         gid = glyphlist[i]
 
-        if type(gid) == types.TupleType:
+        if type(gid) == tuple:
             # Allocate a specific code.
             gid, thiscode = gid
         else:
-            while codes.has_key(code):
+            while code in codes:
                 code = code + 1
             assert code < 0x100
             thiscode = code
@@ -5461,7 +5451,7 @@ elif len(args) == 1 and args[0] == "-simple":
 
         char = eval(gid)
 
-        if not outlines.has_key(gid):
+        if gid not in outlines:
             outlines[gid] = get_ps_path(char)
 
         xo, yo = char.origin
@@ -5476,16 +5466,16 @@ elif len(args) == 1 and args[0] == "-simple":
         else:
             xo = xo * char.scale / 3600. * 40
             yo = yo * char.scale / 3600. * 40
-        if char.__dict__.has_key("hy"):
+        if hasattr(char, "hy"):
             yo = (1000 - char.hy) * 40
-        if char.__dict__.has_key("hx"):
+        if hasattr(char, "hx"):
             xo = char.hx * 40
 
-        dict = {}
-        if char.__dict__.has_key("width"):
-            dict["xw"] = char.width * 40 + xo
+        props = {}
+        if hasattr(char, "width"):
+            props["xw"] = char.width * 40 + xo
 
-        glyphlist[i] = (gid, gid, thiscode, xo, yo, None, None, None, None, dict)
+        glyphlist[i] = (gid, gid, thiscode, xo, yo, None, None, None, None, props)
 
     writesfd("gonville-simple", "Gonville-Simple", "UnicodeBmp", 65537, outlines, glyphlist)
     system("fontforge -lang=ff -c 'Open($1); CorrectDirection(); " + \
@@ -5529,8 +5519,10 @@ elif len(args) == 2 and args[0] == "-lilycheck":
     "scripts.dsignumcongruentiae",
     ]
 
-    s = string.replace(args[1], "'", "'\\''")
-    system("fontforge -lang=ff -c 'Open($1); Save($2)' '%s' temp.sfd >&/dev/null" % s)
+    subprocess.check_call(["fontforge", "-lang=ff", "-c",
+                           "Open($1); Save($2)", args.argument, "temp.sfd"],
+                          stdout=open(os.devnull, "w"),
+                          stderr=open(os.devnull, "w"))
     f = open("temp.sfd", "r")
     while 1:
         s = f.readline()
@@ -5541,7 +5533,7 @@ elif len(args) == 2 and args[0] == "-lilycheck":
             ok = known.get(name, 0)
             if not ok:
                 for r in ignored:
-                    if type(r) == types.StringType:
+                    if type(r) == str:
                         match = (r == name)
                     else:
                         match = r.match(name)
@@ -5549,5 +5541,5 @@ elif len(args) == 2 and args[0] == "-lilycheck":
                         ok = 1
                         break
             if not ok:
-                print name
+                print(name)
     f.close()
