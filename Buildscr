@@ -30,13 +30,21 @@ in gonville-$(Version) do zip -r ../gonville-$(Version).zip *
 in gonville do lilypond --ps lilydemo.ly
 in gonville do gs -sDEVICE=pngmono -sPAPERSIZE=a4 -r720 -sOutputFile=before0.png -dBATCH -dNOPAUSE lilydemo.ps
 in gonville do convert -resize 1400x- -trim -bordercolor white -border 10 before0.png before.png
+in gonville do lilypond -dbackend=svg lilydemo.ly
+in gonville do inkscape -D lilydemo.svg --export-margin=2 --export-plain-svg=before.svg
+
 in gonville do ./lilysetup ../gonville-$(Version)/lilyfonts /usr/share/lilypond/* lilydata
+
 in gonville do ./run-lilypond-with-datadir $$PWD/lilydata --ps lilydemo.ly
 in gonville do gs -sDEVICE=pngmono -sPAPERSIZE=a4 -r720 -sOutputFile=after0.png -dBATCH -dNOPAUSE lilydemo.ps
 in gonville do convert -resize 1400x- -trim -bordercolor white -border 10 after0.png after.png
+in gonville do ./run-lilypond-with-datadir $$PWD/lilydata -dbackend=svg lilydemo.ly
+in gonville do inkscape -D lilydemo.svg --export-margin=2 --export-plain-svg=after.svg
 
 deliver gonville-$(Version)-src.tar.gz $@
 deliver gonville-$(Version).tar.gz $@
 deliver gonville-$(Version).zip $@
 deliver gonville/before.png $@
 deliver gonville/after.png $@
+deliver gonville/before.svg $@
+deliver gonville/after.svg $@
