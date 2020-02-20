@@ -854,6 +854,13 @@ def lilypond_output(args, do_main_font=True, do_brace_font=True):
     # process with FontForge into a replacement system font set for
     # GNU LilyPond.
 
+    def postprocess_svg_file(outfile):
+        if args.svgfilter is None:
+            return
+        data = subprocess.check_output([args.svgfilter, outfile])
+        with open(outfile, "wb") as f:
+            f.write(data)
+
     def run_ff(infile, outfile, tableprefix=None, fontname=None):
         ffscript = "Open($1); CorrectDirection(); "
         if tableprefix is not None:
@@ -864,6 +871,8 @@ def lilypond_output(args, do_main_font=True, do_brace_font=True):
         ffscript += "Generate($2)"
         check_call_devnull(["fontforge", "-lang=ff", "-c",
                             ffscript, infile, outfile])
+        if outfile.endswith(".svg"):
+            postprocess_svg_file(outfile)
 
     def writetables(filepfx, size, subids, subnames, outlines, glyphlist, bracesonly=0):
         fname = filepfx + ".LILF"
@@ -1455,6 +1464,8 @@ def main():
     parser.add_argument(
         "--ver", "--version-string",
         help="Version string to put in output font files")
+    parser.add_argument(
+        "--svgfilter", help="Postprocessing filter for SVG font output")
     group = parser.add_mutually_exclusive_group()
     group.add_argument(
         "--test", action="store_const", dest="action", const=test_glyph,
