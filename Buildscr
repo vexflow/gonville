@@ -16,7 +16,7 @@ in . do tar czvf gonville-$(Version)-src.tar.gz gonville-$(Version)
 in . do rm -rf gonville-$(Version)
 in . do mkdir gonville-$(Version)
 in gonville do cp LICENCE README lilysetup ../gonville-$(Version)
-in gonville do ./glyphs.py --ver=$(Version) -lily
+in gonville do ./glyphs.py --ver=$(Version) --lily
 in gonville-$(Version) do mv ../gonville/lilyfonts .
 in . do tar czvf gonville-$(Version).tar.gz gonville-$(Version)
 # And build a zip file for Windows users, which will of course store

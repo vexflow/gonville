@@ -7,6 +7,7 @@ import math
 import time
 import base64
 import subprocess
+import argparse
 from curves import *
 
 class GlyphContext:
@@ -4610,32 +4611,20 @@ def writesfd(filepfx, fontname, encodingname, encodingsize, outlines, glyphlist)
     f.write("EndSplineFont\n")
     f.close()
 
-def run_ff(infile, outfile, tableprefix=None, fontname=None):
-    ffscript = "Open($1); CorrectDirection(); "
-    if tableprefix is not None:
-        for table in ["LILC", "LILF", "LILY"]:
-            ffscript += "LoadTableFromFile(\"{t}\", \"{p}.{t}\"); ".format(p=tableprefix, t=table)
-    if fontname is not None:
-        ffscript += "SetFontNames(\"{n}\",\"{n}\",\"{n}\"); ".format(n=fontname)
-    ffscript += "Generate($2)"
-    subprocess.check_call(["fontforge", "-lang=ff", "-c", ffscript, infile, outfile])
-
-args = sys.argv[1:]
-if len(args) >= 1 and args[0][:6] == "--ver=":
-    verstring = args[0][6:]
-    args = args[1:]
-if len(args) == 2 and args[0] == "-test":
+def test_glyph(args):
     # example usage:
-    # ./glyphs.py -test braceupper | gs -sDEVICE=pngmono -sOutputFile=out.png -r72 -g1000x1000 -dBATCH -dNOPAUSE -q -
+    # ./glyphs.py --test braceupper | gs -sDEVICE=pngmono -sOutputFile=out.png -r72 -g1000x1000 -dBATCH -dNOPAUSE -q -
     # and then to view that in gui for correction:
     # convert -recolor '.25 0 0 0 0 .25 0 0 0 0 .25 0 .75 .75 .75 1' out.png zout.gif && ./gui.py zout.gif
-    glyph = eval(args[1])
+    glyph = eval(args.argument)
     glyph.testdraw()
-elif len(args) == 2 and (args[0] == "-testps" or args[0] == "-testpsunscaled"):
-    char = eval(args[1])
+
+def test_ps(args, scaled=True):
+    char = eval(args.argument)
     bbox, path = get_ps_path(char)
-    if args[0] == "-testps":
-        xrt = lambda x: x * (3600.0 / (40*char.scale)) # potrace's factor of ten, ours of four
+    if scaled:
+        # Compensate for potrace's factor of ten, and ours of four
+        xrt = lambda x: x * (3600.0 / (40*char.scale))
         yrt = lambda y: y * (3600.0 / (40*char.scale))
         xat = lambda x: xrt(x) - char.origin[0]
         yat = lambda y: yrt(y) - char.origin[1]
@@ -4652,8 +4641,11 @@ elif len(args) == 2 and (args[0] == "-testps" or args[0] == "-testpsunscaled"):
         elif c[0] == 'cp':
             print("closepath")
 
-elif len(args) == 1 and args[0] == "-mus":
-    # Generate a Postscript prologue suitable for use with 'mus' in
+def test_ps_unscaled(args):
+    return test_ps(args, scaled=False)
+
+def mus_output(args):
+    # Generate a Postscript prologue suitable for use with 'mus'
     glyphlist = [
     "accent",
     "acciaccatura",
@@ -4742,7 +4734,6 @@ elif len(args) == 1 and args[0] == "-mus":
     "turn",
     ]
     encoding = [(i+33, glyphlist[i]) for i in range(len(glyphlist))]
-    # the parent directory.
     f = open("prologue.ps", "w")
     g = open("abspaths.txt", "w")
     f.write("save /m /rmoveto load def /l /rlineto load def\n")
@@ -4949,10 +4940,22 @@ elif len(args) == 1 and args[0] == "-mus":
     g.write("    for (p=prologue; *p; p++)\n")
     g.write("        fputs(*p, fp);\n")
     g.write("}\n")
-elif len(args) == 1 and args[0][:5] == "-lily":
+
+def lilypond_output(args, do_main_font=True, do_brace_font=True):
     # Generate .sfd files and supporting metadata which we then
     # process with FontForge into a replacement system font set for
     # GNU LilyPond.
+
+    def run_ff(infile, outfile, tableprefix=None, fontname=None):
+        ffscript = "Open($1); CorrectDirection(); "
+        if tableprefix is not None:
+            for table in ["LILC", "LILF", "LILY"]:
+                ffscript += "LoadTableFromFile(\"{t}\", \"{p}.{t}\"); ".format(p=tableprefix, t=table)
+        if fontname is not None:
+            ffscript += "SetFontNames(\"{n}\",\"{n}\",\"{n}\"); ".format(n=fontname)
+        ffscript += "Generate($2)"
+        subprocess.check_call(["fontforge", "-lang=ff", "-c", ffscript, infile, outfile])
+
     def writetables(filepfx, size, subids, subnames, outlines, glyphlist, bracesonly=0):
         fname = filepfx + ".LILF"
         f = open(fname, "w")
@@ -4992,7 +4995,7 @@ elif len(args) == 1 and args[0][:5] == "-lily":
             f.write("(attachment . (%.6f . %.6f))))\n" % (xt(ax), yt(ay)))
         f.close()
 
-    if args[0] != "-lilybrace":
+    if do_main_font:
         # Allocate sequential Unicode code points in the private use
         # area for all the glyphs that don't already have a specific
         # ASCII code point where they need to live.
@@ -5175,7 +5178,7 @@ elif len(args) == 1 and args[0][:5] == "-lily":
     # nice to be able to debug just the interesting bits.) Construct
     # the PS outlines via potrace, once for each glyph we're
     # actually using.
-    if args[0] != "-lilymain":
+    if do_brace_font:
         outlines = {}
         bracelist = []
         for i in range(576):
@@ -5222,7 +5225,13 @@ elif len(args) == 1 and args[0][:5] == "-lily":
         for subid in range(subids):
             run_ff("gonville-bracepart%d.sfd" % subid, "lilyfonts/type1/gonville-bracepart%d.pfa" % subid)
             run_ff("gonville-bracepart%d.sfd" % subid, "lilyfonts/svg/gonville-bracepart%d.svg" % subid)
-elif len(args) == 1 and args[0] == "-simple":
+
+def lilypond_output_main(args):
+    return lilypond_output(args, do_brace_font=False)
+def lilypond_output_brace(args):
+    return lilypond_output(args, do_main_font=False)
+
+def simple_output(args):
     # Generate an .sfd file which can be compiled into a really
     # simple binary font in which all the glyphs are in the bottom
     # 256 code points.
@@ -5470,7 +5479,7 @@ elif len(args) == 1 and args[0] == "-simple":
     system("fontforge -lang=ff -c 'Open($1); CorrectDirection(); " + \
     "Generate($2)' gonville-simple.sfd gonville-simple.otf")
 
-elif len(args) == 2 and args[0] == "-lilycheck":
+def lilypond_list_missing_glyphs(args):
     # Run over the list of glyph names in another font file and list
     # the ones not known to this file. Expects one additional
     # argument which is the name of a font file.
@@ -5532,3 +5541,51 @@ elif len(args) == 2 and args[0] == "-lilycheck":
             if not ok:
                 print(name)
     f.close()
+
+def main():
+    parser = argparse.ArgumentParser(description='')
+    parser.add_argument(
+        "--ver", "--version-string",
+        help="Version string to put in output font files")
+    group = parser.add_mutually_exclusive_group()
+    group.add_argument(
+        "--test", action="store_const", dest="action", const=test_glyph,
+        help="Generate renderable Postscript output for a single glyph")
+    group.add_argument(
+        "--testps", action="store_const", dest="action", const=test_ps,
+        help="Generate raw Postscript path for a single glyph")
+    group.add_argument(
+        "--testpsunscaled", action="store_const", dest="action",
+        const=test_ps_unscaled,
+        help="Generate raw Postscript path for a single glyph, exactly as the "
+        "coordinates came out of potrace")
+    group.add_argument(
+        "--lily", action="store_const", dest="action", const=lilypond_output,
+        help="Generate font files for use with GNU Lilypond.")
+    group.add_argument(
+        "--lilymain", action="store_const", dest="action",
+        const=lilypond_output_main,
+        help="Generate just the main font files for GNU Lilypond.")
+    group.add_argument(
+        "--lilybrace", action="store_const", dest="action",
+        const=lilypond_output_brace,
+        help="Generate just the font file of braces for GNU Lilypond.")
+    group.add_argument(
+        "--lilycheck", action="store_const", dest="action",
+        const=lilypond_list_missing_glyphs,
+        help="Scan a Lilypond font file for any glyphs we don't have.")
+    group.add_argument(
+        "--mus", action="store_const", dest="action", const=mus_output,
+        help="Generate a Postscript prologue suitable for SGT's legacy 'mus' "
+        "score formatter.")
+    group.add_argument(
+        "--simple", action="store_const", dest="action", const=simple_output,
+        help="Generate a simple font file you could use in running text.")
+    parser.add_argument("argument", nargs="?",
+                        help=" glyph to use in test modes")
+    parser.set_defaults(verstring="version unavailable")
+    args = parser.parse_args()
+    args.action(args)
+
+if __name__ == '__main__':
+    main()
