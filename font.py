@@ -59,13 +59,6 @@ class GlyphContext:
         print(self.makeps())
         print("grestore showpage")
 
-# Python doesn't have the ?: operator, bah.
-def qc(cond,t,f):
-    if cond:
-        return t
-    else:
-        return f
-
 class container:
     pass
 font = container()
@@ -1309,7 +1302,7 @@ def tmpfn():
     c7.nibdir = c8.nibdir = c3.nibdir
 
     topy = c0.compute_y(0)
-    c0.nib = lambda c,x,y,t,theta: qc(t>0.5, 20, (3, 0, 17, min(17,-17+(y-topy)*1.2)))
+    c0.nib = lambda c,x,y,t,theta: 20 if t>0.5 else (3, 0, 17, min(17,-17+(y-topy)*1.2))
     theta0 = c0.compute_theta(0)
     theta2 = c2.compute_theta(0)
     c1.nib = c2.nib = lambda c,x,y,t,theta: 14+6*cos(pi*(theta-theta0)/(theta2-theta0))
@@ -1580,7 +1573,7 @@ def tmpfn(): # one
 
     y2 = c1.compute_y(1)
     y1 = y2-50 # this value is the same as is used for the serif on the 4
-    serif = lambda y: qc(y<y1,0,26*((y-y1)/(y2-y1))**4)
+    serif = lambda y: 0 if y<y1 else 26*((y-y1)/(y2-y1))**4
     c1.nib = lambda c,x,y,t,theta: (6, 0, 25+serif(y), 25+serif(y))
 
     return cont
@@ -1702,7 +1695,7 @@ def tmpfn(): # four
     y0 = c2.compute_y(0)
     y2 = c2.compute_y(1)
     y1 = y2-50 # this value is the same as is used for the serif on the 1
-    serif = lambda y: qc(y<y1,0,26*((y-y1)/(y2-y1))**4)
+    serif = lambda y: 0 if y<y1 else 26*((y-y1)/(y2-y1))**4
     c2.nib = lambda c,x,y,t,theta: (6, 0, 25+serif(y), min(25+serif(y), -25+(y-y0)/gradient))
     c3.nib = 8
 
@@ -1743,7 +1736,7 @@ def tmpfn(): # five
 
     xr = c5.compute_x(1)
     xl = c5.compute_x(0)
-    taper = lambda x: (qc(x>0, (lambda t: t**4), (lambda t: 0)))(x)
+    taper = lambda x: x**4 if x>0 else 0
     xm = xl + 0.5*(xr-xl)
     c5.nib = lambda c,x,y,t,theta: (6,-pi/2,32*(1-taper((x-xm)/(xr-xm))),0)
 
@@ -1784,7 +1777,7 @@ def tmpfn(): # six
     c2.nib = c3.nib = lambda c,x,y,t,theta: (6, 0, 22*(1-abs((y-ymid2)/yext2)**2.5), 22*(1-abs((y-ymid2)/yext2)**2.5))
 
     ythreshold = c1.compute_y(0.5)
-    c0.nib = c1.nib = lambda c,x,y,t,theta: (6, 0, 22*(1-abs((y-ymid2)/yext2)**2.5), qc(y>ythreshold, 0, 22*(1-abs((y-ymid2)/yext2)**2.5)))
+    c0.nib = c1.nib = lambda c,x,y,t,theta: (6, 0, 22*(1-abs((y-ymid2)/yext2)**2.5), 0 if y>ythreshold else 22*(1-abs((y-ymid2)/yext2)**2.5))
 
     c8.nib = 6
     blob(c8, 1, 'r', 25, 4)
@@ -1822,7 +1815,7 @@ def tmpfn(): # seven
     x2 = c7.compute_x(1)
     x0 = c7.compute_x(0)
     x1 = x2 + 0.4 * (x0-x2)
-    serif = lambda x: qc(x>x1,0,26*((x-x1)/(x2-x1))**4)
+    serif = lambda x: 0 if x>x1 else 26*((x-x1)/(x2-x1))**4
     xc3 = eval(c3.serialise())
     xc7 = eval(c7.serialise())
     xc3.nib = xc7.nib = lambda c,x,y,t,theta: (lambda k: (6,pi/2,k,k))(serif(x))
@@ -1909,7 +1902,7 @@ def tmpfn(): # nine
     c2.nib = c3.nib = lambda c,x,y,t,theta: (6, 0, 22*(1-abs((y-ymid2)/yext2)**2.5), 22*(1-abs((y-ymid2)/yext2)**2.5))
 
     ythreshold = c1.compute_y(0.5)
-    c0.nib = c1.nib = lambda c,x,y,t,theta: (6, 0, qc(y<ythreshold, 0, 22*(1-abs((y-ymid2)/yext2)**2.5)), 22*(1-abs((y-ymid2)/yext2)**2.5))
+    c0.nib = c1.nib = lambda c,x,y,t,theta: (6, 0, 0 if y<ythreshold else 22*(1-abs((y-ymid2)/yext2)**2.5), 22*(1-abs((y-ymid2)/yext2)**2.5))
 
     c8.nib = 6
     blob(c8, 1, 'r', 25, 4)
@@ -2164,7 +2157,7 @@ def tmpfn(): # p
 
     y2 = c2.compute_y(1)
     y1 = y2 - 20
-    serif = lambda y: qc(y<y1,0,26*((y-y1)/(y2-y1))**4)
+    serif = lambda y: 0 if y<y1 else 26*((y-y1)/(y2-y1))**4
     c2.nib = lambda c,x,y,t,theta: (lambda k: (6,0,k,k))(18 + serif(y))
     phi = c1.compute_theta(1)
     psi = c0.compute_theta(0)
@@ -2247,7 +2240,7 @@ def tmpfn(): # z
     x2 = c0.compute_x(0)
     x1 = x2 + 30
     x0 = c0.compute_x(1)
-    serif = lambda x: qc(x>x1,0,13*((x-x1)/(x2-x1))**4)
+    serif = lambda x: 0 if x>x1 else 13*((x-x1)/(x2-x1))**4
     serifangle = 1.15 # radians of the slant at the end of the z's top stroke
     c0.nib = lambda c,x,y,t,theta: (lambda k: (6,1.15,0,k))(min(26 + serif(x), x0-x))
     c1.nib = 6
