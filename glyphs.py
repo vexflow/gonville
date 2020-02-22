@@ -107,6 +107,17 @@ def break_curve(x0,y0, x1,y1, x2,y2, x3,y3):
             #sys.stderr.write("  got %g,%g %g,%g %g,%g %g,%g\n" % curves[-1])
     return curves
 
+def check_call_devnull(*args, **kws):
+    # Wrapper on subprocess.check_call which prints the standard error
+    # of the process if it fails.
+    p = subprocess.Popen(*args, **kws, stdout=subprocess.DEVNULL,
+                         stderr=subprocess.PIPE)
+    _, err = p.communicate()
+    status = p.wait()
+    if status != 0:
+        sys.stderr.write(err)
+        raise subprocess.CalledProcessError(status, args[0])
+
 # Use potrace to compute the PS path outline of any glyph.
 def get_ps_path(char, debug=None):
     path = []
@@ -851,7 +862,8 @@ def lilypond_output(args, do_main_font=True, do_brace_font=True):
         if fontname is not None:
             ffscript += "SetFontNames(\"{n}\",\"{n}\",\"{n}\"); ".format(n=fontname)
         ffscript += "Generate($2)"
-        subprocess.check_call(["fontforge", "-lang=ff", "-c", ffscript, infile, outfile])
+        check_call_devnull(["fontforge", "-lang=ff", "-c",
+                            ffscript, infile, outfile])
 
     def writetables(filepfx, size, subids, subnames, outlines, glyphlist, bracesonly=0):
         fname = filepfx + ".LILF"
@@ -1373,9 +1385,9 @@ def simple_output(args):
         glyphlist[i] = (gid, gid, thiscode, xo, yo, None, None, None, None, props)
 
     writesfd("gonville-simple", "Gonville-Simple", "UnicodeBmp", 65537, outlines, glyphlist)
-    subprocess.check_call(["fontforge", "-lang=ff", "-c",
-                           "Open($1); CorrectDirection(); Generate($2)",
-                           "gonville-simple.sfd", "gonville-simple.otf"])
+    check_call_devnull(["fontforge", "-lang=ff", "-c",
+                        "Open($1); CorrectDirection(); Generate($2)",
+                        "gonville-simple.sfd", "gonville-simple.otf"])
 
 def lilypond_list_missing_glyphs(args):
     # Run over the list of glyph names in another font file and list
@@ -1415,10 +1427,8 @@ def lilypond_list_missing_glyphs(args):
     "scripts.dsignumcongruentiae",
     ]
 
-    subprocess.check_call(["fontforge", "-lang=ff", "-c",
-                           "Open($1); Save($2)", args.argument, "temp.sfd"],
-                          stdout=open(os.devnull, "w"),
-                          stderr=open(os.devnull, "w"))
+    check_call_devnull(["fontforge", "-lang=ff", "-c",
+                        "Open($1); Save($2)", args.argument, "temp.sfd"])
     f = open("temp.sfd", "r")
     while 1:
         s = f.readline()
