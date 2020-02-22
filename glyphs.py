@@ -7,6 +7,7 @@ import math
 import time
 import base64
 import subprocess
+import multiprocessing
 import argparse
 from curves import *
 from font import font, scaledbrace
@@ -229,6 +230,13 @@ def get_ps_path(char, debug=None):
         if c[0] != 'cp':
             bbox = update_bbox(bbox, c[-2], c[-1])
     return bbox, path
+
+def get_ps_path_map_function(glyphname):
+    # Wrapper on get_ps_path suitable for feeding to the unordered
+    # imap function in multiprocessing.Pool. Returns tuples of the
+    # form (name, (bbox, path)), so that you can feed a list of those
+    # tuples directly to dict().
+    return glyphname, get_ps_path(getattr(font, glyphname))
 
 verstring = "version unavailable"
 
@@ -673,13 +681,17 @@ def mus_output(args):
     f.write("/BBox %d dict def\n" % len(encoding))
     f.write("/CharacterDefs %d dict def\n" % len(encoding))
     fontbbox = (None,)*4
+
+    pool = multiprocessing.Pool(args.jobs)
+    char_data = dict(pool.imap_unordered(get_ps_path_map_function, encoding))
+
     for code, name in encoding:
         char = getattr(font, name)
         xrt = lambda x: x * (3600.0 / (40*char.scale)) # potrace's factor of ten, ours of four
         yrt = lambda y: y * (3600.0 / (40*char.scale))
         xat = lambda x: round(xrt(x) - char.origin[0])
         yat = lambda y: round(yrt(y) - char.origin[1])
-        bbox, path = get_ps_path(char)
+        bbox, path = char_data[name]
         f.write("CharacterDefs /.%s {\n" % name)
         g.write("# %s\n" % name)
         output = "newpath"
@@ -926,12 +938,9 @@ def lilypond_output(args, do_main_font=True, do_brace_font=True):
 
         # Construct the PS outlines via potrace, once for each glyph
         # we're actually using.
-        outlines = {}
-        for g in lilyglyphlist:
-            gid = g[0]
-            char = getattr(font, gid)
-            if gid not in outlines:
-                outlines[gid] = get_ps_path(char)
+        pool = multiprocessing.Pool(args.jobs)
+        outlines = dict(pool.imap_unordered(get_ps_path_map_function,
+                                            set(g[0] for g in lilyglyphlist)))
 
         # PAINFUL HACK! Add invisible droppings above and below the
         # digits. This is because LP draws time signatures by
@@ -1099,11 +1108,17 @@ def lilypond_output(args, do_main_font=True, do_brace_font=True):
     if do_brace_font:
         outlines = {}
         bracelist = []
+        gidlist = []
         for i in range(576):
             char = scaledbrace(525 * (151./150)**i)
             gid = "brace%d" % i
+            gidlist.append(gid)
             setattr(font, gid, char)
-            outlines[gid] = get_ps_path(char)
+
+        pool = multiprocessing.Pool(args.jobs)
+        outlines = dict(pool.imap_unordered(get_ps_path_map_function, gidlist))
+
+        for gid in gidlist:
             x0, y0, x1, y1 = outlines[gid][0]
             yh = (y0+y1)/2.0
             bracelist.append((gid, gid, 0xe100+i, x1, yh, x1, yh))
@@ -1351,7 +1366,11 @@ def simple_output(args):
     for i in range(0x7f, 0xa1):
         codes[i] = None # avoid these code points
 
-    outlines = {}
+    pool = multiprocessing.Pool(args.jobs)
+    gidlist = [t[0] if type(t) == tuple else t
+               for t in glyphlist]
+    outlines = dict(pool.imap_unordered(get_ps_path_map_function, gidlist))
+
     for i in range(len(glyphlist)):
         gid = glyphlist[i]
 
@@ -1366,9 +1385,6 @@ def simple_output(args):
         codes[thiscode] = gid
 
         char = getattr(font, gid)
-
-        if gid not in outlines:
-            outlines[gid] = get_ps_path(char)
 
         xo, yo = char.origin
         if (xo,yo) == (1000,1000):
@@ -1466,6 +1482,9 @@ def main():
         help="Version string to put in output font files")
     parser.add_argument(
         "--svgfilter", help="Postprocessing filter for SVG font output")
+    parser.add_argument(
+        "-j", "--jobs", type=int,
+        help="Number of potrace jobs to run concurrently")
     group = parser.add_mutually_exclusive_group()
     group.add_argument(
         "--test", action="store_const", dest="action", const=test_glyph,
@@ -1504,6 +1523,10 @@ def main():
                         help=" glyph to use in test modes")
     parser.set_defaults(verstring="version unavailable")
     args = parser.parse_args()
+
+    global verstring
+    verstring = args.verstring
+
     args.action(args)
 
 if __name__ == '__main__':
