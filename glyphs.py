@@ -1118,7 +1118,7 @@ def lilypond_output(args, do_main_font=True, do_brace_font=True):
         pool = multiprocessing.Pool(args.jobs)
         outlines = dict(pool.imap_unordered(get_ps_path_map_function, gidlist))
 
-        for gid in gidlist:
+        for i, gid in enumerate(gidlist):
             x0, y0, x1, y1 = outlines[gid][0]
             yh = (y0+y1)/2.0
             bracelist.append((gid, gid, 0xe100+i, x1, yh, x1, yh))
