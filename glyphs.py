@@ -368,6 +368,10 @@ def system(cmd):
     ret = os.system(cmd)
     assert ret == 0
 
+class container:
+    pass
+font = container()
+
 # ----------------------------------------------------------------------
 # G clef (treble).
 #
@@ -439,16 +443,16 @@ def tmpfn():
     cont.hy = 1000 - (cont.origin[1] * cont.scale / 3600.) # I should probably work this out better
 
     return cont
-clefG = tmpfn()
+font.clefG = tmpfn()
 
 def tmpfn():
     cont = GlyphContext()
-    cont.extra = ".8 dup scale", clefG
-    cont.scale = clefG.scale
-    cont.origin = clefG.origin
-    cont.hy = .8 * clefG.hy
+    cont.extra = ".8 dup scale", font.clefG
+    cont.scale = font.clefG.scale
+    cont.origin = font.clefG.origin
+    cont.hy = .8 * font.clefG.hy
     return cont
-clefGsmall = tmpfn()
+font.clefGsmall = tmpfn()
 
 # ----------------------------------------------------------------------
 # F clef (bass).
@@ -481,14 +485,14 @@ def tmpfn():
     cont.hy = (417+542)/2.0
 
     return cont
-clefF = tmpfn()
+font.clefF = tmpfn()
 
 def tmpfn():
     cont = GlyphContext()
-    cont.extra = ".8 dup scale", clefF
-    cont.hy = .8 * clefF.hy
+    cont.extra = ".8 dup scale", font.clefF
+    cont.hy = .8 * font.clefF.hy
     return cont
-clefFsmall = tmpfn()
+font.clefFsmall = tmpfn()
 
 # ----------------------------------------------------------------------
 # C clef (alto, tenor).
@@ -574,13 +578,13 @@ def tmpfn():
     "625 206 641 742 box "
 
     return cont
-clefC = tmpfn()
+font.clefC = tmpfn()
 
 def tmpfn():
     cont = GlyphContext()
-    cont.extra = ".8 dup scale", clefC
+    cont.extra = ".8 dup scale", font.clefC
     return cont
-clefCsmall = tmpfn()
+font.clefCsmall = tmpfn()
 
 # ----------------------------------------------------------------------
 # Percussion 'clef'.
@@ -593,13 +597,13 @@ def tmpfn():
     "newpath 530 368 moveto 530 632 lineto " + \
     "590 632 lineto 590 368 lineto closepath fill "
     return cont
-clefperc = tmpfn()
+font.clefperc = tmpfn()
 
 def tmpfn():
     cont = GlyphContext()
-    cont.extra = ".8 dup scale", clefperc
+    cont.extra = ".8 dup scale", font.clefperc
     return cont
-clefpercsmall = tmpfn()
+font.clefpercsmall = tmpfn()
 
 # ----------------------------------------------------------------------
 # Tablature 'clef': just the letters "TAB", written vertically in a
@@ -651,14 +655,14 @@ def tmpfn():
     cont.hy = (c1.compute_y(0) + c2.compute_y(0)) / 2.0
 
     return cont
-clefTAB = tmpfn()
+font.clefTAB = tmpfn()
 
 def tmpfn():
     cont = GlyphContext()
-    cont.extra = ".8 dup scale", clefTAB
-    cont.hy = .8 * clefTAB.hy
+    cont.extra = ".8 dup scale", font.clefTAB
+    cont.hy = .8 * font.clefTAB.hy
     return cont
-clefTABsmall = tmpfn()
+font.clefTABsmall = tmpfn()
 
 # ----------------------------------------------------------------------
 # Quaver tails.
@@ -692,8 +696,8 @@ def clipdn(tail):
     clip = clippath([tail.c0, tail.c1, (900,100), (900,1900), (100,1900), (100,900)])
     cont.extra = "gsave 0 -%g translate newpath" % quavertaildispdn, clip, \
     "clip 0 %g translate" % quavertaildispdn, tail, "grestore"
-    cont.ox = tailquaverdn.ox
-    cont.oy = tailquaverdn.oy
+    cont.ox = font.tailquaverdn.ox
+    cont.oy = font.tailquaverdn.oy
     return cont
 
 def multiup(n, tail):
@@ -753,7 +757,7 @@ def tmpfn():
     cont.origin = cx * 3600. / cont.scale - 12, (1000-cont.oy) * 3600. / cont.scale
 
     return cont
-tailquaverup = tmpfn()
+font.tailquaverup = tmpfn()
 
 def tmpfn():
     # Single tail for an up-pointing semiquaver.
@@ -790,7 +794,7 @@ def tmpfn():
     cont.origin = cx * 3600. / cont.scale - 12, (1000-cont.oy) * 3600. / cont.scale
 
     return cont
-tailsemiup = multiup(2, tmpfn())
+font.tailsemiup = multiup(2, tmpfn())
 
 def tmpfn():
     # Single tail for an up-pointing demisemiquaver.
@@ -827,7 +831,7 @@ def tmpfn():
     cont.origin = cx * 3600. / cont.scale - 12, (1000-cont.oy) * 3600. / cont.scale
 
     return cont
-taildemiup = multiup(3, tmpfn())
+font.taildemiup = multiup(3, tmpfn())
 
 def tmpfn():
     # Single tail for an up-pointing hemidemisemiquaver.
@@ -864,7 +868,7 @@ def tmpfn():
     cont.origin = cx * 3600. / cont.scale - 12, (1000-cont.oy) * 3600. / cont.scale
 
     return cont
-tailhemiup = multiup(4, tmpfn())
+font.tailhemiup = multiup(4, tmpfn())
 
 def tmpfn():
     # Single tail for an up-pointing quasihemidemisemiquaver.
@@ -901,7 +905,7 @@ def tmpfn():
     cont.origin = cx * 3600. / cont.scale - 12, (1000-cont.oy) * 3600. / cont.scale
 
     return cont
-tailquasiup = multiup(5, tmpfn())
+font.tailquasiup = multiup(5, tmpfn())
 
 def tmpfn():
     # Full-size tail for a quaver with a down-pointing stem.
@@ -935,7 +939,7 @@ def tmpfn():
     cont.origin = cx * 3600. / cont.scale - 12, (1000-cont.oy) * 3600. / cont.scale
 
     return cont
-tailquaverdn = tmpfn()
+font.tailquaverdn = tmpfn()
 
 def tmpfn():
     # Single tail for a down-pointing semiquaver.
@@ -972,7 +976,7 @@ def tmpfn():
     cont.origin = cx * 3600. / cont.scale - 12, (1000-cont.oy) * 3600. / cont.scale
 
     return cont
-tailsemidn = multidn(2, tmpfn())
+font.tailsemidn = multidn(2, tmpfn())
 
 def tmpfn():
     # Single tail for a down-pointing demisemiquaver.
@@ -1009,7 +1013,7 @@ def tmpfn():
     cont.origin = cx * 3600. / cont.scale - 12, (1000-cont.oy) * 3600. / cont.scale
 
     return cont
-taildemidn = multidn(3, tmpfn())
+font.taildemidn = multidn(3, tmpfn())
 
 def tmpfn():
     # Single tail for a down-pointing hemidemisemiquaver.
@@ -1046,7 +1050,7 @@ def tmpfn():
     cont.origin = cx * 3600. / cont.scale - 12, (1000-cont.oy) * 3600. / cont.scale
 
     return cont
-tailhemidn = multidn(4, tmpfn())
+font.tailhemidn = multidn(4, tmpfn())
 
 def tmpfn():
     # Single tail for a down-pointing quasihemidemisemiquaver.
@@ -1083,7 +1087,7 @@ def tmpfn():
     cont.origin = cx * 3600. / cont.scale - 12, (1000-cont.oy) * 3600. / cont.scale
 
     return cont
-tailquasidn = multidn(5, tmpfn())
+font.tailquasidn = multidn(5, tmpfn())
 
 # ----------------------------------------------------------------------
 # Minim note head.
@@ -1208,7 +1212,7 @@ def tmpfn():
     cont.ay = 472 - b/sqrt(c)/denom
 
     return cont
-headminim = tmpfn()
+font.headminim = tmpfn()
 
 # ----------------------------------------------------------------------
 # Filled note head, for crotchet/quaver/semiquaver/etc.
@@ -1221,9 +1225,9 @@ def tmpfn():
     "gsave 527 472 translate newpath " + \
     "matrix currentmatrix 76 67 scale [1 0 -.3 1 0 0] concat 1 0 moveto 0 0 1 0 360 arc closepath setmatrix " + \
     "gsave fill grestore 8 setlinewidth stroke grestore"
-    cont.ay = headminim.ay
+    cont.ay = font.headminim.ay
     return cont
-headcrotchet = tmpfn()
+font.headcrotchet = tmpfn()
 
 # ----------------------------------------------------------------------
 # Semibreve head. This is another nested pair of ellipses. The outer
@@ -1253,7 +1257,7 @@ def tmpfn():
     "matrix currentmatrix -%g rotate 1 %g scale %g 0 moveto 0 0 %g 360 0 arcn closepath setmatrix " % (angle,sq,r,r) + \
     "gsave fill grestore 8 setlinewidth stroke grestore"
     return cont
-semibreve = tmpfn()
+font.semibreve = tmpfn()
 
 # A breve is just a semibreve with bars down the sides.
 def tmpfn():
@@ -1267,9 +1271,9 @@ def tmpfn():
 
     cont.default_nib = 10
 
-    cont.extra = semibreve
+    cont.extra = font.semibreve
     return cont
-breve = tmpfn()
+font.breve = tmpfn()
 
 # ----------------------------------------------------------------------
 # Shaped note heads used for drum and other notation.
@@ -1290,7 +1294,7 @@ def tmpfn():
     cont.default_nib = lambda c,x,y,t,theta: (6, 0, (527-x)/3, 0)
 
     return cont
-diamondsemi = tmpfn()
+font.diamondsemi = tmpfn()
 def tmpfn():
     cont = GlyphContext()
     # Saved data from gui.py
@@ -1309,7 +1313,7 @@ def tmpfn():
     c3.nib = lambda c,x,y,t,theta: (6, -53*pi/180, min(12, 300*t, 100*(1-t)), 0)
 
     return cont
-diamondminim = tmpfn()
+font.diamondminim = tmpfn()
 def tmpfn():
     cont = GlyphContext()
     # Saved data from gui.py
@@ -1327,7 +1331,7 @@ def tmpfn():
     cont.default_nib = lambda c,x,y,t,theta: ptp_nib(c,x,y,t,theta,527,472,6)
 
     return cont
-diamondcrotchet = tmpfn()
+font.diamondcrotchet = tmpfn()
 def tmpfn():
     cont = GlyphContext()
     # Saved data from gui.py
@@ -1346,7 +1350,7 @@ def tmpfn():
     c2.nib = lambda c,x,y,t,theta: (6, 0, min((527-x)/3, (ybase-y)*angle), 0)
 
     return cont
-trianglesemi = tmpfn()
+font.trianglesemi = tmpfn()
 def tmpfn():
     cont = GlyphContext()
     # Saved data from gui.py
@@ -1370,7 +1374,7 @@ def tmpfn():
     cont.iy = 2*472 - cont.ay
 
     return cont
-triangleminim = tmpfn()
+font.triangleminim = tmpfn()
 def tmpfn():
     cont = GlyphContext()
     # Saved data from gui.py
@@ -1388,7 +1392,7 @@ def tmpfn():
     cont.ay = c0.compute_y(0)
     cont.iy = 2*472 - cont.ay
     return cont
-trianglecrotchet = tmpfn()
+font.trianglecrotchet = tmpfn()
 def tmpfn():
     cont = GlyphContext()
     outerw = 9
@@ -1401,7 +1405,7 @@ def tmpfn():
     "grestore"]
     cont.ay = ay
     return cont
-crosssemi = tmpfn()
+font.crosssemi = tmpfn()
 def tmpfn():
     cont = GlyphContext()
     outerw = 9
@@ -1414,7 +1418,7 @@ def tmpfn():
     "grestore"]
     cont.ay = 472 - ay
     return cont
-crossminim = tmpfn()
+font.crossminim = tmpfn()
 def tmpfn():
     cont = GlyphContext()
     r = 12
@@ -1425,7 +1429,7 @@ def tmpfn():
     "grestore"]
     cont.ay = 472 - ay
     return cont
-crosscrotchet = tmpfn()
+font.crosscrotchet = tmpfn()
 def tmpfn():
     cont = GlyphContext()
     r = 12
@@ -1436,7 +1440,7 @@ def tmpfn():
     "%g setlinewidth stroke" % (2*r),
     "grestore"]
     return cont
-crosscircle = tmpfn()
+font.crosscircle = tmpfn()
 
 def tmpfn():
     cont = GlyphContext()
@@ -1450,7 +1454,7 @@ def tmpfn():
     "grestore"]
     cont.ay = 472 - ay
     return cont
-slashsemi = tmpfn()
+font.slashsemi = tmpfn()
 def tmpfn():
     cont = GlyphContext()
     r = 12
@@ -1463,7 +1467,7 @@ def tmpfn():
     "grestore"]
     cont.ay = 472 - ay
     return cont
-slashminim = tmpfn()
+font.slashminim = tmpfn()
 def tmpfn():
     cont = GlyphContext()
     r = 12
@@ -1476,7 +1480,7 @@ def tmpfn():
     "grestore"]
     cont.ay = 472 - ay
     return cont
-slashcrotchet = tmpfn()
+font.slashcrotchet = tmpfn()
 
 # ----------------------------------------------------------------------
 # Trill sign. There seem to be two standard-ish designs for this:
@@ -1522,7 +1526,7 @@ def tmpfn():
     c1.nib = c2.nib = lambda c,x,y,t,theta: 14+6*cos(pi*(theta-theta0)/(theta2-theta0))
 
     return cont
-trill = tmpfn()
+font.trill = tmpfn()
 
 # ----------------------------------------------------------------------
 # Crotchet rest. The top section is done by curve-following, drawing
@@ -1565,7 +1569,7 @@ def tmpfn():
     c2.nib = lambda c,x,y,t,theta: (6, phia, (1-(1-t)**2)*40, 0)
     c3.nib = lambda c,x,y,t,theta: (6, phia, (1-t**2)*40, 0)
     return cont
-restcrotchet = tmpfn()
+font.restcrotchet = tmpfn()
 
 # ----------------------------------------------------------------------
 # Quaver rest and friends.
@@ -1586,7 +1590,7 @@ def tmpfn():
     cont.origin = 1000, ((1000-cont.cy) * 3600 / cont.scale)
 
     return cont
-restquaver = tmpfn()
+font.restquaver = tmpfn()
 def tmpfn():
     cont = GlyphContext()
     # Saved data from gui.py
@@ -1605,7 +1609,7 @@ def tmpfn():
     cont.origin = 1000-(39*1800/cont.scale), ((1000-cont.cy) * 3600 / cont.scale)
 
     return cont
-restsemi = tmpfn()
+font.restsemi = tmpfn()
 def tmpfn():
     cont = GlyphContext()
     # Saved data from gui.py
@@ -1626,7 +1630,7 @@ def tmpfn():
     cont.origin = 1000-(39*2*1800/cont.scale), ((1000-cont.cy) * 3600 / cont.scale)
 
     return cont
-restdemi = tmpfn()
+font.restdemi = tmpfn()
 def tmpfn():
     cont = GlyphContext()
     # Saved data from gui.py
@@ -1649,7 +1653,7 @@ def tmpfn():
     cont.origin = 1000-(39*3*1800/cont.scale), ((1000-cont.cy) * 3600 / cont.scale)
 
     return cont
-resthemi = tmpfn()
+font.resthemi = tmpfn()
 def tmpfn():
     cont = GlyphContext()
     # Saved data from gui.py
@@ -1674,16 +1678,16 @@ def tmpfn():
     cont.origin = 1000-(39*4*1800/cont.scale), ((1000-cont.cy) * 3600 / cont.scale)
 
     return cont
-restquasi = tmpfn()
+font.restquasi = tmpfn()
 
 def tmpfn():
     cont = GlyphContext()
 
     cont.before = "1000 0 translate -1 1 scale"
-    cont.extra = restquaver
+    cont.extra = font.restquaver
 
     return cont
-restcrotchetx = tmpfn()
+font.restcrotchetx = tmpfn()
 
 # ----------------------------------------------------------------------
 # Rectangular rests (minim/semibreve, breve, longa, double longa).
@@ -1695,7 +1699,7 @@ def tmpfn():
     "newpath 440 439 moveto 440 505 lineto 614 505 lineto 614 439 lineto closepath fill "
 
     return cont
-restminim = tmpfn()
+font.restminim = tmpfn()
 
 def tmpfn():
     cont = GlyphContext()
@@ -1704,7 +1708,7 @@ def tmpfn():
     "newpath 452 406 moveto 452 538 lineto 602 538 lineto 602 406 lineto closepath fill "
 
     return cont
-restbreve = tmpfn()
+font.restbreve = tmpfn()
 
 def tmpfn():
     cont = GlyphContext()
@@ -1713,37 +1717,38 @@ def tmpfn():
     "newpath 452 406 moveto 452 670 lineto 602 670 lineto 602 406 lineto closepath fill "
 
     return cont
-restlonga = tmpfn()
+font.restlonga = tmpfn()
 
 def tmpfn():
     cont = GlyphContext()
 
-    cont.extra = restlonga, "-300 0 translate", restlonga
+    cont.extra = (font.restlonga, "-300 0 translate",
+                  font.restlonga)
 
     return cont
-restdbllonga = tmpfn()
+font.restdbllonga = tmpfn()
 
 def tmpfn():
     cont = GlyphContext()
 
-    cont.extra = restminim, \
+    cont.extra = font.restminim, \
     "newpath 390 505 moveto 664 505 lineto 12 setlinewidth 1 setlinecap stroke"
 
     cont.oy = 505
 
     return cont
-restminimo = tmpfn()
+font.restminimo = tmpfn()
 
 def tmpfn():
     cont = GlyphContext()
 
-    cont.extra = restminim, \
+    cont.extra = font.restminim, \
     "newpath 390 439 moveto 664 439 lineto 12 setlinewidth 1 setlinecap stroke"
 
     cont.oy = 439
 
     return cont
-restsemibreveo = tmpfn()
+font.restsemibreveo = tmpfn()
 
 # ----------------------------------------------------------------------
 # Digits for time signatures.
@@ -1774,7 +1779,7 @@ def tmpfn(): # zero
     cont.default_nib = lambda c,x,y,t,theta: (6, 0, 25*(1-abs((y-ymid)/yext)**2.5), 25*(1-abs((y-ymid)/yext)**2.5))
 
     return cont
-big0 = tmpfn()
+font.big0 = tmpfn()
 def tmpfn(): # one
     cont = GlyphContext()
     # Saved data from gui.py
@@ -1790,7 +1795,7 @@ def tmpfn(): # one
     c1.nib = lambda c,x,y,t,theta: (6, 0, 25+serif(y), 25+serif(y))
 
     return cont
-big1 = tmpfn()
+font.big1 = tmpfn()
 def tmpfn(): # two
 
     # At the top of the 2 I use the same hack as I did for the 3 to
@@ -1836,7 +1841,7 @@ def tmpfn(): # two
     blob(c5, 1, 'l', 25, 4)
 
     return cont
-big2 = tmpfn()
+font.big2 = tmpfn()
 def tmpfn(): # three
     cont = GlyphContext()
 
@@ -1883,7 +1888,7 @@ def tmpfn(): # three
     blob(c5, 1, 'l', 25, 4)
 
     return cont
-big3 = tmpfn()
+font.big3 = tmpfn()
 def tmpfn(): # four
     # Secondary context
     cont = GlyphContext()
@@ -1919,7 +1924,7 @@ def tmpfn(): # four
     cont.gy = (cont.ty + cont.by) / 2 + (250*cont.scale/3600.0)
 
     return cont
-big4 = tmpfn()
+font.big4 = tmpfn()
 def tmpfn(): # five
     cont = GlyphContext()
 
@@ -1956,7 +1961,7 @@ def tmpfn(): # five
     blob(c0, 0, 'r', 25, 4)
 
     return cont
-big5 = tmpfn()
+font.big5 = tmpfn()
 def tmpfn(): # six
     cont = GlyphContext()
     # Saved data from gui.py
@@ -1999,7 +2004,7 @@ def tmpfn(): # six
     # on the 3.
 
     return cont
-big6 = tmpfn()
+font.big6 = tmpfn()
 def tmpfn(): # seven
 
     cont = GlyphContext()
@@ -2034,7 +2039,7 @@ def tmpfn(): # seven
     xc3.nib = xc7.nib = lambda c,x,y,t,theta: (lambda k: (6,pi/2,k,k))(serif(x))
 
     return cont
-big7 = tmpfn()
+font.big7 = tmpfn()
 def tmpfn(): # eight
 
     # The traditional 8 just contains _too_ many ellipse-like curves
@@ -2081,7 +2086,7 @@ def tmpfn(): # eight
     c7.nib = lambda c,x,y,t,theta: (lambda x1,x2: ((lambda k: (8, 0, k, 0))(9*((max(x1,x2)-x)/abs(x2-x1)))))(c.compute_x(0),c.compute_x(1))
 
     return cont
-big8 = tmpfn()
+font.big8 = tmpfn()
 def tmpfn(): # nine
     cont = GlyphContext()
     # Saved data from gui.py
@@ -2124,7 +2129,7 @@ def tmpfn(): # nine
     # on the 3. (Well, recopying from the 6 if I do.)
 
     return cont
-big9 = tmpfn()
+font.big9 = tmpfn()
 
 def tmpfn():
     cont = GlyphContext()
@@ -2136,7 +2141,7 @@ def tmpfn():
     cont.default_nib = 12
 
     return cont
-asciiplus = tmpfn()
+font.asciiplus = tmpfn()
 def tmpfn():
     cont = GlyphContext()
     # Saved data from gui.py
@@ -2146,7 +2151,7 @@ def tmpfn():
     cont.default_nib = 12
 
     return cont
-asciiminus = tmpfn()
+font.asciiminus = tmpfn()
 def tmpfn():
     cont = GlyphContext()
     # Saved data from gui.py
@@ -2158,17 +2163,19 @@ def tmpfn():
     blob(c0, 0, 'l', 5, 0)
 
     return cont
-asciicomma = tmpfn()
+font.asciicomma = tmpfn()
 def tmpfn():
     cont = GlyphContext()
 
     cont.extra = "newpath 500 439 34 0 360 arc fill"
 
     return cont
-asciiperiod = tmpfn()
-for x in big0,big1,big2,big3,big5,big6,big7,big8,big9,\
-         asciiplus,asciiminus,asciicomma,asciiperiod:
-    x.ty,x.by,x.gy = big4.ty,big4.by,big4.gy
+font.asciiperiod = tmpfn()
+for x in [getattr(font, name) for name in
+          ['big0','big1','big2','big3','big5','big6','big7','big8','big9',
+           'asciiplus','asciiminus','asciicomma','asciiperiod']]:
+    x.ty,x.by,x.gy = (font.big4.ty, font.big4.by,
+                      font.big4.gy)
 
 # ----------------------------------------------------------------------
 # The small digits used for ntuplets and fingering marks. Scaled and
@@ -2176,54 +2183,54 @@ for x in big0,big1,big2,big3,big5,big6,big7,big8,big9,\
 
 def tmpfn():
     cont = GlyphContext()
-    cont.extra = "gsave 480 480 translate 0.6 0.72 scale [1 0 -.3 1 0 0] concat -480 -480 translate", big0, "grestore"
+    cont.extra = "gsave 480 480 translate 0.6 0.72 scale [1 0 -.3 1 0 0] concat -480 -480 translate", font.big0, "grestore"
     return cont
-small0 = tmpfn()
+font.small0 = tmpfn()
 def tmpfn():
     cont = GlyphContext()
-    cont.extra = "gsave 480 480 translate 0.6 0.72 scale [1 0 -.3 1 0 0] concat -480 -480 translate", big1, "grestore"
+    cont.extra = "gsave 480 480 translate 0.6 0.72 scale [1 0 -.3 1 0 0] concat -480 -480 translate", font.big1, "grestore"
     return cont
-small1 = tmpfn()
+font.small1 = tmpfn()
 def tmpfn():
     cont = GlyphContext()
-    cont.extra = "gsave 480 480 translate 0.6 0.72 scale [1 0 -.3 1 0 0] concat -480 -480 translate", big2, "grestore"
+    cont.extra = "gsave 480 480 translate 0.6 0.72 scale [1 0 -.3 1 0 0] concat -480 -480 translate", font.big2, "grestore"
     return cont
-small2 = tmpfn()
+font.small2 = tmpfn()
 def tmpfn():
     cont = GlyphContext()
-    cont.extra = "gsave 480 480 translate 0.6 0.72 scale [1 0 -.3 1 0 0] concat -480 -480 translate", big3, "grestore"
+    cont.extra = "gsave 480 480 translate 0.6 0.72 scale [1 0 -.3 1 0 0] concat -480 -480 translate", font.big3, "grestore"
     return cont
-small3 = tmpfn()
+font.small3 = tmpfn()
 def tmpfn():
     cont = GlyphContext()
-    cont.extra = "gsave 480 480 translate 0.6 0.72 scale [1 0 -.3 1 0 0] concat -480 -480 translate", big4, "grestore"
+    cont.extra = "gsave 480 480 translate 0.6 0.72 scale [1 0 -.3 1 0 0] concat -480 -480 translate", font.big4, "grestore"
     return cont
-small4 = tmpfn()
+font.small4 = tmpfn()
 def tmpfn():
     cont = GlyphContext()
-    cont.extra = "gsave 480 480 translate 0.6 0.72 scale [1 0 -.3 1 0 0] concat -480 -480 translate", big5, "grestore"
+    cont.extra = "gsave 480 480 translate 0.6 0.72 scale [1 0 -.3 1 0 0] concat -480 -480 translate", font.big5, "grestore"
     return cont
-small5 = tmpfn()
+font.small5 = tmpfn()
 def tmpfn():
     cont = GlyphContext()
-    cont.extra = "gsave 480 480 translate 0.6 0.72 scale [1 0 -.3 1 0 0] concat -480 -480 translate", big6, "grestore"
+    cont.extra = "gsave 480 480 translate 0.6 0.72 scale [1 0 -.3 1 0 0] concat -480 -480 translate", font.big6, "grestore"
     return cont
-small6 = tmpfn()
+font.small6 = tmpfn()
 def tmpfn():
     cont = GlyphContext()
-    cont.extra = "gsave 480 480 translate 0.6 0.72 scale [1 0 -.3 1 0 0] concat -480 -480 translate", big7, "grestore"
+    cont.extra = "gsave 480 480 translate 0.6 0.72 scale [1 0 -.3 1 0 0] concat -480 -480 translate", font.big7, "grestore"
     return cont
-small7 = tmpfn()
+font.small7 = tmpfn()
 def tmpfn():
     cont = GlyphContext()
-    cont.extra = "gsave 480 480 translate 0.6 0.72 scale [1 0 -.3 1 0 0] concat -480 -480 translate", big8, "grestore"
+    cont.extra = "gsave 480 480 translate 0.6 0.72 scale [1 0 -.3 1 0 0] concat -480 -480 translate", font.big8, "grestore"
     return cont
-small8 = tmpfn()
+font.small8 = tmpfn()
 def tmpfn():
     cont = GlyphContext()
-    cont.extra = "gsave 480 480 translate 0.6 0.72 scale [1 0 -.3 1 0 0] concat -480 -480 translate", big9, "grestore"
+    cont.extra = "gsave 480 480 translate 0.6 0.72 scale [1 0 -.3 1 0 0] concat -480 -480 translate", font.big9, "grestore"
     return cont
-small9 = tmpfn()
+font.small9 = tmpfn()
 
 # ----------------------------------------------------------------------
 # The big C for common time signature.
@@ -2246,7 +2253,7 @@ def tmpfn():
     blob(c0, 0, 'r', 32, 8)
 
     return cont
-timeC = tmpfn()
+font.timeC = tmpfn()
 def tmpfn():
     cont = GlyphContext()
     # Saved data from gui.py
@@ -2255,10 +2262,10 @@ def tmpfn():
 
     cont.default_nib = 8
 
-    cont.extra = timeC
+    cont.extra = font.timeC
 
     return cont
-timeCbar = tmpfn()
+font.timeCbar = tmpfn()
 
 # ----------------------------------------------------------------------
 # Dynamics marks (f,m,p,s,z).
@@ -2300,7 +2307,7 @@ def tmpfn(): # m (we do this one first to define the baseline)
     cont.rx = 751 - (-49.53 - -87.53) * cont.scale / 3600.0
 
     return cont
-dynamicm = tmpfn()
+font.dynamicm = tmpfn()
 def tmpfn(): # f
     cont = GlyphContext()
     # Saved data from gui.py
@@ -2341,12 +2348,12 @@ def tmpfn(): # f
     blob(c0, 0, 'r', 20, 8)
     blob(c4, 1, 'r', 20, 8)
 
-    cont.by = dynamicm.by
+    cont.by = font.dynamicm.by
     cont.lx = 496.7 + (-81.74 - -86.74) * cont.scale / 3600.0
     cont.rx = 657.7 - (-139.36 - -165.36) * cont.scale / 3600.0
 
     return cont
-dynamicf = tmpfn()
+font.dynamicf = tmpfn()
 def tmpfn(): # p
     cont = GlyphContext()
 
@@ -2378,12 +2385,12 @@ def tmpfn(): # p
     shear = lambda theta: (lambda dx,dy: atan2(-dy,dx+gamma*dy))(cos(theta),-sin(theta))
     cont.default_nib = lambda c,x,y,t,theta: 12-9*sin(shear(theta))
 
-    cont.by = dynamicm.by
+    cont.by = font.dynamicm.by
     cont.lx = 510.4 + (-23.26 - -38.26) * cont.scale / 3600.0
     cont.rx = 690.615 - (-51.72 - -28.72) * cont.scale / 3600.0
 
     return cont
-dynamicp = tmpfn()
+font.dynamicp = tmpfn()
 def tmpfn(): # r
     cont = GlyphContext()
 
@@ -2403,12 +2410,12 @@ def tmpfn(): # r
     c0.nib = c1.nib = lambda c,x,y,t,theta: (lambda k: 4+k)(15*cos(pi/2*(theta-phi)/(psi-phi))**2)
     c3.nib = lambda c,x,y,t,theta: (lambda k: 8+k)(15*cos(pi/2*(theta-phi)/(psi-phi))**2)
 
-    cont.by = dynamicm.by
+    cont.by = font.dynamicm.by
     cont.lx = 557 + (-18.93 - 58.07) * cont.scale / 3600.0
     cont.rx = 670.187 - (-66.39 - -57.39) * cont.scale / 3600.0
 
     return cont
-dynamicr = tmpfn()
+font.dynamicr = tmpfn()
 def tmpfn(): # s
 
     cont = GlyphContext()
@@ -2427,12 +2434,12 @@ def tmpfn(): # s
     blob(c0, 0, 'r', 12, 7)
     blob(c3, 1, 'r', 12, 7)
 
-    cont.by = dynamicm.by
+    cont.by = font.dynamicm.by
     cont.lx = 529 + (-0.36 - 52.64) * cont.scale / 3600.0
     cont.rx = 628.788 - (-36.35 - -51.35) * cont.scale / 3600.0
 
     return cont
-dynamics = tmpfn()
+font.dynamics = tmpfn()
 def tmpfn(): # z
 
     cont = GlyphContext()
@@ -2474,13 +2481,13 @@ def tmpfn(): # z
     c4.nib = 6
     blob(c4, 1, 'l', 12, 8)
 
-    cont.by = dynamicm.by
+    cont.by = font.dynamicm.by
     cont.lx = 533 + (-0.2 - 22.8) * cont.scale / 3600.0
     cont.rx = 650.1 - (-65.44 - -42.44) * cont.scale / 3600.0
 
     return cont
-dynamicz = tmpfn()
-for x in dynamicf, dynamicm, dynamicp, dynamicr, dynamics, dynamicz:
+font.dynamicz = tmpfn()
+for x in [getattr(font, "dynamic"+letter) for letter in "fmprsz"]:
     x.origin = (x.by * 3600. / x.scale, x.lx * 3600. / x.scale)
     x.width = x.rx - x.lx
 
@@ -2498,15 +2505,16 @@ def tmpfn():
     cont.default_nib = 10
 
     return cont
-accent = tmpfn()
+font.accent = tmpfn()
 
 def tmpfn():
     cont = GlyphContext()
 
-    cont.extra = accent, "800 0 translate -1 1 scale", accent
+    cont.extra = (font.accent, "800 0 translate -1 1 scale",
+                  font.accent)
 
     return cont
-espressivo = tmpfn()
+font.espressivo = tmpfn()
 
 # ----------------------------------------------------------------------
 # Miscellaneous articulation marks.
@@ -2521,7 +2529,7 @@ def tmpfn(): # stopping
     cont.default_nib = 8
 
     return cont
-stopping = tmpfn()
+font.stopping = tmpfn()
 
 def tmpfn(): # legato
     cont = GlyphContext()
@@ -2533,7 +2541,7 @@ def tmpfn(): # legato
     cont.ly = c0.compute_y(0.5)
 
     return cont
-legato = tmpfn()
+font.legato = tmpfn()
 
 def tmpfn(): # staccato
     cont = GlyphContext()
@@ -2541,27 +2549,28 @@ def tmpfn(): # staccato
     cont.extra = "newpath 527 446 26 0 360 arc fill "
 
     return cont
-staccato = tmpfn()
+font.staccato = tmpfn()
 
 def tmpfn(): # 'portato' - a staccato stacked on a legato
     cont = GlyphContext()
 
-    cont.extra = legato, "0 -54 translate", staccato
+    cont.extra = (font.legato, "0 -54 translate",
+                  font.staccato)
 
-    cont.ly = legato.ly
+    cont.ly = font.legato.ly
 
     return cont
-portatoup = tmpfn()    
+font.portatoup = tmpfn()    
 
 def tmpfn(): # portato, the other way up
     cont = GlyphContext()
 
-    cont.extra = "0 1000 translate 1 -1 scale", portatoup
+    cont.extra = "0 1000 translate 1 -1 scale", font.portatoup
 
-    cont.ly = 1000 - portatoup.ly
+    cont.ly = 1000 - font.portatoup.ly
 
     return cont
-portatodn = tmpfn()    
+font.portatodn = tmpfn()    
 
 def tmpfn(): # staccatissimo
     cont = GlyphContext()
@@ -2569,7 +2578,7 @@ def tmpfn(): # staccatissimo
     cont.extra = "newpath 498 381 moveto 526 478 lineto 554 381 lineto closepath fill "
 
     return cont
-staccatissdn = tmpfn()
+font.staccatissdn = tmpfn()
 
 def tmpfn(): # staccatissimo pointing the other way
     cont = GlyphContext()
@@ -2577,7 +2586,7 @@ def tmpfn(): # staccatissimo pointing the other way
     cont.extra = "newpath 498 478 moveto 526 381 lineto 554 478 lineto closepath fill "
 
     return cont
-staccatissup = tmpfn()
+font.staccatissup = tmpfn()
 
 def tmpfn(): # snap-pizzicato
     cont = GlyphContext()
@@ -2585,7 +2594,7 @@ def tmpfn(): # snap-pizzicato
     cont.extra = "newpath 500 500 50 0 360 arc 500 500 moveto 500 400 lineto 16 setlinewidth 1 setlinejoin 1 setlinecap stroke"
 
     return cont
-snappizz = tmpfn()
+font.snappizz = tmpfn()
 
 # ----------------------------------------------------------------------
 # The 'segno' sign (for 'D.S. al Fine' sort of stuff).
@@ -2621,7 +2630,7 @@ def tmpfn():
     "newpath 410 339 24 0 360 arc fill "
 
     return cont
-segno = tmpfn()
+font.segno = tmpfn()
 
 # ----------------------------------------------------------------------
 # The coda sign.
@@ -2645,7 +2654,7 @@ def tmpfn():
     cont.default_nib = lambda c,x,y,t,theta: 8+12*abs(sin(theta))**2.5
 
     return cont
-coda = tmpfn()
+font.coda = tmpfn()
 
 def tmpfn(): # variant square form used by Lilypond
     cont = GlyphContext()
@@ -2670,7 +2679,7 @@ def tmpfn(): # variant square form used by Lilypond
     c2.nib = c4.nib = lambda c,x,y,t,theta: (lambda k: (8, 0, k, k))(12.0*(x-xmid)/xdiff)
 
     return cont
-varcoda = tmpfn()
+font.varcoda = tmpfn()
 
 # ----------------------------------------------------------------------
 # The turn sign.
@@ -2703,7 +2712,7 @@ def tmpfn():
     lambda theta: phi0 + (phi2-phi0)*(shift(theta)-theta0)/(theta2-theta0)
 
     return cont
-turn = tmpfn()
+font.turn = tmpfn()
 
 def tmpfn():
     cont = GlyphContext()
@@ -2713,10 +2722,10 @@ def tmpfn():
 
     cont.default_nib = 8
 
-    cont.extra = turn
+    cont.extra = font.turn
 
     return cont
-invturn = tmpfn()
+font.invturn = tmpfn()
 
 # ----------------------------------------------------------------------
 # Mordent and its relatives.
@@ -2741,7 +2750,7 @@ def tmpfn():
     cont.cy = c2.compute_y(.5)
 
     return cont
-mordentupper = tmpfn()
+font.mordentupper = tmpfn()
 def tmpfn(): # and the same with a vertical line through it
     cont = GlyphContext()
     # Saved data from gui.py
@@ -2753,12 +2762,13 @@ def tmpfn(): # and the same with a vertical line through it
     # These things are stacked above the note, so they each have a
     # baseline and a height rather than being vertically centred.
     # Hence we must translate the other mordent sign upwards.
-    cont.extra = "gsave 0 -43 translate", mordentupper, "grestore"
+    cont.extra = ("gsave 0 -43 translate", font.mordentupper,
+                  "grestore")
 
-    cont.cy = mordentupper.cy - 43
+    cont.cy = font.mordentupper.cy - 43
 
     return cont
-mordentlower = tmpfn()
+font.mordentlower = tmpfn()
 
 def tmpfn():
     cont = GlyphContext()
@@ -2781,10 +2791,10 @@ def tmpfn():
     alpha = c2.compute_theta(.5)
     cont.default_nib = (8, alpha, 30, 30)
 
-    cont.cy = mordentupper.cy
+    cont.cy = font.mordentupper.cy
 
     return cont
-mordentupperlong = tmpfn()
+font.mordentupperlong = tmpfn()
 def tmpfn(): # and the same with a vertical line through it
     cont = GlyphContext()
     # Saved data from gui.py
@@ -2796,12 +2806,13 @@ def tmpfn(): # and the same with a vertical line through it
     # These things are stacked above the note, so they each have a
     # baseline and a height rather than being vertically centred.
     # Hence we must translate the other mordent sign upwards.
-    cont.extra = "gsave 0 -43 translate", mordentupperlong, "grestore"
+    cont.extra = ("gsave 0 -43 translate", font.mordentupperlong,
+                  "grestore")
 
-    cont.cy = mordentupper.cy - 43
+    cont.cy = font.mordentupper.cy - 43
 
     return cont
-mordentupperlower = tmpfn()
+font.mordentupperlower = tmpfn()
 
 def tmpfn():
     cont = GlyphContext()
@@ -2827,10 +2838,10 @@ def tmpfn():
     cont.default_nib = (8, alpha, 30, 30)
     c0.nib = c7.nib = 8
 
-    cont.cy = mordentupper.cy
+    cont.cy = font.mordentupper.cy
 
     return cont
-upmordentupperlong = tmpfn()
+font.upmordentupperlong = tmpfn()
 def tmpfn(): # and the same with a vertical line through it
     cont = GlyphContext()
     # Saved data from gui.py
@@ -2842,12 +2853,13 @@ def tmpfn(): # and the same with a vertical line through it
     # These things are stacked above the note, so they each have a
     # baseline and a height rather than being vertically centred.
     # Hence we must translate the other mordent sign upwards.
-    cont.extra = "gsave 0 -43 translate", upmordentupperlong, "grestore"
+    cont.extra = ("gsave 0 -43 translate", font.upmordentupperlong,
+                  "grestore")
 
-    cont.cy = mordentupper.cy - 43
+    cont.cy = font.mordentupper.cy - 43
 
     return cont
-upmordentupperlower = tmpfn()
+font.upmordentupperlower = tmpfn()
 
 def tmpfn():
     cont = GlyphContext()
@@ -2873,10 +2885,10 @@ def tmpfn():
     cont.default_nib = (8, alpha, 30, 30)
     c0.nib = c7.nib = 8
 
-    cont.cy = mordentupper.cy
+    cont.cy = font.mordentupper.cy
 
     return cont
-downmordentupperlong = tmpfn()
+font.downmordentupperlong = tmpfn()
 def tmpfn(): # and the same with a vertical line through it
     cont = GlyphContext()
     # Saved data from gui.py
@@ -2888,12 +2900,13 @@ def tmpfn(): # and the same with a vertical line through it
     # These things are stacked above the note, so they each have a
     # baseline and a height rather than being vertically centred.
     # Hence we must translate the other mordent sign upwards.
-    cont.extra = "gsave 0 -43 translate", downmordentupperlong, "grestore"
+    cont.extra = ("gsave 0 -43 translate", font.downmordentupperlong,
+                  "grestore")
 
-    cont.cy = mordentupper.cy - 43
+    cont.cy = font.mordentupper.cy - 43
 
     return cont
-downmordentupperlower = tmpfn()
+font.downmordentupperlower = tmpfn()
 
 def tmpfn():
     cont = GlyphContext()
@@ -2919,10 +2932,10 @@ def tmpfn():
     cont.default_nib = (8, alpha, 30, 30)
     c0.nib = c7.nib = 8
 
-    cont.cy = mordentupper.cy
+    cont.cy = font.mordentupper.cy
 
     return cont
-straightmordentupperlong = tmpfn()
+font.straightmordentupperlong = tmpfn()
 
 def tmpfn():
     # Lilypond renders this glyph as a reflection of
@@ -2930,18 +2943,20 @@ def tmpfn():
     # render it as a rotation of downmordentupperlong, so as to get
     # the mordent zigzag itself the same way round.
     cont = GlyphContext()
-    cont.extra = "gsave 1000 1000 translate -1 -1 scale", downmordentupperlong
-    cont.cy = 1000 - mordentupper.cy
+    cont.extra = ("gsave 1000 1000 translate -1 -1 scale",
+                  font.downmordentupperlong)
+    cont.cy = 1000 - font.mordentupper.cy
     return cont
-mordentupperlongdown = tmpfn()
+font.mordentupperlongdown = tmpfn()
 def tmpfn():
     # Likewise, Lilypond uses a reflection of downmordentupperlong,
     # whereas I rotate upmordentupperlong.
     cont = GlyphContext()
-    cont.extra = "gsave 1000 1000 translate -1 -1 scale", upmordentupperlong
-    cont.cy = 1000 - mordentupper.cy
+    cont.extra = ("gsave 1000 1000 translate -1 -1 scale",
+                  font.upmordentupperlong)
+    cont.cy = 1000 - font.mordentupper.cy
     return cont
-mordentupperlongup = tmpfn()
+font.mordentupperlongup = tmpfn()
 
 # ----------------------------------------------------------------------
 # Fermata signs.
@@ -2960,7 +2975,7 @@ def tmpfn():
     cont.extra = "newpath 527 446 24 0 360 arc fill "
 
     return cont
-fermata = tmpfn()
+font.fermata = tmpfn()
 
 def tmpfn():
     cont = GlyphContext()
@@ -2977,7 +2992,7 @@ def tmpfn():
     cont.extra = "newpath 527 446 24 0 360 arc fill "
 
     return cont
-fermata0 = tmpfn()
+font.fermata0 = tmpfn()
 
 def tmpfn():
     cont = GlyphContext()
@@ -2995,7 +3010,7 @@ def tmpfn():
     cont.extra = "newpath 527 446 24 0 360 arc fill "
 
     return cont
-fermata2 = tmpfn()
+font.fermata2 = tmpfn()
 
 def tmpfn():
     cont = GlyphContext()
@@ -3019,28 +3034,28 @@ def tmpfn():
     cont.extra = "newpath 527 446 24 0 360 arc fill "
 
     return cont
-fermata3 = tmpfn()
+font.fermata3 = tmpfn()
 
 def tmpfn():
     cont = GlyphContext()
-    cont.extra = '0 1000 translate 1 -1 scale', fermata
+    cont.extra = '0 1000 translate 1 -1 scale', font.fermata
     return cont
-fermataup = tmpfn()
+font.fermataup = tmpfn()
 def tmpfn():
     cont = GlyphContext()
-    cont.extra = '0 1000 translate 1 -1 scale', fermata0
+    cont.extra = '0 1000 translate 1 -1 scale', font.fermata0
     return cont
-fermata0up = tmpfn()
+font.fermata0up = tmpfn()
 def tmpfn():
     cont = GlyphContext()
-    cont.extra = '0 1000 translate 1 -1 scale', fermata2
+    cont.extra = '0 1000 translate 1 -1 scale', font.fermata2
     return cont
-fermata2up = tmpfn()
+font.fermata2up = tmpfn()
 def tmpfn():
     cont = GlyphContext()
-    cont.extra = '0 1000 translate 1 -1 scale', fermata3
+    cont.extra = '0 1000 translate 1 -1 scale', font.fermata3
     return cont
-fermata3up = tmpfn()
+font.fermata3up = tmpfn()
 
 # ----------------------------------------------------------------------
 # Parentheses to go round accidentals.
@@ -3056,17 +3071,18 @@ def tmpfn():
     cont.rx = c0.compute_x(0) + c0.compute_nib(0) + 10
 
     return cont
-acclparen = tmpfn()
+font.acclparen = tmpfn()
 
 def tmpfn():
     cont = GlyphContext()
 
-    cont.extra = "gsave 1000 0 translate -1 1 scale", acclparen, "grestore"
+    cont.extra = ("gsave 1000 0 translate -1 1 scale",
+                  font.acclparen, "grestore")
 
-    cont.lx = 1000 - acclparen.rx
+    cont.lx = 1000 - font.acclparen.rx
 
     return cont
-accrparen = tmpfn()
+font.accrparen = tmpfn()
 
 # ----------------------------------------------------------------------
 # Braces between staves.
@@ -3086,7 +3102,7 @@ def tmpfn():
     cont.origin = 1000, 10
 
     return cont
-braceupper = tmpfn()
+font.braceupper = tmpfn()
 
 def tmpfn():
     cont = GlyphContext()
@@ -3103,9 +3119,9 @@ def tmpfn():
     cont.origin = 1000, 2170
 
     return cont
-bracelower = tmpfn()
+font.bracelower = tmpfn()
 
-def tmpfn(span): # arbitrarily sized brace
+def scaledbrace(span): # arbitrarily sized brace
     cont = GlyphContext()
     # Saved data from gui.py
     c0 = CircleInvolute(cont, 87, 20, -0.490261, 0.871576, 64, 313, 0.33035, 0.943858)
@@ -3146,10 +3162,9 @@ def tmpfn(span): # arbitrarily sized brace
     cont.curve_res = max(1001, int(span))
 
     return cont
-scaledbrace = tmpfn # note this is a function, not an actual GlyphContext
 
 # Should be equivalent to 'braceupper'+'bracelower'
-fixedbrace = scaledbrace(3982)
+font.fixedbrace = scaledbrace(3982)
 
 # ----------------------------------------------------------------------
 # End pieces for an arbitrary-sized bracket between two staves.
@@ -3173,8 +3188,8 @@ def tmpfn(vwid):
     cont.hy = c1.compute_y(0)
 
     return cont
-bracketlower = tmpfn(75)
-bracketlowerlily = tmpfn(-1) # omit the vertical
+font.bracketlower = tmpfn(75)
+font.bracketlowerlily = tmpfn(-1) # omit the vertical
 def tmpfn(x):
     cont = GlyphContext()
 
@@ -3183,8 +3198,8 @@ def tmpfn(x):
     cont.hy = 946 - x.hy
 
     return cont
-bracketupper = tmpfn(bracketlower)
-bracketupperlily = tmpfn(bracketlowerlily)
+font.bracketupper = tmpfn(font.bracketlower)
+font.bracketupperlily = tmpfn(font.bracketlowerlily)
 
 # ----------------------------------------------------------------------
 # Note head indicating an artificial harmonic above another base
@@ -3209,7 +3224,7 @@ def tmpfn():
     cont.ay = c1.compute_y(0)
 
     return cont
-harmart = tmpfn()
+font.harmart = tmpfn()
 
 def tmpfn():
     cont = GlyphContext()
@@ -3229,7 +3244,7 @@ def tmpfn():
     cont.ay = c1.compute_y(0)
 
     return cont
-harmartfilled = tmpfn()
+font.harmartfilled = tmpfn()
 
 # ----------------------------------------------------------------------
 # Natural harmonic mark and a couple of other miscellaneous note flags.
@@ -3240,7 +3255,7 @@ def tmpfn():
     cont.extra = "newpath 527 439 40 0 360 arc 6 setlinewidth stroke "
 
     return cont
-harmnat = tmpfn()
+font.harmnat = tmpfn()
 
 def tmpfn(thumb):
     cont = GlyphContext()
@@ -3265,8 +3280,8 @@ def tmpfn(thumb):
     cont.cy = c0.compute_y(1)
 
     return cont
-flagopen = tmpfn(0)
-flagthumb = tmpfn(1)
+font.flagopen = tmpfn(0)
+font.flagthumb = tmpfn(1)
 
 # ----------------------------------------------------------------------
 # Ditto (same as previous bar) mark.
@@ -3284,7 +3299,7 @@ def tmpfn():
     "newpath 632 546 35 0 360 arc fill "
 
     return cont
-ditto = tmpfn()
+font.ditto = tmpfn()
 
 # ----------------------------------------------------------------------
 # Breath mark and related stuff.
@@ -3300,7 +3315,7 @@ def tmpfn():
     blob(c0, 0, 'l', 5, 0)
 
     return cont
-breath = tmpfn()
+font.breath = tmpfn()
 
 def tmpfn():
     cont = GlyphContext()
@@ -3311,19 +3326,19 @@ def tmpfn():
     c0.nib = lambda c,x,y,t,theta: 4+14*t
 
     return cont
-varbreath = tmpfn()
+font.varbreath = tmpfn()
 
 def tmpfn():
     cont = GlyphContext()
-    cont.extra = "1000 1000 translate -1 -1 scale", breath
+    cont.extra = "1000 1000 translate -1 -1 scale", font.breath
     return cont
-revbreath = tmpfn()
+font.revbreath = tmpfn()
 
 def tmpfn():
     cont = GlyphContext()
-    cont.extra = "1000 1000 translate -1 -1 scale", varbreath
+    cont.extra = "1000 1000 translate -1 -1 scale", font.varbreath
     return cont
-revvarbreath = tmpfn()
+font.revvarbreath = tmpfn()
 
 def tmpfn():
     cont = GlyphContext()
@@ -3333,7 +3348,7 @@ def tmpfn():
     # End saved data
     cont.default_nib = 8
     return cont
-caesura = tmpfn()
+font.caesura = tmpfn()
 
 def tmpfn():
     cont = GlyphContext()
@@ -3343,7 +3358,7 @@ def tmpfn():
     # End saved data
     cont.default_nib = lambda c,x,y,t,theta: 8+4.0*(x-c.compute_x(0))/(c.compute_x(1)-c.compute_x(0))
     return cont
-caesuracurved = tmpfn()
+font.caesuracurved = tmpfn()
 
 # ----------------------------------------------------------------------
 # Random functional stuff like arrowheads.
@@ -3373,14 +3388,14 @@ def tmpfn(rotate, is_open):
     cont.extent = abs(c0.compute_y(0) - cont.cy) + 6
 
     return cont
-openarrowright = tmpfn(0,1)
-closearrowright = tmpfn(0,0)
-openarrowleft = tmpfn(180,1)
-closearrowleft = tmpfn(180,0)
-openarrowup = tmpfn(270,1)
-closearrowup = tmpfn(270,0)
-openarrowdown = tmpfn(90,1)
-closearrowdown = tmpfn(90,0)
+font.openarrowright = tmpfn(0,1)
+font.closearrowright = tmpfn(0,0)
+font.openarrowleft = tmpfn(180,1)
+font.closearrowleft = tmpfn(180,0)
+font.openarrowup = tmpfn(270,1)
+font.closearrowup = tmpfn(270,0)
+font.openarrowdown = tmpfn(90,1)
+font.closearrowdown = tmpfn(90,0)
 
 # ----------------------------------------------------------------------
 # Flat (and multiples of flat).
@@ -3405,7 +3420,7 @@ def tmpfn():
     cont.hy = 469 # no sensible way to specify this except manually
 
     return cont
-flat = tmpfn()
+font.flat = tmpfn()
 
 def tmpfn():
     cont = GlyphContext()
@@ -3426,10 +3441,10 @@ def tmpfn():
     cont.ox = c0.compute_x(0.5)
     cont.hy = 469 # no sensible way to specify this except manually
 
-    cont.extra = "gsave 430 236 16 add translate 0.7 dup scale -500 dup 150 sub translate", closearrowup, "grestore"
+    cont.extra = "gsave 430 236 16 add translate 0.7 dup scale -500 dup 150 sub translate", font.closearrowup, "grestore"
 
     return cont
-flatup = tmpfn()
+font.flatup = tmpfn()
 
 def tmpfn():
     cont = GlyphContext()
@@ -3449,10 +3464,10 @@ def tmpfn():
     cont.ox = c0.compute_x(0.5)
     cont.hy = 469 # no sensible way to specify this except manually
 
-    cont.extra = "gsave 430 568 16 sub translate 0.7 dup scale -500 dup 150 add translate", closearrowdown, "grestore"
+    cont.extra = "gsave 430 568 16 sub translate 0.7 dup scale -500 dup 150 add translate", font.closearrowdown, "grestore"
 
     return cont
-flatdn = tmpfn()
+font.flatdn = tmpfn()
 
 def tmpfn():
     cont = GlyphContext()
@@ -3472,40 +3487,42 @@ def tmpfn():
     cont.ox = c0.compute_x(0.5)
     cont.hy = 469 # no sensible way to specify this except manually
 
-    cont.extra = flatup.extra + flatdn.extra
+    cont.extra = font.flatup.extra + font.flatdn.extra
 
     return cont
-flatupdn = tmpfn()
-
-def tmpfn():
-    cont = GlyphContext()
-    cont.extra = flat, "gsave -90 0 translate", flat, "grestore"
-    cont.ox = flat.ox - 90
-    cont.hy = flat.hy
-    return cont
-doubleflat = tmpfn()
+font.flatupdn = tmpfn()
 
 def tmpfn():
     cont = GlyphContext()
-    reflectpt = flat.ox - 20
-    cont.extra = "gsave %g 0 translate -1 1 scale" % (2*reflectpt), \
-    flat, "grestore"
-    cont.hy = flat.hy
+    cont.extra = (font.flat, "gsave -90 0 translate",
+                  font.flat, "grestore")
+    cont.ox = font.flat.ox - 90
+    cont.hy = font.flat.hy
     return cont
-semiflat = tmpfn()
+font.doubleflat = tmpfn()
 
 def tmpfn():
     cont = GlyphContext()
-    cont.extra = flat, semiflat
-    cont.hy = flat.hy
+    reflectpt = font.flat.ox - 20
+    cont.extra = ("gsave %g 0 translate -1 1 scale" % (2*reflectpt),
+                  font.flat, "grestore")
+    cont.hy = font.flat.hy
     return cont
-sesquiflat = tmpfn()
+font.semiflat = tmpfn()
 
 def tmpfn():
     cont = GlyphContext()
-    cont.extra = "gsave 580 380 translate 0.5 dup scale -580 -380 translate", flat, "grestore"
+    cont.extra = font.flat, font.semiflat
+    cont.hy = font.flat.hy
     return cont
-smallflat = tmpfn()
+font.sesquiflat = tmpfn()
+
+def tmpfn():
+    cont = GlyphContext()
+    cont.extra = ("gsave 580 380 translate 0.5 dup scale -580 -380 translate",
+                  font.flat, "grestore")
+    return cont
+font.smallflat = tmpfn()
 
 def tmpfn():
     cont = GlyphContext()
@@ -3515,13 +3532,13 @@ def tmpfn():
 
     c0.nib = 8
 
-    cont.ox = flat.ox
-    cont.hy = flat.hy
+    cont.ox = font.flat.ox
+    cont.hy = font.flat.hy
 
-    cont.extra = flat
+    cont.extra = font.flat
 
     return cont
-flatslash = tmpfn()
+font.flatslash = tmpfn()
 
 def tmpfn():
     cont = GlyphContext()
@@ -3532,22 +3549,22 @@ def tmpfn():
 
     c0.nib = c1.nib = 8
 
-    cont.ox = flat.ox
-    cont.hy = flat.hy
+    cont.ox = font.flat.ox
+    cont.hy = font.flat.hy
 
-    cont.extra = flat
+    cont.extra = font.flat
 
     return cont
-flatslash2 = tmpfn()
+font.flatslash2 = tmpfn()
 
 def tmpfn():
     cont = GlyphContext()
-    reflectpt = flat.ox - 20
-    cont.extra = "gsave %g 0 translate -1 1 scale" % (2*reflectpt), \
-    flatslash, "grestore"
-    cont.hy = flatslash.hy
+    reflectpt = font.flat.ox - 20
+    cont.extra = ("gsave %g 0 translate -1 1 scale" % (2*reflectpt),
+                  font.flatslash, "grestore")
+    cont.hy = font.flatslash.hy
     return cont
-semiflatslash = tmpfn()
+font.semiflatslash = tmpfn()
 
 def tmpfn():
     cont = GlyphContext()
@@ -3557,13 +3574,13 @@ def tmpfn():
 
     c0.nib = 8
 
-    cont.ox = doubleflat.ox
-    cont.hy = doubleflat.hy
+    cont.ox = font.doubleflat.ox
+    cont.hy = font.doubleflat.hy
 
-    cont.extra = doubleflat
+    cont.extra = font.doubleflat
 
     return cont
-doubleflatslash = tmpfn()
+font.doubleflatslash = tmpfn()
 
 # ----------------------------------------------------------------------
 # Natural.
@@ -3584,7 +3601,7 @@ def tmpfn():
     cont.cy = (c0.compute_y(0) + c2.compute_y(0)) / 2.0
 
     return cont
-natural = tmpfn()
+font.natural = tmpfn()
 
 def tmpfn():
     cont = GlyphContext()
@@ -3599,12 +3616,12 @@ def tmpfn():
 
     cont.default_nib = (8, pi/2, 16, 16)
 
-    cont.extra = "gsave 442 318 translate 0.7 dup scale -500 dup 150 sub translate", closearrowup, "grestore"
+    cont.extra = "gsave 442 318 translate 0.7 dup scale -500 dup 150 sub translate", font.closearrowup, "grestore"
 
-    cont.cy = natural.cy
+    cont.cy = font.natural.cy
 
     return cont
-naturalup = tmpfn()
+font.naturalup = tmpfn()
 
 def tmpfn():
     cont = GlyphContext()
@@ -3619,12 +3636,12 @@ def tmpfn():
 
     cont.default_nib = (8, pi/2, 16, 16)
 
-    cont.extra = "gsave 519 622 translate 0.7 dup scale -500 dup 150 add translate", closearrowdown, "grestore"
+    cont.extra = "gsave 519 622 translate 0.7 dup scale -500 dup 150 add translate", font.closearrowdown, "grestore"
 
-    cont.cy = natural.cy
+    cont.cy = font.natural.cy
 
     return cont
-naturaldn = tmpfn()
+font.naturaldn = tmpfn()
 
 def tmpfn():
     cont = GlyphContext()
@@ -3639,18 +3656,18 @@ def tmpfn():
 
     cont.default_nib = (8, pi/2, 16, 16)
 
-    cont.extra = naturalup.extra + naturaldn.extra
+    cont.extra = font.naturalup.extra + font.naturaldn.extra
 
-    cont.cy = natural.cy
+    cont.cy = font.natural.cy
 
     return cont
-naturalupdn = tmpfn()
+font.naturalupdn = tmpfn()
 
 def tmpfn():
     cont = GlyphContext()
-    cont.extra = "gsave 580 280 translate 0.5 dup scale -580 -280 translate", natural, "grestore"
+    cont.extra = "gsave 580 280 translate 0.5 dup scale -580 -280 translate", font.natural, "grestore"
     return cont
-smallnatural = tmpfn()
+font.smallnatural = tmpfn()
 
 # ----------------------------------------------------------------------
 # Sharp.
@@ -3669,7 +3686,7 @@ def tmpfn():
     cont.cy = (c2.compute_y(0) + c3.compute_y(1))/2.0
 
     return cont
-sharp = tmpfn()
+font.sharp = tmpfn()
 
 def tmpfn():
     cont = GlyphContext()
@@ -3682,12 +3699,12 @@ def tmpfn():
 
     cont.default_nib = (8, pi/2, 16, 16)
 
-    cont.extra = "gsave 493 271 translate 0.7 dup scale -500 dup 150 sub translate", closearrowup, "grestore"
+    cont.extra = "gsave 493 271 translate 0.7 dup scale -500 dup 150 sub translate", font.closearrowup, "grestore"
 
-    cont.cy = sharp.cy
+    cont.cy = font.sharp.cy
 
     return cont
-sharpup = tmpfn()
+font.sharpup = tmpfn()
 
 def tmpfn():
     cont = GlyphContext()
@@ -3700,12 +3717,12 @@ def tmpfn():
 
     cont.default_nib = (8, pi/2, 16, 16)
 
-    cont.extra = "gsave 442 672 translate 0.7 dup scale -500 dup 150 add translate", closearrowdown, "grestore"
+    cont.extra = "gsave 442 672 translate 0.7 dup scale -500 dup 150 add translate", font.closearrowdown, "grestore"
 
-    cont.cy = sharp.cy
+    cont.cy = font.sharp.cy
 
     return cont
-sharpdn = tmpfn()
+font.sharpdn = tmpfn()
 
 def tmpfn():
     cont = GlyphContext()
@@ -3718,18 +3735,18 @@ def tmpfn():
 
     cont.default_nib = (8, pi/2, 16, 16)
 
-    cont.extra = sharpup.extra + sharpdn.extra
+    cont.extra = font.sharpup.extra + font.sharpdn.extra
 
-    cont.cy = sharp.cy
+    cont.cy = font.sharp.cy
 
     return cont
-sharpupdn = tmpfn()
+font.sharpupdn = tmpfn()
 
 def tmpfn():
     cont = GlyphContext()
-    cont.extra = "gsave 580 280 translate 0.5 dup scale -580 -280 translate", sharp, "grestore"
+    cont.extra = "gsave 580 280 translate 0.5 dup scale -580 -280 translate", font.sharp, "grestore"
     return cont
-smallsharp = tmpfn()
+font.smallsharp = tmpfn()
 
 def tmpfn():
     cont = GlyphContext()
@@ -3742,7 +3759,7 @@ def tmpfn():
     cont.default_nib = (8, pi/2, 16, 16)
 
     return cont
-semisharp = tmpfn()
+font.semisharp = tmpfn()
 
 def tmpfn():
     cont = GlyphContext()
@@ -3757,7 +3774,7 @@ def tmpfn():
     cont.default_nib = (8, pi/2, 16, 16)
 
     return cont
-sesquisharp = tmpfn()
+font.sesquisharp = tmpfn()
 
 def tmpfn():
     cont = GlyphContext()
@@ -3774,7 +3791,7 @@ def tmpfn():
     cont.cy = (c2.compute_y(0) + c3.compute_y(1))/2.0
 
     return cont
-sharp3 = tmpfn()
+font.sharp3 = tmpfn()
 
 def tmpfn():
     cont = GlyphContext()
@@ -3790,7 +3807,7 @@ def tmpfn():
     cont.cy = (c2.compute_y(0) + c3.compute_y(1))/2.0
 
     return cont
-semisharp3 = tmpfn()
+font.semisharp3 = tmpfn()
 
 # ----------------------------------------------------------------------
 # Double sharp.
@@ -3813,7 +3830,7 @@ def tmpfn():
     "newpath 504 521 24 square "
 
     return cont
-doublesharp = tmpfn()
+font.doublesharp = tmpfn()
 
 # ----------------------------------------------------------------------
 # Arpeggio mark and friends.
@@ -3833,7 +3850,7 @@ def tmpfn():
     cont.default_nib = lambda c,x,y,t,theta: 4+14*abs(cos(theta + 3*pi/4))**1.5
 
     return cont
-arpeggio = tmpfn()
+font.arpeggio = tmpfn()
 
 def tmpfn():
     cont = GlyphContext()
@@ -3847,11 +3864,11 @@ def tmpfn():
 
     cont.ty = c0.compute_y(0)
     cont.oy = c1.compute_y(1)
-    cont.lx = c0.compute_x(0) - closearrowdown.extent
-    cont.rx = c0.compute_x(0) + closearrowdown.extent
+    cont.lx = c0.compute_x(0) - font.closearrowdown.extent
+    cont.rx = c0.compute_x(0) + font.closearrowdown.extent
 
     return cont
-arpeggioshort = tmpfn()
+font.arpeggioshort = tmpfn()
 
 def tmpfn():
     cont = GlyphContext()
@@ -3861,40 +3878,40 @@ def tmpfn():
 
     cont.default_nib = lambda c,x,y,t,theta: 4+16*t*(1-t)
 
-    cont.extra = "-9 0 translate", closearrowdown
+    cont.extra = "-9 0 translate", font.closearrowdown
 
-    cont.lx = arpeggioshort.lx
-    cont.rx = arpeggioshort.rx
+    cont.lx = font.arpeggioshort.lx
+    cont.rx = font.arpeggioshort.rx
     cont.ey = c0.compute_y(0)
 
     return cont
-arpeggioarrowdown = tmpfn()
+font.arpeggioarrowdown = tmpfn()
 
 def tmpfn():
     cont = GlyphContext()
 
-    cont.extra = "1000 1000 translate -1 -1 scale", arpeggioarrowdown
+    cont.extra = "1000 1000 translate -1 -1 scale", font.arpeggioarrowdown
 
-    cont.ey = 1000 - arpeggioarrowdown.ey
-    cont.lx = 1000 - arpeggioshort.rx
-    cont.rx = 1000 - arpeggioshort.lx
+    cont.ey = 1000 - font.arpeggioarrowdown.ey
+    cont.lx = 1000 - font.arpeggioshort.rx
+    cont.rx = 1000 - font.arpeggioshort.lx
 
     return cont
-arpeggioarrowup = tmpfn()
+font.arpeggioarrowup = tmpfn()
 
 def tmpfn():
     # Rotate the arpeggio mark by 90 degrees and use it as the wavy
     # line after 'tr' to indicate an extended trill.
     cont = GlyphContext()
 
-    cont.extra = "500 500 translate -90 rotate -500 -500 translate", \
-    arpeggioshort
+    cont.extra = ("500 500 translate -90 rotate -500 -500 translate",
+                  font.arpeggioshort)
 
-    cont.lx = arpeggioshort.ty
-    cont.rx = arpeggioshort.oy
+    cont.lx = font.arpeggioshort.ty
+    cont.rx = font.arpeggioshort.oy
 
     return cont
-trillwiggle = tmpfn()
+font.trillwiggle = tmpfn()
 
 # ----------------------------------------------------------------------
 # Downbow and upbow marks.
@@ -3912,7 +3929,7 @@ def tmpfn():
     cont.default_nib = 8, pi/2, 35, 35
 
     return cont
-bowdown = tmpfn()
+font.bowdown = tmpfn()
 
 def tmpfn():
     cont = GlyphContext()
@@ -3926,7 +3943,7 @@ def tmpfn():
     c1.nib = 6
 
     return cont
-bowup = tmpfn()
+font.bowup = tmpfn()
 
 # ----------------------------------------------------------------------
 # Sforzando / marcato is an inverted upbow mark.
@@ -3943,15 +3960,15 @@ def tmpfn():
     c1.nib = lambda c,x,y,t,theta: (6, pi, min(25, t*100), 0)
 
     return cont
-sforzando = tmpfn()
+font.sforzando = tmpfn()
 
 def tmpfn():
     cont = GlyphContext()
 
-    cont.extra = "1000 1000 translate -1 -1 scale", sforzando
+    cont.extra = "1000 1000 translate -1 -1 scale", font.sforzando
 
     return cont
-sforzandodn = tmpfn()
+font.sforzandodn = tmpfn()
 
 # ----------------------------------------------------------------------
 # Repeat mark (just a pair of dots).
@@ -3964,7 +3981,7 @@ def tmpfn():
     "newpath 561 542 32 0 360 arc fill "
 
     return cont
-repeatmarks = tmpfn()
+font.repeatmarks = tmpfn()
 
 # ----------------------------------------------------------------------
 # Grace notes.
@@ -3975,15 +3992,15 @@ def tmpfn():
     cont.extra = [
     "gsave 495 472 translate 0.45 dup scale -527 -472 translate",
     "gsave 602.346 452.748 -450 add translate -535 -465 translate",
-    tailquaverup,
+    font.tailquaverup,
     "grestore",
-    headcrotchet,
+    font.headcrotchet,
     "newpath 602.346 452.748 moveto 0 -450 rlineto 16 setlinewidth stroke",
     "grestore",
     ]
 
     return cont
-appoggiatura = tmpfn()
+font.appoggiatura = tmpfn()
 
 def tmpfn():
     cont = GlyphContext()
@@ -4003,10 +4020,10 @@ accslashup = tmpfn()
 def tmpfn():
     cont = GlyphContext()
 
-    cont.extra = appoggiatura, accslashup
+    cont.extra = font.appoggiatura, accslashup
 
     return cont
-acciaccatura = tmpfn()
+font.acciaccatura = tmpfn()
 
 def tmpfn():
     cont = GlyphContext()
@@ -4017,18 +4034,18 @@ def tmpfn():
     cont.oy = accslashup.oy / .45
 
     return cont
-accslashbigup = tmpfn()
+font.accslashbigup = tmpfn()
 
 def tmpfn():
     cont = GlyphContext()
 
-    cont.extra = '0 1000 translate 1 -1 scale', accslashbigup
+    cont.extra = '0 1000 translate 1 -1 scale', font.accslashbigup
 
-    cont.ox = accslashbigup.ox
-    cont.oy = 1000 - accslashbigup.oy
+    cont.ox = font.accslashbigup.ox
+    cont.oy = 1000 - font.accslashbigup.oy
 
     return cont
-accslashbigdn = tmpfn()
+font.accslashbigdn = tmpfn()
 
 # ----------------------------------------------------------------------
 # Piano pedal marks.
@@ -4085,7 +4102,7 @@ def tmpfn():
     cont.by = c5.compute_y(1) + c5.compute_nib(1)
 
     return cont
-pedP = tmpfn()
+font.pedP = tmpfn()
 
 def tmpfn():
     cont = GlyphContext()
@@ -4106,10 +4123,10 @@ def tmpfn():
     c2.nib = lambda c,x,y,t,theta: (6, theta0, 7+3*t, 7+3*t)
     c3.nib = lambda c,x,y,t,theta: (6, (theta0+t*(theta1-theta0)), 10, 10)
 
-    cont.by = pedP.by
+    cont.by = font.pedP.by
 
     return cont
-pede = tmpfn()
+font.pede = tmpfn()
 
 def tmpfn():
     cont = GlyphContext()
@@ -4129,40 +4146,41 @@ def tmpfn():
     c0.nib = c1.nib = lambda c,x,y,t,theta: 6+8*sin(pi*(theta-theta0)/(theta1-theta0))**2
     c2.nib = c3.nib = lambda c,x,y,t,theta: 6+12*sin(pi*(theta-theta1)/(theta2-theta1))**2
 
-    cont.by = pedP.by
+    cont.by = font.pedP.by
 
     return cont
-pedd = tmpfn()
+font.pedd = tmpfn()
 
 def tmpfn():
     cont = GlyphContext()
 
     cont.extra = "newpath 708 611 20 0 360 arc fill "
 
-    cont.by = pedP.by
+    cont.by = font.pedP.by
 
     return cont
-peddot = tmpfn()
+font.peddot = tmpfn()
 
 def tmpfn():
     cont = GlyphContext()
 
-    cont.extra = pedP, pede, pedd
+    cont.extra = font.pedP, font.pede, font.pedd
 
-    cont.by = pedP.by
+    cont.by = font.pedP.by
 
     return cont
-pedPed = tmpfn()
+font.pedPed = tmpfn()
 
 def tmpfn():
     cont = GlyphContext()
 
-    cont.extra = pedP, pede, pedd, peddot
+    cont.extra = (font.pedP, font.pede,
+                  font.pedd, font.peddot)
 
-    cont.by = pedP.by
+    cont.by = font.pedP.by
 
     return cont
-pedPeddot = tmpfn()
+font.pedPeddot = tmpfn()
 
 # The pedal-up asterisk is drawn by drawing a single curved edge and
 # repeating it around the circle eight times.
@@ -4195,10 +4213,10 @@ def tmpfn():
     "%g %g translate 45 rotate %g %g translate } repeat" % (cx,cy, -cx,-cy) + \
     " newpath %g %g %g 0 360 arc closepath 12 setlinewidth stroke" % (cx,cy, r-5)
 
-    cont.by = pedP.by
+    cont.by = font.pedP.by
 
     return cont
-pedstar = tmpfn()
+font.pedstar = tmpfn()
 
 def tmpfn():
     cont = GlyphContext()
@@ -4208,10 +4226,10 @@ def tmpfn():
 
     c0.nib = lambda c,x,y,t,theta: (4, pi/3, 18, 18)
 
-    cont.by = pedP.by
+    cont.by = font.pedP.by
 
     return cont
-peddash = tmpfn()
+font.peddash = tmpfn()
 
 # ----------------------------------------------------------------------
 # Some note flags I don't really understand, but which Lilypond's
@@ -4224,7 +4242,7 @@ def tmpfn():
     "16 setlinewidth 1 setlinecap stroke"
     cont.cy = 500
     return cont
-upedalheel = tmpfn()
+font.upedalheel = tmpfn()
 
 def tmpfn():
     cont = GlyphContext()
@@ -4233,7 +4251,7 @@ def tmpfn():
     "16 setlinewidth 1 setlinecap stroke"
     cont.cy = 500
     return cont
-dpedalheel = tmpfn()
+font.dpedalheel = tmpfn()
 
 def tmpfn():
     cont = GlyphContext()
@@ -4242,7 +4260,7 @@ def tmpfn():
     "16 setlinewidth 1 setlinecap 1 setlinejoin stroke"
     cont.cy = 500
     return cont
-upedaltoe = tmpfn()
+font.upedaltoe = tmpfn()
 
 def tmpfn():
     cont = GlyphContext()
@@ -4251,7 +4269,7 @@ def tmpfn():
     "16 setlinewidth 1 setlinecap 1 setlinejoin stroke"
     cont.cy = 500
     return cont
-dpedaltoe = tmpfn()
+font.dpedaltoe = tmpfn()
 
 # ----------------------------------------------------------------------
 # Accordion-specific markings.
@@ -4267,9 +4285,9 @@ def tmpfn(n):
         cont.extra = cont.extra + "%g %g moveto %g %g lineto " % (500-x, 500+y, 500+x, 500+y)
     cont.extra = cont.extra + "8 setlinewidth stroke"
     return cont
-acc2 = tmpfn(2)
-acc3 = tmpfn(3)
-acc4 = tmpfn(4)
+font.acc2 = tmpfn(2)
+font.acc3 = tmpfn(3)
+font.acc4 = tmpfn(4)
 
 def tmpfn(w,h):
     cont = GlyphContext()
@@ -4284,14 +4302,14 @@ def tmpfn(w,h):
         cont.extra = cont.extra + "%g %g moveto %g %g lineto " % (500-ww, 500+y, 500+ww, 500+y)
     cont.extra = cont.extra + "8 setlinewidth stroke"
     return cont
-accr = tmpfn(2,3)
+font.accr = tmpfn(2,3)
 
 def tmpfn():
     cont = GlyphContext()
     cont.scale = 1440 # make life easier: one stave space is now 100px
     cont.extra = "newpath 500 500 25 0 360 arc fill "
     return cont
-accdot = tmpfn()
+font.accdot = tmpfn()
 
 def tmpfn():
     cont = GlyphContext()
@@ -4305,7 +4323,7 @@ def tmpfn():
     "  45 rotate" + \
     "} repeat"
     return cont
-accstar = tmpfn()
+font.accstar = tmpfn()
 
 # ----------------------------------------------------------------------
 # A blank glyph!
@@ -4317,7 +4335,7 @@ def tmpfn():
     cont.by = 500
     cont.ty = 600
     return cont
-blank = tmpfn()
+font.blank = tmpfn()
 
 # ----------------------------------------------------------------------
 # End of actual glyph definitions. Now for the output layer.
@@ -4576,7 +4594,7 @@ def writesfd(filepfx, fontname, encodingname, encodingsize, outlines, glyphlist)
     for glyph in glyphlist:
         ourname, theirname, encoding, ox, oy = glyph[:5]
         bbox, path = outlines[ourname]
-        char = eval(ourname)
+        char = getattr(font, ourname)
         xrt = lambda x: x * (3600.0 / (40*char.scale)) # potrace's factor of ten, ours of four
         yrt = lambda y: y * (3600.0 / (40*char.scale))
         xat = lambda x: xrt(x) - char.origin[0]
@@ -4616,11 +4634,11 @@ def test_glyph(args):
     # ./glyphs.py --test braceupper | gs -sDEVICE=pngmono -sOutputFile=out.png -r72 -g1000x1000 -dBATCH -dNOPAUSE -q -
     # and then to view that in gui for correction:
     # convert -recolor '.25 0 0 0 0 .25 0 0 0 0 .25 0 .75 .75 .75 1' out.png zout.gif && ./gui.py zout.gif
-    glyph = eval(args.argument)
+    glyph = getattr(font, args.argument)
     glyph.testdraw()
 
 def test_ps(args, scaled=True):
-    char = eval(args.argument)
+    char = getattr(font, args.argument)
     bbox, path = get_ps_path(char)
     if scaled:
         # Compensate for potrace's factor of ten, and ours of four
@@ -4766,7 +4784,7 @@ def mus_output(args):
     f.write("/CharacterDefs %d dict def\n" % len(encoding))
     fontbbox = (None,)*4
     for code, name in encoding:
-        char = eval(name)
+        char = getattr(font, name)
         xrt = lambda x: x * (3600.0 / (40*char.scale)) # potrace's factor of ten, ours of four
         yrt = lambda y: y * (3600.0 / (40*char.scale))
         xat = lambda x: round(xrt(x) - char.origin[0])
@@ -4970,7 +4988,7 @@ def lilypond_output(args, do_main_font=True, do_brace_font=True):
             f.write("(linethickness . %.6f)\n" % (size/40.))
             bbbox = outlines["headcrotchet"][0]
             bwidth = bbbox[2] - bbbox[0]
-            f.write("(black_notehead_width . %.6f)\n" % (bwidth * 3600.0 / (40*headcrotchet.scale) * (size/1000.)))
+            f.write("(black_notehead_width . %.6f)\n" % (bwidth * 3600.0 / (40*font.headcrotchet.scale) * (size/1000.)))
             f.write("(ledgerlinethickness . %.6f)\n" % (size/40.))
         f.write("(design_size . %.6f)\n" % size)
         if not bracesonly:
@@ -4980,7 +4998,7 @@ def lilypond_output(args, do_main_font=True, do_brace_font=True):
         f = open(fname, "w")
         for glyph in glyphlist:
             ourname, theirname, encoding, ox, oy, ax, ay, subid, subcode = glyph[:9]
-            char = eval(ourname)
+            char = getattr(font, ourname)
             bbox, path = outlines[ourname]
             xrt = lambda x: x * (3600.0 / (40*char.scale)) # potrace's factor of ten, ours of four
             yrt = lambda y: y * (3600.0 / (40*char.scale))
@@ -5011,7 +5029,7 @@ def lilypond_output(args, do_main_font=True, do_brace_font=True):
         outlines = {}
         for g in lilyglyphlist:
             gid = g[0]
-            char = eval(gid)
+            char = getattr(font, gid)
             if gid not in outlines:
                 outlines[gid] = get_ps_path(char)
 
@@ -5030,7 +5048,7 @@ def lilypond_output(args, do_main_font=True, do_brace_font=True):
         digits = ["big%d" % i for i in range(10)]
         ymid = (outlines["big4"][0][1] + outlines["big4"][0][3]) / 2.0
         for d in digits:
-            char = eval(d)
+            char = getattr(font, d)
             d250 = 250.0 * (40*char.scale) / 3600.0
             u250 = 236.0 * (40*char.scale) / 3600.0 # empirically chosen
             one = 1.0 * (40*char.scale) / 3600.0
@@ -5059,9 +5077,9 @@ def lilypond_output(args, do_main_font=True, do_brace_font=True):
                 prop = g[7]
                 for k, v in prop.items():
                     if k[0] == "x":
-                        v = eval(gid+"."+v) * 40
+                        v = getattr(getattr(font, gid), v) * 40
                     elif k[0] == "y":
-                        v = (1000 - eval(gid+"."+v)) * 40
+                        v = (1000 - getattr(getattr(font, gid), v)) * 40
                     else:
                         raise "Error!"
                     prop[k] = v
@@ -5083,25 +5101,25 @@ def lilypond_output(args, do_main_font=True, do_brace_font=True):
             outlines[gid] = ((x0,y0,x1,y1),outlines[gid][1])
             xo = g[3]
             if type(xo) == str:
-                xo = eval(gid+"."+xo) * 40
+                xo = getattr(getattr(font, gid), xo) * 40
             else:
                 xo = x0 + (x1-x0) * xo
             g[3] = xo
             yo = g[4]
             if type(yo) == str:
-                yo = (1000 - eval(gid+"."+yo)) * 40
+                yo = (1000 - getattr(getattr(font, gid), yo)) * 40
             else:
                 yo = y0 + (y1-y0) * yo
             g[4] = yo
             xa = g[5]
             if type(xa) == str:
-                xa = eval(gid+"."+xa) * 40
+                xa = getattr(getattr(font, gid), xa) * 40
             else:
                 xa = x0 + (x1-x0) * xa
             g[5] = xa
             ya = g[6]
             if type(ya) == str:
-                ya = (1000 - eval(gid+"."+ya)) * 40
+                ya = (1000 - getattr(getattr(font, gid), ya)) * 40
             else:
                 ya = y0 + (y1-y0) * ya
             g[6] = ya
@@ -5184,7 +5202,7 @@ def lilypond_output(args, do_main_font=True, do_brace_font=True):
         for i in range(576):
             char = scaledbrace(525 * (151./150)**i)
             gid = "brace%d" % i
-            exec("%s = char" % gid)
+            setattr(font, gid, char)
             outlines[gid] = get_ps_path(char)
             x0, y0, x1, y1 = outlines[gid][0]
             yh = (y0+y1)/2.0
@@ -5447,7 +5465,7 @@ def simple_output(args):
             thiscode = code
         codes[thiscode] = gid
 
-        char = eval(gid)
+        char = getattr(font, gid)
 
         if gid not in outlines:
             outlines[gid] = get_ps_path(char)
