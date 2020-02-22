@@ -112,15 +112,26 @@ def get_ps_path(char, debug=None):
     path = []
     xsize, ysize = char.canvas_size
     res = char.trace_res
-    if debug == None:
-        tee1 = tee2 = ""
-    else:
-        tee1 = " | tee z1.%s" % debug
-        tee2 = " | tee z2.%s" % debug
-    p = subprocess.Popen("gs -sDEVICE=pbm -sOutputFile=- -g%dx%d -r%d -dBATCH -dNOPAUSE -q -%s | potrace -b ps -c -q -W 1in -H 1in -r 4000 -M 1000 -O 1 -o - -%s" % (xsize*res, ysize*res, 72*res, tee1, tee2), shell=True,
-                         stdin=subprocess.PIPE, stdout=subprocess.PIPE, close_fds=True)
-    p.stdin.write(("0 %d translate 1 -1 scale\n" % ysize + char.makeps() + "showpage").encode("ASCII"))
-    p.stdin.close()
+    commands = []
+    commands.append(["gs", "-sDEVICE=pbm", "-sOutputFile=-",
+                     "-g{:d}x{:d}".format(xsize*res, ysize*res),
+                     "-r{:d}".format(72*res),
+                     "-dBATCH", "-dNOPAUSE", "-q", "-"])
+    if debug is not None:
+        commands.append(["tee", "z1."+debug])
+    commands.append(["potrace", "-b", "ps", "-c", "-q",
+                     "-W", "1in", "-H", "1in", "-r", "4000",
+                     "-M", "1000", "-O", "1", "-o", "-", "-"])
+    if debug is not None:
+        commands.append(["tee", "z2."+debug])
+    procs = [None] * len(commands)
+    for i, command in enumerate(commands):
+        procs[i] = subprocess.Popen(command,
+                                    stdin=(procs[i-1].stdout if i>0
+                                           else subprocess.PIPE),
+                                    stdout=subprocess.PIPE, close_fds=True)
+    procs[0].stdin.write(("0 %d translate 1 -1 scale\n" % ysize + char.makeps() + "showpage").encode("ASCII"))
+    procs[0].stdin.close()
     # Now we read and parse potrace's PostScript output. This is easy
     # enough if we've configured potrace to output as simply as
     # possible (which we did) and are also ignoring most of the fiddly
@@ -135,7 +146,7 @@ def get_ps_path(char, debug=None):
     output = "newpath"
     scale = 4.0 / char.trace_res
     while 1:
-        s = p.stdout.readline().decode("ASCII")
+        s = procs[-1].stdout.readline().decode("ASCII")
         if s == "": break
         if s[:1] == "%":
             continue # comment
@@ -199,18 +210,14 @@ def get_ps_path(char, debug=None):
                     path.append(('c',) + c)
             elif word == "closepath":
                 path.append(('cp',))
-    p.stdout.close()
-    p.wait()
+    procs[-1].stdout.close()
+    for p in procs:
+        p.wait()
     bbox = None, None, None, None
     for c in path:
         if c[0] != 'cp':
             bbox = update_bbox(bbox, c[-2], c[-1])
     return bbox, path
-
-# Wrapper on os.system() that enforces a success return.
-def system(cmd):
-    ret = os.system(cmd)
-    assert ret == 0
 
 verstring = "version unavailable"
 
@@ -1366,8 +1373,9 @@ def simple_output(args):
         glyphlist[i] = (gid, gid, thiscode, xo, yo, None, None, None, None, props)
 
     writesfd("gonville-simple", "Gonville-Simple", "UnicodeBmp", 65537, outlines, glyphlist)
-    system("fontforge -lang=ff -c 'Open($1); CorrectDirection(); " + \
-    "Generate($2)' gonville-simple.sfd gonville-simple.otf")
+    subprocess.check_call(["fontforge", "-lang=ff", "-c",
+                           "Open($1); CorrectDirection(); Generate($2)",
+                           "gonville-simple.sfd", "gonville-simple.otf"])
 
 def lilypond_list_missing_glyphs(args):
     # Run over the list of glyph names in another font file and list
