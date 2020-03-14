@@ -531,7 +531,7 @@ def test_glyph(args):
     # example usage:
     # ./glyphs.py --test braceupper | gs -sDEVICE=pngmono -sOutputFile=out.png -r72 -g1000x1000 -dBATCH -dNOPAUSE -q -
     # and then to view that in gui for correction:
-    # convert -recolor '.25 0 0 0 0 .25 0 0 0 0 .25 0 .75 .75 .75 1' out.png zout.gif && ./gui.py zout.gif
+    # convert out.png -fill white -colorize 75% zout.png && ./gui.py zout.png
     glyph = getattr(font, args.argument)
     glyph.testdraw()
 
