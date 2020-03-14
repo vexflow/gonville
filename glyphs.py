@@ -1151,7 +1151,8 @@ def lilypond_output(args, do_main_font=True, do_brace_font=True):
         outlines = {}
         bracelist = []
         gidlist = []
-        for i in range(576):
+        bracerange = range(0, 576, 25) if args.fastbrace else range(576)
+        for i in bracerange:
             char = GlyphContext()
             scaledbrace(char, 525 * (151./150)**i)
             gid = "brace%d" % i
@@ -1573,7 +1574,10 @@ def main():
         "--simple", action="store_const", dest="action", const=simple_output,
         help="Generate a simple font file you could use in running text.")
     parser.add_argument("argument", nargs="?",
-                        help=" glyph to use in test modes")
+                        help="glyph to use in test modes")
+    parser.add_argument("--fastbrace", action="store_true",
+                        help="Only build a small fraction of the brace sizes, "
+                        "to speed up dev builds.")
     parser.set_defaults(verstring="version unavailable")
     args = parser.parse_args()
 

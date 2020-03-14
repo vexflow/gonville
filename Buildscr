@@ -15,7 +15,7 @@ in . do tar czvf gonville-$(Version)-src.tar.gz gonville-$(Version)
 # For a faster development cycle, an option to omit building the large
 # and slow brace subfont.
 set Lilybuildopt --lily
-ifeq "$(NOBRACE)" "yes" set Lilybuildopt --lilymain
+ifeq "$(FASTBRACE)" "yes" set Lilybuildopt --lily --fastbrace
 
 # Build the font set, and construct the distribution archive
 # containing the output fonts directory and only the necessary
