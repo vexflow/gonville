@@ -1476,6 +1476,11 @@ def lilypond_list_missing_glyphs(args):
                 print(name)
     f.close()
 
+def lilypond_list_our_glyphs(args):
+    names = (g[1] for g in lilyglyphlist)
+    for name in names:
+        print(name)
+
 def main():
     parser = argparse.ArgumentParser(description='')
     parser.add_argument(
@@ -1513,6 +1518,10 @@ def main():
         "--lilycheck", action="store_const", dest="action",
         const=lilypond_list_missing_glyphs,
         help="Scan a Lilypond font file for any glyphs we don't have.")
+    group.add_argument(
+        "--lilylist", action="store_const", dest="action",
+        const=lilypond_list_our_glyphs,
+        help="List all the Lilypond glyph names we do have.")
     group.add_argument(
         "--mus", action="store_const", dest="action", const=mus_output,
         help="Generate a Postscript prologue suitable for SGT's legacy 'mus' "
