@@ -2914,6 +2914,28 @@ def _(cont, thumb):
 
     cont.cy = c0.compute_y(1)
 
+@define_glyph("flaghalfopend")
+def _(cont):
+    # Saved data from gui.py
+    c0 = StraightLine(cont, 430, 580, 570, 420)
+    # End saved data
+
+    c0.nib = 6
+    cont.extra = font.flagopen
+
+    cont.cy = font.flagopen.cy
+
+@define_glyph("flaghalfopenv")
+def _(cont):
+    # Saved data from gui.py
+    c0 = StraightLine(cont, 500, 580, 500, 420)
+    # End saved data
+
+    c0.nib = 6
+    cont.extra = font.flagopen
+
+    cont.cy = font.flagopen.cy
+
 # ----------------------------------------------------------------------
 # Ditto (same as previous bar) mark.
 

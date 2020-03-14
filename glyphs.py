@@ -342,6 +342,8 @@ lilyglyphlist = [
 ("harmnat",      "scripts.flageolet",      0, 0.5,0.5, 1,0.5),
 ("flagopen",     "scripts.open",           0, 0.5,'cy', 1,'cy'),
 ("flagthumb",    "scripts.thumb",          0, 0.5,'cy', 1,'cy'),
+("flaghalfopend", "scripts.halfopen",      0, 0.5,'cy', 1,'cy'),
+("flaghalfopenv", "scripts.halfopenvertical", 0, 0.5,'cy', 1,'cy'),
 ("headcrotchet", "noteheads.s2",           0, 0,0.5, 1,'ay'),
 ("headminim",    "noteheads.s1",           0, 0,0.5, 1,'ay'),
 ("legato",       "scripts.tenuto",         0, 0.5,0.5, 1,0.5),
