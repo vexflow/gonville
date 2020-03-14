@@ -1300,100 +1300,29 @@ def _(cont_main):
 # ----------------------------------------------------------------------
 # Quaver rest and friends.
 
-@define_glyph("restquaver")
-def _(cont):
-    # Saved data from gui.py
-    c0 = StraightLine(cont, 531, 271, 588, 81)
-    c1 = CircleInvolute(cont, 588, 81, -0.347314, 0.937749, 480, 125, -0.784883, -0.619644)
-    c0.weld_to(1, c1, 0, 1)
-    # End saved data
+@define_glyph("restquaver", args=(1,))
+@define_glyph("restsemi", args=(2,))
+@define_glyph("restdemi", args=(3,))
+@define_glyph("resthemi", args=(4,))
+@define_glyph("restquasi", args=(5,))
+def _(cont, n):
+    c0 = StraightLine(cont, 570 - 39*n, 141 + 130*n, 588, 81)
+    cs = [CircleInvolute(cont, 588 - 39*i, 81 + 130*i, -0.347314, 0.937749,
+                         480 - 39*i, 125 + 130*i, -0.784883, -0.619644)
+          for i in range(n)]
+    c0.weld_to(1, cs[0], 0, 1)
 
     cont.default_nib = 8
 
-    blob(c1, 1, 'r', 33, 3)
-    cont.cy = c1.compute_y(1) - 33*sin(c1.compute_theta(1)-pi/2) + 76
+    for c in cs:
+        blob(c, 1, 'r', 33, 3)
 
-    cont.origin = 1000, ((1000-cont.cy) * 3600 / cont.scale)
+    co = cs[(n - 1) // 2] # which curve is used as the origin
+    cont.cy = co.compute_y(1) - 33*sin(co.compute_theta(1)-pi/2) + 76
 
-@define_glyph("restsemi")
-def _(cont):
-    # Saved data from gui.py
-    c0 = StraightLine(cont, 492, 401, 588, 81)
-    c1 = CircleInvolute(cont, 588, 81, -0.347314, 0.937749, 480, 125, -0.784883, -0.619644)
-    c2 = CircleInvolute(cont, 549, 211, -0.347314, 0.937749, 441, 255, -0.784883, -0.619644)
-    c0.weld_to(1, c1, 0, 1)
-    # End saved data
+    cont.origin = 1000-(39*n*1800/cont.scale), ((1000-cont.cy) * 3600 / cont.scale)
 
-    cont.default_nib = 8
-
-    blob(c1, 1, 'r', 33, 3)
-    blob(c2, 1, 'r', 33, 3)
-    cont.cy = c1.compute_y(1) - 33*sin(c1.compute_theta(1)-pi/2) + 76
-
-    cont.origin = 1000-(39*1800/cont.scale), ((1000-cont.cy) * 3600 / cont.scale)
-
-@define_glyph("restdemi")
-def _(cont):
-    # Saved data from gui.py
-    c0 = StraightLine(cont, 453, 531, 588, 81)
-    c1 = CircleInvolute(cont, 588, 81, -0.347314, 0.937749, 480, 125, -0.784883, -0.619644)
-    c2 = CircleInvolute(cont, 549, 211, -0.347314, 0.937749, 441, 255, -0.784883, -0.619644)
-    c3 = CircleInvolute(cont, 510, 341, -0.347314, 0.937749, 402, 385, -0.784883, -0.619644)
-    c0.weld_to(1, c1, 0, 1)
-    # End saved data
-
-    cont.default_nib = 8
-
-    blob(c1, 1, 'r', 33, 3)
-    blob(c2, 1, 'r', 33, 3)
-    blob(c3, 1, 'r', 33, 3)
-    cont.cy = c2.compute_y(1) - 33*sin(c1.compute_theta(1)-pi/2) + 76
-
-    cont.origin = 1000-(39*2*1800/cont.scale), ((1000-cont.cy) * 3600 / cont.scale)
-
-@define_glyph("resthemi")
-def _(cont):
-    # Saved data from gui.py
-    c0 = StraightLine(cont, 414, 661, 588, 81)
-    c1 = CircleInvolute(cont, 588, 81, -0.347314, 0.937749, 480, 125, -0.784883, -0.619644)
-    c2 = CircleInvolute(cont, 549, 211, -0.347314, 0.937749, 441, 255, -0.784883, -0.619644)
-    c3 = CircleInvolute(cont, 510, 341, -0.347314, 0.937749, 402, 385, -0.784883, -0.619644)
-    c4 = CircleInvolute(cont, 471, 471, -0.347314, 0.937749, 363, 515, -0.784883, -0.619644)
-    c0.weld_to(1, c1, 0, 1)
-    # End saved data
-
-    cont.default_nib = 8
-
-    blob(c1, 1, 'r', 33, 3)
-    blob(c2, 1, 'r', 33, 3)
-    blob(c3, 1, 'r', 33, 3)
-    blob(c4, 1, 'r', 33, 3)
-    cont.cy = c2.compute_y(1) - 33*sin(c1.compute_theta(1)-pi/2) + 76
-
-    cont.origin = 1000-(39*3*1800/cont.scale), ((1000-cont.cy) * 3600 / cont.scale)
-
-@define_glyph("restquasi")
-def _(cont):
-    # Saved data from gui.py
-    c0 = StraightLine(cont, 375, 791, 588, 81)
-    c1 = CircleInvolute(cont, 588, 81, -0.347314, 0.937749, 480, 125, -0.784883, -0.619644)
-    c2 = CircleInvolute(cont, 549, 211, -0.347314, 0.937749, 441, 255, -0.784883, -0.619644)
-    c3 = CircleInvolute(cont, 510, 341, -0.347314, 0.937749, 402, 385, -0.784883, -0.619644)
-    c4 = CircleInvolute(cont, 471, 471, -0.347314, 0.937749, 363, 515, -0.784883, -0.619644)
-    c5 = CircleInvolute(cont, 432, 601, -0.347314, 0.937749, 324, 645, -0.784883, -0.619644)
-    c0.weld_to(1, c1, 0, 1)
-    # End saved data
-
-    cont.default_nib = 8
-
-    blob(c1, 1, 'r', 33, 3)
-    blob(c2, 1, 'r', 33, 3)
-    blob(c3, 1, 'r', 33, 3)
-    blob(c4, 1, 'r', 33, 3)
-    blob(c5, 1, 'r', 33, 3)
-    cont.cy = c3.compute_y(1) - 33*sin(c1.compute_theta(1)-pi/2) + 76
-
-    cont.origin = 1000-(39*4*1800/cont.scale), ((1000-cont.cy) * 3600 / cont.scale)
+    cont.canvas_size = 1000, 1000 + 130*n
 
 @define_glyph("restcrotchetx")
 def _(cont):
