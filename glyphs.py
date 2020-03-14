@@ -275,6 +275,7 @@ lilyglyphlist = [
 ("revbreath",    "scripts.lcomma",         0, 0,0.5, 1,0.5),
 ("varbreath",    "scripts.rvarcomma",      0, 0.5,0.5, 1,0.5),
 ("revvarbreath", "scripts.lvarcomma",      0, 0.5,0.5, 1,0.5),
+("tickmark",     "scripts.tickmark",       0, 'ox',0, 1,0),
 ("caesura",      "scripts.caesura",        0, 0,0.4, 1,0.4),
 ("caesura",      "scripts.caesura.straight", 0, 0,0.4, 1,0.4),
 ("caesuracurved", "scripts.caesura.curved", 0, 0,0.4, 1,0.4),

@@ -2927,6 +2927,17 @@ def _(cont):
 def _(cont):
     cont.extra = "1000 1000 translate -1 -1 scale", font.varbreath
 
+@define_glyph("tickmark")
+def _(cont):
+    # Saved data from gui.py
+    c0 = CircleInvolute(cont, 425, 397, 0.808736, 0.588172, 500.5, 486.5, 0.393919, 0.919145)
+    c1 = CircleInvolute(cont, 500.5, 486.5, 0.247004, -0.969015, 640, 280, 0.910366, -0.413803)
+    c0.weld_to(1, c1, 0, 1)
+    # End saved data
+    c0.nib = lambda c,x,y,t,theta: 4+12*t
+    c1.nib = lambda c,x,y,t,theta: 4+12*(1-t)**2
+    cont.ox = c0.compute_x(1)
+
 @define_glyph("caesura")
 def _(cont):
     # Saved data from gui.py
