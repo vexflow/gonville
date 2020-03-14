@@ -1441,6 +1441,7 @@ def lilypond_list_missing_glyphs(args):
     re.compile(r'.*medicaea.*'),
     re.compile(r'.*solesmes.*'),
     re.compile(r'.*hufnagel.*'),
+    re.compile(r'.*kievan.*'),
     "scripts.ictus",
     "scripts.uaccentus",
     "scripts.daccentus",
