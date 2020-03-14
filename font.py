@@ -730,6 +730,9 @@ def _(cont):
     cont.origin = cx * 3600. / cont.scale - 12, (1000-cont.oy) * 3600. / cont.scale
 
 @define_glyph("tailquasiup", postprocess=lambda cont: multiup(5, cont))
+@define_glyph("tail6up", postprocess=lambda cont: multiup(6, cont))
+@define_glyph("tail7up", postprocess=lambda cont: multiup(7, cont))
+@define_glyph("tail8up", postprocess=lambda cont: multiup(8, cont))
 def _(cont):
     # Single tail for an up-pointing quasihemidemisemiquaver.
     # Saved data from gui.py
@@ -897,6 +900,9 @@ def _(cont):
     cont.origin = cx * 3600. / cont.scale - 12, (1000-cont.oy) * 3600. / cont.scale
 
 @define_glyph("tailquasidn", postprocess=lambda cont: multidn(5, cont))
+@define_glyph("tail6dn", postprocess=lambda cont: multidn(6, cont))
+@define_glyph("tail7dn", postprocess=lambda cont: multidn(7, cont))
+@define_glyph("tail8dn", postprocess=lambda cont: multidn(8, cont))
 def _(cont):
     # Single tail for a down-pointing quasihemidemisemiquaver.
     # Saved data from gui.py
@@ -1387,10 +1393,14 @@ def _(cont_main):
 @define_glyph("restdemi", args=(3,))
 @define_glyph("resthemi", args=(4,))
 @define_glyph("restquasi", args=(5,))
+@define_glyph("rest6", args=(6,))
+@define_glyph("rest7", args=(7,))
+@define_glyph("rest8", args=(8,))
 def _(cont, n):
-    c0 = StraightLine(cont, 570 - 39*n, 141 + 130*n, 588, 81)
-    cs = [CircleInvolute(cont, 588 - 39*i, 81 + 130*i, -0.347314, 0.937749,
-                         480 - 39*i, 125 + 130*i, -0.784883, -0.619644)
+    xoff = 39 - 4*max(0, n-5)
+    c0 = StraightLine(cont, 570 - xoff*n, 141 + 130*n, 588, 81)
+    cs = [CircleInvolute(cont, 588 - xoff*i, 81 + 130*i, -0.347314, 0.937749,
+                         480 - xoff*i, 125 + 130*i, -0.784883, -0.619644)
           for i in range(n)]
     c0.weld_to(1, cs[0], 0, 1)
 
@@ -1402,7 +1412,7 @@ def _(cont, n):
     co = cs[(n - 1) // 2] # which curve is used as the origin
     cont.cy = co.compute_y(1) - 33*sin(co.compute_theta(1)-pi/2) + 76
 
-    cont.origin = 1000-(39*n*1800/cont.scale), ((1000-cont.cy) * 3600 / cont.scale)
+    cont.origin = 1000-(xoff*n*1800/cont.scale), ((1000-cont.cy) * 3600 / cont.scale)
 
     cont.canvas_size = 1000, 1000 + 130*n
 
