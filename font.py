@@ -2563,6 +2563,33 @@ def _(cont):
     cont.ox = c1.compute_x(0)
     cont.ax = c1.compute_x(1) + c1.compute_nib(1)
 
+@define_glyph("fermataleft")
+def _(cont):
+    # Saved data from gui.py
+    c0 = CircleInvolute(cont, 364, 465, 0, -1, 527, 313, 1, 0)
+    # End saved data
+
+    cont.default_nib = lambda c,x,y,t,theta: 8+18*cos(theta)**2
+
+    # Draw the dot.
+    cont.extra = "newpath 527 446 24 0 360 arc fill "
+
+    cont.ox = font.fermata.ox
+    cont.ax = font.fermata.ax
+
+@define_glyph("fermatadbldot")
+def _(cont):
+    # Saved data from gui.py
+    c0 = CircleInvolute(cont, 364, 465, 0, -1, 527, 313, 1, 0)
+    c1 = CircleInvolute(cont, 527, 313, 1, 0, 690, 465, 0, 1)
+    c0.weld_to(1, c1, 0)
+    # End saved data
+
+    cont.default_nib = lambda c,x,y,t,theta: 8+18*cos(theta)**2
+
+    # Draw the dots.
+    cont.extra = ("newpath 477 446 24 0 360 arc fill "
+                  "newpath 577 446 24 0 360 arc fill ")
 
 @define_glyph("fermata0")
 def _(cont):
@@ -2577,6 +2604,24 @@ def _(cont):
 
     # Draw the dot.
     cont.extra = "newpath 527 446 24 0 360 arc fill "
+
+@define_glyph("fermata00")
+def _(cont):
+    # Saved data from gui.py
+    c0 = StraightLine(cont, 360, 465, 537, 180)
+    c1 = StraightLine(cont, 537, 180, 714, 465)
+    c2 = StraightLine(cont, 422, 465, 527, 295)
+    c3 = StraightLine(cont, 527, 295, 632, 465)
+    c0.weld_to(1, c1, 0, 1)
+    c2.weld_to(1, c3, 0, 1)
+    # End saved data
+
+    c0.nib = c2.nib = 8
+    c1.nib = lambda c,x,y,t,theta: (8, pi, min(24, t*250), 0)
+    c3.nib = lambda c,x,y,t,theta: (8, pi, min(24, t*150), 0)
+
+    # Draw the dot.
+    cont.extra = "newpath 522 446 24 0 360 arc fill "
 
 @define_glyph("fermata2")
 def _(cont):
@@ -2618,7 +2663,21 @@ def _(cont):
 def _(cont):
     cont.extra = '0 1000 translate 1 -1 scale', font.fermata
 
+@define_glyph("fermataleftup")
+def _(cont):
+    cont.extra = '0 1000 translate 1 -1 scale', font.fermataleft
+    cont.ox = font.fermata.ox
+    cont.ax = font.fermata.ax
+
+@define_glyph("fermatadbldotup")
+def _(cont):
+    cont.extra = '0 1000 translate 1 -1 scale', font.fermatadbldot
+
 @define_glyph("fermata0up")
+def _(cont):
+    cont.extra = '0 1000 translate 1 -1 scale', font.fermata0
+
+@define_glyph("fermata00up")
 def _(cont):
     cont.extra = '0 1000 translate 1 -1 scale', font.fermata0
 
