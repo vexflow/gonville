@@ -366,7 +366,7 @@ class CircleInvolute(Curve):
             self.inparams = (x1, y1, dx1, dy1, x2, y2, dx2, dy2, mx)
             self.set_params()
             self.tk_refresh()
-            end = (self.dragpt-1)/2
+            end = (self.dragpt-1)//2
             self.weld_update(end, 2)
             return 1
 
