@@ -464,6 +464,8 @@ lilyglyphlist = [
 ("slashsemi",    "noteheads.s0slash",      0, 0,0.5, 1,0.5),
 ("slashminim",   "noteheads.s1slash",      0, 0,0.5, 1,'ay'),
 ("slashcrotchet", "noteheads.s2slash",     0, 0,0.5, 1,'ay'),
+("lyrictie",     "ties.lyric.default",     0, 'ox','oy', 'ox','oy'),
+("lyrictieshort", "ties.lyric.short",      0, 'ox','oy', 'ox','oy'),
 ]
 
 def writesfd(filepfx, fontname, encodingname, encodingsize, outlines, glyphlist):

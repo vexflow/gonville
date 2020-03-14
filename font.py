@@ -3768,6 +3768,37 @@ def _(cont):
     cont.ox = c1.compute_x(0)
 
 # ----------------------------------------------------------------------
+# Lyric ties.
+
+@define_glyph("lyrictie")
+def _(cont):
+    # Saved data from gui.py
+    c0 = CircleInvolute(cont, 385, 552, 0.77193, 0.635707, 615, 552, 0.77193, -0.635707)
+    c1 = CircleInvolute(cont, 385, 552, 0.879292, 0.476283, 615, 552, 0.879292, -0.476283)
+    c0.weld_to(0, c1, 0, 1)
+    c0.weld_to(1, c1, 1, 1)
+    # End saved data
+
+    cont.ox = 500
+    cont.oy = 500
+
+    cont.default_nib = 6
+
+@define_glyph("lyrictieshort")
+def _(cont):
+    # Saved data from gui.py
+    c0 = CircleInvolute(cont, 416, 552, 0.618865, 0.785497, 584, 553, 0.618865, -0.785497)
+    c1 = CircleInvolute(cont, 416, 552, 0.791647, 0.610979, 584, 553, 0.791647, -0.610979)
+    c0.weld_to(0, c1, 0, 1)
+    c0.weld_to(1, c1, 1, 1)
+    # End saved data
+
+    cont.ox = 500
+    cont.oy = 500
+
+    cont.default_nib = 6
+
+# ----------------------------------------------------------------------
 # A blank glyph!
 
 @define_glyph("blank")
