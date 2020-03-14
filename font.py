@@ -3637,6 +3637,31 @@ def _(cont):
     "  45 rotate" + \
     "} repeat"
 
+@define_glyph("accpush")
+def _(cont):
+    # Saved data from gui.py
+    c0 = StraightLine(cont, 435, 460, 535, 310)
+    c1 = StraightLine(cont, 535, 310, 435, 160)
+    c0.weld_to(1, c1, 0)
+    # End saved data
+
+    cont.default_nib = 10
+
+    cont.ox = c1.compute_x(0)
+
+@define_glyph("accpull")
+def _(cont):
+    # Saved data from gui.py
+    c0 = StraightLine(cont, 435, 160, 535, 160)
+    c1 = StraightLine(cont, 535, 160, 535, 460)
+    c0.weld_to(1, c1, 0)
+    # End saved data
+
+    c0.nib = lambda c,x,y,t,theta: (10, pi/2, 0, 40) if x<525 else 10
+    c1.nib = 10
+
+    cont.ox = c1.compute_x(0)
+
 # ----------------------------------------------------------------------
 # A blank glyph!
 

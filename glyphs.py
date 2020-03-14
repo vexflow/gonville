@@ -438,6 +438,8 @@ lilyglyphlist = [
 ("accdot",       "accordion.dot",          0, 0.5,0.5, 1,0.5),
 ("accstar",      "accordion.accOldEE",     0, 0.5,0, 1,0),
 ("accstar",      "accordion.oldEE",        0, 0.5,0, 1,0),
+("accpush",      "accordion.push",         0, 'ox',0, 1,0),
+("accpull",      "accordion.pull",         0, 'ox',0, 1,0),
 ("diamondsemi",  "noteheads.s0diamond",    0, 0,0.5, 1,0.5),
 ("diamondminim", "noteheads.s1diamond",    0, 0,0.5, 1,0.5),
 ("diamondcrotchet", "noteheads.s2diamond", 0, 0,0.5, 1,0.5),
