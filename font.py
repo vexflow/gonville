@@ -699,8 +699,8 @@ def _(cont):
 def _(cont):
     # Single tail for an up-pointing hemidemisemiquaver.
     # Saved data from gui.py
-    c0 = CircleInvolute(cont, 535, 555, 0.853282, -0.52145, 577, 552, 0.894427, 0.447214)
-    c1 = CircleInvolute(cont, 577, 552, 0.894427, 0.447214, 640, 753, -0.447214, 0.894427)
+    c0 = CircleInvolute(cont, 535, 555, 0.977176, -0.21243, 578, 556, 0.948683, 0.316228)
+    c1 = CircleInvolute(cont, 578, 556, 0.948683, 0.316228, 640, 753, -0.447214, 0.894427)
     c2 = CircleInvolute(cont, 535, 465, 0.28, 0.96, 592, 545, 0.77193, 0.635707)
     c3 = CircleInvolute(cont, 592, 545, 0.77193, 0.635707, 640, 753, -0.447214, 0.894427)
     c4 = StraightLine(cont, 660, 815.96, 660, 500.096)
