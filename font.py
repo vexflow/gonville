@@ -2339,6 +2339,11 @@ def _(cont):
 
     cont.extra = font.turn
 
+@define_glyph("mirrorturn")
+def _(cont):
+    cont.before = "1000 0 translate -1 1 scale"
+    cont.extra = font.turn
+
 # ----------------------------------------------------------------------
 # Mordent and its relatives.
 
