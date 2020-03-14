@@ -391,9 +391,12 @@ def _(cont):
     "newpath 530 368 moveto 530 632 lineto " + \
     "590 632 lineto 590 368 lineto closepath fill "
 
+    cont.ox = 320
+
 @define_glyph("clefpercsmall")
 def _(cont):
     cont.extra = ".8 dup scale", font.clefperc
+    cont.ox = font.clefperc.ox * .8
 
 # ----------------------------------------------------------------------
 # Tablature 'clef': just the letters "TAB", written vertically in a
@@ -2177,6 +2180,8 @@ def _(cont): # staccatissimo pointing the other way
 def _(cont): # snap-pizzicato
     cont.extra = "newpath 500 500 50 0 360 arc 500 500 moveto 500 400 lineto 16 setlinewidth 1 setlinejoin 1 setlinecap stroke"
 
+    cont.oy = 500
+
 # ----------------------------------------------------------------------
 # The 'segno' sign (for 'D.S. al Fine' sort of stuff).
 
@@ -2513,6 +2518,9 @@ def _(cont):
 
     # Draw the dot.
     cont.extra = "newpath 527 446 24 0 360 arc fill "
+
+    cont.ox = c1.compute_x(0)
+    cont.ax = c1.compute_x(1) + c1.compute_nib(1)
 
 
 @define_glyph("fermata0")
