@@ -597,9 +597,14 @@ class ExponentialInvolute(Curve):
         if t == 0:
             dx, dy = 0, 1
         else:
+            # We're computing the direction of the exponential curve,
+            # same as above. But the direction of the involute is at
+            # right angles to that, because in an involute, the
+            # endpoint of the imaginary unreeling thread is always
+            # moving at right angles to the thread direction itself.
             t = (1-t) * 15
-            dx = 1
-            dy = -b*exp(-b*t)
+            dx = b*exp(-b*t)
+            dy = 1
 
         dx, dy = xdx*dx + ydx*dy, xdy*dx + ydy*dy
         dlen = sqrt(dx*dx + dy*dy)
