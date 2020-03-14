@@ -5,6 +5,8 @@ module gonville
 
 set Version $(!builddate).$(vcsid)
 
+ifeq "$(SHARE_LILYPOND)" "" set SHARE_LILYPOND /usr/share/lilypond
+
 # Construct the source archive, before we create any new files.
 in . do mkdir gonville-$(Version)
 in gonville-$(Version) do cp -r ../gonville/* .
@@ -38,7 +40,7 @@ in gonville do convert -resize 1400x- -trim -bordercolor white -border 10 before
 in gonville do lilypond -dbackend=svg lilydemo.ly
 in gonville do inkscape -D lilydemo.svg --export-margin=2 --export-plain-svg=before.svg
 
-in gonville do ./lilysetup ../gonville-$(Version)/lilyfonts /usr/share/lilypond/* lilydata
+in gonville do ./lilysetup ../gonville-$(Version)/lilyfonts $(SHARE_LILYPOND)/* lilydata
 
 in gonville do ./run-lilypond-with-datadir $$PWD/lilydata --ps lilydemo.ly
 in gonville do gs -sDEVICE=pngmono -sPAPERSIZE=a4 -r720 -sOutputFile=after0.png -dBATCH -dNOPAUSE lilydemo.ps
