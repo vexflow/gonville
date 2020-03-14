@@ -1451,6 +1451,12 @@ def _(cont):
 
     cont.oy = 505
 
+@define_glyph("restbreveo")
+def _(cont):
+    cont.extra = font.restbreve, \
+    "newpath 390 406 moveto 664 406 lineto " \
+    "390 538 moveto 664 538 lineto 12 setlinewidth 1 setlinecap stroke"
+
 @define_glyph("restsemibreveo")
 def _(cont):
     cont.extra = font.restminim, \

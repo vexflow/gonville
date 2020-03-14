@@ -373,6 +373,7 @@ lilyglyphlist = [
 ("restdbllonga", "rests.M3",               0, 0,0.5, 1,0.5),
 ("restlonga",    "rests.M2",               0, 0,0.5, 1,0.5),
 ("restbreve",    "rests.M1",               0, 0,0, 1,0),
+("restbreveo",   "rests.M1o",              0, 0,0, 1,0),
 ("restcrotchet", "rests.2",                0, 0,0.5, 1,0.5),
 ("restcrotchetx", "rests.2classical",      0, 0,0.5, 1,0.5),
 ("restdemi",     "rests.5",                0, 0,'cy', 1,'cy'),
