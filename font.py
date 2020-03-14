@@ -1,4 +1,5 @@
 from curves import *
+import collections
 
 class GlyphContext:
     def __init__(self):
@@ -135,7 +136,8 @@ def blob(curve, end, whichside, radius, shrink, nibradius=None):
 # Construct a PostScript path description which follows the centre
 # of some series of curve objects and visits other points in
 # between. Used to arrange that one quaver tail doesn't go past
-# another.
+# another, and similar.
+Reversed = collections.namedtuple("Reversed", "curve")
 def clippath(elements):
     coords = []
     for e in elements:
@@ -143,6 +145,10 @@ def clippath(elements):
             for it in range(e.cont.curve_res):
                 t = it / float(e.cont.curve_res-1)
                 coords.append(e.compute_point(t))
+        elif isinstance(e, Reversed):
+            for it in range(e.curve.cont.curve_res):
+                t = it / float(e.curve.cont.curve_res-1)
+                coords.append(e.curve.compute_point(1 - t))
         else:
             # Plain coordinate pair.
             coords.append(e)
@@ -191,6 +197,26 @@ def makesmallclef(clef):
         if hasattr(clef, attr):
             setattr(cont, attr, .8 * getattr(clef, attr))
     return cont
+
+# ----------------------------------------------------------------------
+# Shared component used in variant forms of both G and C clef.
+
+@define_component("clefCstraightright")
+def _(cont):
+    # Saved data from gui.py
+    c0 = StraightLine(cont, 437, 420, 740, 420)
+    c1 = StraightLine(cont, 740, 420, 740, 186)
+    c2 = StraightLine(cont, 437, 528, 740, 528)
+    c3 = StraightLine(cont, 740, 528, 740, 762)
+    c0.weld_to(1, c1, 0)
+    c2.weld_to(1, c3, 0)
+    # End saved data
+    c0.nib = c2.nib = 8, pi/2, 20, 20
+    cont.default_nib = 8
+    blob(c1, 1, 'r', 40, 9)
+    blob(c3, 1, 'l', 40, 9)
+
+    cont.hy = 474
 
 # ----------------------------------------------------------------------
 # G clef (treble).
@@ -247,6 +273,7 @@ def _(cont_main):
 
     # for use in clipping
     cont.left_side_path = [c2, c3, c4, c5, c6]
+    cont.right_side_path = [Reversed(c9), Reversed(c8), Reversed(c7)]
 
     cont.default_nib = lambda c,x,y,t,theta: 17+11*cos(theta-c.nibdir(t))
     c0.nibdir = c1.nibdir = c2.nibdir = lambda t: 0
@@ -279,6 +306,23 @@ def _(cont):
                   "newpath", clip, "clip",
                   "setmatrix", font.clefG, "grestore")
     cont.scale = font.clefG.scale
+    cont.origin = font.clefG.origin
+    cont.hy = font.clefG.hy
+
+@define_glyph("clefGtenorised")
+@define_glyph("clefGtenorisedsmall", postprocess=makesmallclef)
+def _(cont):
+    clip = clippath(font.clefG.left_side_path +
+                    [(559, 0), (1000, 0), (1000, 1000), (598, 1000)] +
+                    font.clefG.right_side_path +
+                    [(559, 0), (1000, 0), (1000, 1000), (666, 1000)])
+    cont.scale = font.clefG.scale
+    cont.extra = (font.clefG,
+                  "gsave newpath", clip, "clip",
+                  "0 %g translate" % font.clefG.hy,
+                  "%g dup scale" % (cont.scale / clefCstraightright.scale),
+                  "0 %g translate" % (-clefCstraightright.hy),
+                  "40 -268 translate", clefCstraightright, "grestore")
     cont.origin = font.clefG.origin
     cont.hy = font.clefG.hy
 
@@ -397,6 +441,14 @@ def _(cont_main):
     "/box { newpath 3 index 3 index moveto 3 index 1 index lineto 1 index 1 index lineto 1 index 3 index lineto closepath fill pop pop pop } def " + \
     "537 206 601 742 box " + \
     "625 206 641 742 box "
+
+@define_glyph("clefCstraight")
+@define_glyph("clefCstraightsmall", postprocess=makesmallclef)
+def _(cont):
+    cont.extra = (font.clefC.extra,
+                  "gsave newpath 641 0 moveto 0 1000 rlineto 1000 1000 lineto "
+                  "1000 0 lineto closepath clip",
+                  clefCstraightright, "grestore")
 
 # ----------------------------------------------------------------------
 # Percussion 'clef'.
