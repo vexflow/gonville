@@ -982,13 +982,14 @@ def lilypond_output(args, do_main_font=True, do_brace_font=True):
         for i in range(len(lilyglyphlist)):
             g = list(lilyglyphlist[i])
             gid = g[0]
+            glyph = getattr(font, gid)
             if len(g) > 7:
                 prop = g[7]
                 for k, v in prop.items():
                     if k[0] == "x":
-                        v = getattr(getattr(font, gid), v) * 40
+                        v = getattr(glyph, v) * 40
                     elif k[0] == "y":
-                        v = (1000 - getattr(getattr(font, gid), v)) * 40
+                        v = (glyph.canvas_size[1] - getattr(glyph, v)) * 40
                     else:
                         raise "Error!"
                     prop[k] = v
@@ -1010,25 +1011,25 @@ def lilypond_output(args, do_main_font=True, do_brace_font=True):
             outlines[gid] = ((x0,y0,x1,y1),outlines[gid][1])
             xo = g[3]
             if type(xo) == str:
-                xo = getattr(getattr(font, gid), xo) * 40
+                xo = getattr(glyph, xo) * 40
             else:
                 xo = x0 + (x1-x0) * xo
             g[3] = xo
             yo = g[4]
             if type(yo) == str:
-                yo = (1000 - getattr(getattr(font, gid), yo)) * 40
+                yo = (glyph.canvas_size[1] - getattr(glyph, yo)) * 40
             else:
                 yo = y0 + (y1-y0) * yo
             g[4] = yo
             xa = g[5]
             if type(xa) == str:
-                xa = getattr(getattr(font, gid), xa) * 40
+                xa = getattr(glyph, xa) * 40
             else:
                 xa = x0 + (x1-x0) * xa
             g[5] = xa
             ya = g[6]
             if type(ya) == str:
-                ya = (1000 - getattr(getattr(font, gid), ya)) * 40
+                ya = (glyph.canvas_size[1] - getattr(glyph, ya)) * 40
             else:
                 ya = y0 + (y1-y0) * ya
             g[6] = ya
@@ -1399,7 +1400,7 @@ def simple_output(args):
             xo = xo * char.scale / 3600. * 40
             yo = yo * char.scale / 3600. * 40
         if hasattr(char, "hy"):
-            yo = (1000 - char.hy) * 40
+            yo = (char.canvas_size[1] - char.hy) * 40
         if hasattr(char, "hx"):
             xo = char.hx * 40
 
