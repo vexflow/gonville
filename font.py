@@ -2344,6 +2344,21 @@ def _(cont):
     cont.before = "1000 0 translate -1 1 scale"
     cont.extra = font.turn
 
+@define_glyph("turnhaydn")
+def _(cont):
+    # Saved data from gui.py
+    c0 = ExponentialInvolute(cont, 525, 402, -0.852987, -0.521932, 407, 427, -0.533993, 0.845489)
+    c1 = ExponentialInvolute(cont, 525, 402, 0.852987, 0.521932, 643, 377, 0.533993, -0.845489)
+    c2 = StraightLine(cont, 525, 336, 525, 468)
+    c0.weld_to(0, c1, 0)
+    # End saved data
+
+    theta_thin = c0.compute_theta(1)
+    cont.default_nib = lambda c,x,y,t,theta: 10+16*sin(theta-theta_thin)**2
+    c2.nib = 10
+
+    cont.curve_res *= 10
+
 # ----------------------------------------------------------------------
 # Mordent and its relatives.
 
