@@ -245,6 +245,9 @@ def _(cont_main):
     c9.weld_to(1, c10, 0)
     # End saved data
 
+    # for use in clipping
+    cont.left_side_path = [c2, c3, c4, c5, c6]
+
     cont.default_nib = lambda c,x,y,t,theta: 17+11*cos(theta-c.nibdir(t))
     c0.nibdir = c1.nibdir = c2.nibdir = lambda t: 0
     phi = c4.compute_theta(1)
@@ -263,6 +266,21 @@ def _(cont_main):
     cont.origin = 800, 822
 
     cont.hy = 1000 - (cont.origin[1] * cont.scale / 3600.) # I should probably work this out better
+
+@define_glyph("clefGdouble")
+@define_glyph("clefGdoublesmall", postprocess=makesmallclef)
+def _(cont):
+    xoffset = 155
+    clip = clippath(font.clefG.left_side_path +
+                    [(559, 0), (0, 0), (0, 1000), (666, 1000)])
+    cont.extra = ("gsave matrix currentmatrix",
+                  "%g 0 translate" % xoffset,
+                  font.clefG,
+                  "newpath", clip, "clip",
+                  "setmatrix", font.clefG, "grestore")
+    cont.scale = font.clefG.scale
+    cont.origin = font.clefG.origin
+    cont.hy = font.clefG.hy
 
 # ----------------------------------------------------------------------
 # F clef (bass).
