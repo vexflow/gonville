@@ -1421,6 +1421,20 @@ def _(cont):
     cont.before = "1000 0 translate -1 1 scale"
     cont.extra = font.restquaver
 
+@define_glyph("restcrotchetz")
+def _(cont):
+    # Saved data from gui.py
+    c0 = StraightLine(cont, 532, 271, 412, 81)
+    c1 = CircleInvolute(cont, 412, 81, 0.5339929913860784, 0.8454889030321733, 525, 125, 0.784883, -0.619644)
+    c2 = CircleInvolute(cont, 532, 271, -0.5339929913860784, -0.8454889030321733, 419, 227, -0.784883, 0.619644)
+    c0.weld_to(1, c1, 0, 1)
+    # End saved data
+
+    cont.default_nib = 8
+
+    blob(c1, 1, 'l', 33, 3)
+    blob(c2, 1, 'l', 33, 3)
+
 # ----------------------------------------------------------------------
 # Rectangular rests (minim/semibreve, breve, longa, double longa).
 
