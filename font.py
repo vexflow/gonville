@@ -451,7 +451,7 @@ def _(cont):
                   clefCstraightright, "grestore")
 
 # ----------------------------------------------------------------------
-# Percussion 'clef'.
+# Percussion 'clefs'.
 
 @define_glyph("clefperc")
 @define_glyph("clefpercsmall", postprocess=makesmallclef)
@@ -463,6 +463,26 @@ def _(cont):
     "590 632 lineto 590 368 lineto closepath fill "
 
     cont.ox = 320
+
+@define_glyph("clefpercbox")
+@define_glyph("clefpercboxsmall", postprocess=makesmallclef)
+def _(cont):
+    # Saved data from gui.py
+    c0 = StraightLine(cont, 450, 282, 550, 282)
+    c1 = StraightLine(cont, 550, 282, 550, 718)
+    c2 = StraightLine(cont, 550, 718, 450, 718)
+    c3 = StraightLine(cont, 450, 718, 450, 282)
+    c0.weld_to(1, c1, 0)
+    c0.weld_to(0, c3, 1)
+    c1.weld_to(1, c2, 0)
+    c2.weld_to(1, c3, 0)
+    # End saved data
+
+    c0.nib = lambda c,x,y,t,theta: (10, pi/2, 0, 40) if 455 < x < 545 else 10
+    c2.nib = lambda c,x,y,t,theta: (10, pi/2, 40, 0) if 455 < x < 545 else 10
+    c1.nib = c3.nib = 10
+
+    cont.ox = 380
 
 # ----------------------------------------------------------------------
 # Tablature 'clef': just the letters "TAB", written vertically in a
