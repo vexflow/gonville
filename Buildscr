@@ -10,6 +10,11 @@ in . do mkdir gonville-$(Version)
 in gonville-$(Version) do cp -r ../gonville/* .
 in . do tar czvf gonville-$(Version)-src.tar.gz gonville-$(Version)
 
+# For a faster development cycle, an option to omit building the large
+# and slow brace subfont.
+set Lilybuildopt --lily
+ifeq "$(NOBRACE)" "yes" set Lilybuildopt --lilymain
+
 # Build the font set, and construct the distribution archive
 # containing the output fonts directory and only the necessary
 # source files.
@@ -17,7 +22,7 @@ in . do rm -rf gonville-$(Version)
 in . do mkdir gonville-$(Version)
 in gonville do cp LICENCE README lilysetup ../gonville-$(Version)
 in gonville/svgfilter do make
-in gonville do ./glyphs.py --ver=$(Version) --svgfilter=./svgfilter/svgfilter --lily -j$(nproc)
+in gonville do ./glyphs.py --ver=$(Version) --svgfilter=./svgfilter/svgfilter $(Lilybuildopt) -j$(nproc)
 in gonville-$(Version) do mv ../gonville/lilyfonts .
 in . do tar czvf gonville-$(Version).tar.gz gonville-$(Version)
 # And build a zip file for Windows users, which will of course store
