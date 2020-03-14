@@ -2286,6 +2286,67 @@ def _(cont):
     "newpath 618 251 24 0 360 arc fill " + \
     "newpath 410 339 24 0 360 arc fill "
 
+@define_component("varsegnoend")
+def _(cont):
+    # Saved data from gui.py
+    c0 = StraightLine(cont, 412.999, 375.995, 604.5, 511.5)
+    c1 = ExponentialInvolute(cont, 412.999, 375.995, -0.816309, -0.577616, 353, 278, 0.039968, -0.999201)
+    c2 = CircleInvolute(cont, 353, 278, 0.039968, -0.999201, 475, 183.5, 0.999764, 0.021734)
+    c3 = CircleInvolute(cont, 475, 183.5, 0.999764, 0.021734, 635, 265, 0.581238, 0.813733)
+    c4 = ExponentialInvolute(cont, 604.5, 511.5, 0.816309, 0.577616, 654.5, 588, 0.00548671, 0.999985)
+    c5 = CircleInvolute(cont, 654.5, 588, 0.00548671, 0.999985, 578, 661, -0.99083, 0.135113)
+    c0.weld_to(0, c1, 0)
+    c0.weld_to(1, c4, 0)
+    c1.weld_to(1, c2, 0)
+    c2.weld_to(1, c3, 0)
+    c4.weld_to(1, c5, 0)
+    # End saved data
+
+    slant = c0.compute_theta(0.5)
+    cross = slant + pi/2
+    def nib(c, x, y, t, theta):
+        thickness = cos(theta-slant)**2
+        w = 12
+        r = 32 - 2*w
+        return 8 + r * thickness, cross, w * thickness, w * thickness
+    cont.default_nib = nib
+
+    def c3nib(c, x, y, t, theta):
+        r, w, f, b = nib(c, x, y, t, theta)
+        if t == 1:
+            return r + f + b
+        else:
+            return r + t * (f + b), w, (1-t)*f, (1-t)*b
+    c3.nib = c3nib
+
+@define_component("varsegnomiddle")
+def _(cont):
+    # Saved data from gui.py
+    c0 = StraightLine(cont, 396, 530.5, 604.5, 688.5)
+    c1 = ExponentialInvolute(cont, 604.5, 688.5, 0.797009, 0.603968, 654.5, 765, 0.00548671, 0.999985)
+    c2 = CircleInvolute(cont, 654.5, 765, 0.00548671, 0.999985, 578, 838, -0.99083, 0.135113)
+    c3 = ExponentialInvolute(cont, 396, 530.5, -0.797009, -0.603968, 346, 454, -0.00548671, -0.999985)
+    c4 = CircleInvolute(cont, 346, 454, -0.00548671, -0.999985, 422.5, 381, 0.99083, -0.135113)
+    c0.weld_to(1, c1, 0)
+    c0.weld_to(0, c3, 0)
+    c1.weld_to(1, c2, 0)
+    c3.weld_to(1, c4, 0)
+    # End saved data
+
+    cont.default_nib = varsegnoend.default_nib
+    cont.centre = c0.compute_x(0.5), c0.compute_y(0.5)
+
+@define_glyph("varsegno")
+def _(cont):
+    cont.extra = ("0 -100 translate", varsegnoend, varsegnomiddle,
+                  "0 177 translate", varsegnomiddle,
+                  "0 177 translate", varsegnomiddle,
+                  "%g %g translate 180 rotate %g %g translate" % (
+                      varsegnomiddle.centre[0], varsegnomiddle.centre[1],
+                      -varsegnomiddle.centre[0], -varsegnomiddle.centre[1]),
+                  varsegnoend)
+    cont.canvas_size = 1000, 1400
+
 # ----------------------------------------------------------------------
 # The coda sign.
 
