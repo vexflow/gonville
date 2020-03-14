@@ -180,6 +180,19 @@ def define_component(name, **kws):
     return decorator
 
 # ----------------------------------------------------------------------
+# Postprocessor for making small clefs.
+
+def makesmallclef(clef):
+    cont = GlyphContext()
+    cont.extra = ".8 dup scale", clef
+    cont.scale = clef.scale
+    cont.origin = clef.origin
+    for attr in ['hy', 'ox']:
+        if hasattr(clef, attr):
+            setattr(cont, attr, .8 * getattr(clef, attr))
+    return cont
+
+# ----------------------------------------------------------------------
 # G clef (treble).
 #
 # The G clef is drawn in two parts. First, we have a connected
@@ -195,6 +208,7 @@ def define_component(name, **kws):
 # context.
 
 @define_glyph("clefG")
+@define_glyph("clefGsmall", postprocess=makesmallclef)
 def _(cont_main):
     # Secondary curves.
     cont = GlyphContext()
@@ -250,17 +264,11 @@ def _(cont_main):
 
     cont.hy = 1000 - (cont.origin[1] * cont.scale / 3600.) # I should probably work this out better
 
-@define_glyph("clefGsmall")
-def _(cont):
-    cont.extra = ".8 dup scale", font.clefG
-    cont.scale = font.clefG.scale
-    cont.origin = font.clefG.origin
-    cont.hy = .8 * font.clefG.hy
-
 # ----------------------------------------------------------------------
 # F clef (bass).
 
 @define_glyph("clefF")
+@define_glyph("clefFsmall", postprocess=makesmallclef)
 def _(cont):
     # Saved data from gui.py
     c0 = CircleInvolute(cont, 534, 761, 0.964764, -0.263117, 783, 479, 0, -1)
@@ -287,11 +295,6 @@ def _(cont):
     # two dots.
     cont.hy = (417+542)/2.0
 
-@define_glyph("clefFsmall")
-def _(cont):
-    cont.extra = ".8 dup scale", font.clefF
-    cont.hy = .8 * font.clefF.hy
-
 # ----------------------------------------------------------------------
 # C clef (alto, tenor).
 #
@@ -311,6 +314,7 @@ def _(cont):
 # precisely along tc0. Again, I don't care.)
 
 @define_glyph("clefC")
+@define_glyph("clefCsmall", postprocess=makesmallclef)
 def _(cont_main):
     # Secondary context.
     cont = GlyphContext()
@@ -376,14 +380,11 @@ def _(cont_main):
     "537 206 601 742 box " + \
     "625 206 641 742 box "
 
-@define_glyph("clefCsmall")
-def _(cont):
-    cont.extra = ".8 dup scale", font.clefC
-
 # ----------------------------------------------------------------------
 # Percussion 'clef'.
 
 @define_glyph("clefperc")
+@define_glyph("clefpercsmall", postprocess=makesmallclef)
 def _(cont):
     cont.extra = \
     "newpath 410 368 moveto 410 632 lineto " + \
@@ -393,16 +394,12 @@ def _(cont):
 
     cont.ox = 320
 
-@define_glyph("clefpercsmall")
-def _(cont):
-    cont.extra = ".8 dup scale", font.clefperc
-    cont.ox = font.clefperc.ox * .8
-
 # ----------------------------------------------------------------------
 # Tablature 'clef': just the letters "TAB", written vertically in a
 # vaguely calligraphic style.
 
 @define_glyph("clefTAB")
+@define_glyph("clefTABsmall", postprocess=makesmallclef)
 def _(cont):
     # Saved data from gui.py
     c0 = StraightLine(cont, 100, 104, 900, 104)
@@ -446,11 +443,6 @@ def _(cont):
     c11.nib = lambda c,x,y,t,theta: 12-6*t
 
     cont.hy = (c1.compute_y(0) + c2.compute_y(0)) / 2.0
-
-@define_glyph("clefTABsmall")
-def _(cont):
-    cont.extra = ".8 dup scale", font.clefTAB
-    cont.hy = .8 * font.clefTAB.hy
 
 # ----------------------------------------------------------------------
 # Quaver tails.
