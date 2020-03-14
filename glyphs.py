@@ -10,7 +10,7 @@ import subprocess
 import multiprocessing
 import argparse
 from curves import *
-from font import font, scaledbrace
+from font import font, scaledbrace, GlyphContext
 
 # UTF-7 encoding, ad-hocked to do it the way Fontforge wants it done
 # (encoding control characters and double quotes, in particular).
