@@ -902,6 +902,20 @@ def mus_output(args):
     g.write("        fputs(*p, fp);\n")
     g.write("}\n")
 
+def mkdir(d):
+    "Make a directory, tolerating it existing already."
+    try:
+        os.mkdir(d)
+    except FileExistsError:
+        pass
+
+def symlink(a, b):
+    "Make a symlink, tolerating it existing already."
+    try:
+        os.symlink(a, b)
+    except FileExistsError:
+        pass
+
 def lilypond_output(args, do_main_font=True, do_brace_font=True):
     # Generate .sfd files and supporting metadata which we then
     # process with FontForge into a replacement system font set for
@@ -927,11 +941,7 @@ def lilypond_output(args, do_main_font=True, do_brace_font=True):
         if outfile.endswith(".svg"):
             postprocess_svg_file(outfile)
 
-    def writetables(filepfx, size, subids, subnames, outlines, glyphlist, bracesonly=0):
-        fname = filepfx + ".LILF"
-        f = open(fname, "w")
-        f.write(" ".join(subnames))
-        f.close()
+    def writetables(filepfx, size, subfontname, outlines, glyphlist, bracesonly=0):
         fname = filepfx + ".LILY"
         f = open(fname, "w")
         if not bracesonly:
@@ -950,7 +960,7 @@ def lilypond_output(args, do_main_font=True, do_brace_font=True):
         fname = filepfx + ".LILC"
         f = open(fname, "w")
         for glyph in glyphlist:
-            ourname, theirname, encoding, ox, oy, ax, ay, subid, subcode = glyph[:9]
+            ourname, theirname, encoding, ox, oy, ax, ay = glyph[:7]
             char = getattr(font, ourname)
             bbox, path = outlines[ourname]
             xrt = lambda x: x * (3600.0 / (40*char.scale)) # potrace's factor of ten, ours of four
@@ -961,9 +971,13 @@ def lilypond_output(args, do_main_font=True, do_brace_font=True):
             yt = lambda y: (yat(y) - yat(oy)) * (size/1000.)
             f.write("(%s .\n" % theirname)
             f.write("((bbox . (%.6f %.6f %.6f %.6f))\n" % (xt(bbox[0]), yt(bbox[1]), xt(bbox[2]), yt(bbox[3])))
-            f.write("(subfont . \"%s\")\n" % subnames[subid])
-            f.write("(subfont-index . %d)\n" % subcode)
+            f.write("(subfont . \"%s\")\n" % subfontname)
+            f.write("(subfont-index . %d)\n" % encoding)
             f.write("(attachment . (%.6f . %.6f))))\n" % (xt(ax), yt(ay)))
+        f.close()
+        fname = filepfx + ".LILF"
+        f = open(fname, "w")
+        f.write(subfontname)
         f.close()
 
     if do_main_font:
@@ -1076,70 +1090,25 @@ def lilypond_output(args, do_main_font=True, do_brace_font=True):
             g[6] = ya
             lilyglyphlist[i] = tuple(g)
 
-        # Split up the glyph list into appropriately sized chunks
-        # for the custom-encoded .pfas.
-        subid = 0
-        subcode = 256
-        subglyphlists = [[]]
-        for i in range(len(lilyglyphlist)):
-            if lilyglyphlist[i][2] < 256:
-                thissubid = 0
-                thissubcode = lilyglyphlist[i][2]
-            else:
-                if subcode >= 256:
-                    subid = subid + 1
-                    subcode = 33
-                    subglyphlists.append([])
-                thissubid = subid
-                thissubcode = subcode
-                subcode = subcode + 1
-            subglyphlists[thissubid].append(lilyglyphlist[i][:2] + (thissubcode,) + lilyglyphlist[i][3:])
-            lilyglyphlist[i] = lilyglyphlist[i][:7] + (thissubid, thissubcode) + lilyglyphlist[i][7:]
-        subids = subid + 1
+        mkdir("lilysrc")
+        for topdir in "lilyfonts", "lilyfonts-old":
+            for suffix in "", "/otf", "/svg":
+                mkdir(topdir + suffix)
 
-        sizes = 11, 13, 14, 16, 18, 20, 23, 26
-        for size in sizes:
-            writesfd("gonville-%d" % size, "Gonville-%d" % size, "UnicodeBmp", 65537, outlines, lilyglyphlist)
-            subnames = ["gonvillealpha%d" % size] + ["gonvillepart%d" % subid for subid in range(1,subids)]
-            writetables("gonville-%d" % size, size, subids, subnames, outlines, lilyglyphlist)
-            writesfd("gonvillealpha%d" % size, subnames[0], "Custom", 256, outlines, subglyphlists[0])
-        for subid in range(1,subids):
-            writesfd("gonvillepart%d" % subid, "Gonville-Part%d" % subid, "Custom", 256, outlines, subglyphlists[subid])
+        for size in [11, 13, 14, 16, 18, 20, 23, 26]:
+            prefix = "lilysrc/gonville-%d" % size
+            sfd = prefix + ".sfd"
 
-        for dir in "lilyfonts", "lilyfonts/type1", "lilyfonts/otf", "lilyfonts/svg":
-            try:
-                os.mkdir(dir)
-            except OSError as e:
-                pass # probably already existed, which we don't mind
+            writesfd(prefix, "Gonville-%d" % size, "UnicodeBmp", 65537, outlines, lilyglyphlist)
+            writetables(prefix, size, "gonville%d" % size, outlines, lilyglyphlist)
 
-        for size in sizes:
-            run_ff("gonville-%d.sfd" % size, "lilyfonts/otf/gonville-%d.otf" % size,
-                   tableprefix="gonville-%d" % size)
-            run_ff("gonville-%d.sfd" % size, "lilyfonts/otf/emmentaler-%d.otf" % size,
-                   fontname="Emmentaler-%d" % size, tableprefix="gonville-%d" % size)
-            run_ff("gonville-%d.sfd" % size, "lilyfonts/svg/emmentaler-%d.svg" % size,
-                   fontname="Emmentaler-%d" % size)
-        for size in sizes:
-            run_ff("gonvillealpha%d.sfd" % size, "lilyfonts/type1/gonvillealpha%d.pfa" % size,
-                   fontname="feta-alphabet%d" % size)
-            run_ff("gonvillealpha%d.sfd" % size, "lilyfonts/type1/gonvillealpha%d.pfb" % size,
-                   fontname="feta-alphabet%d" % size)
-            run_ff("gonvillealpha%d.sfd" % size, "lilyfonts/svg/gonvillealpha%d.svg" % size)
-            try:
-                os.symlink("gonvillealpha%d.pfa" % size, "lilyfonts/type1/feta-alphabet%d.pfa" % size)
-            except OSError as e:
-                pass # probably already existed, which we don't mind
-            try:
-                os.symlink("gonvillealpha%d.pfb" % size, "lilyfonts/type1/feta-alphabet%d.pfb" % size)
-            except OSError as e:
-                pass # probably already existed, which we don't mind
-            try:
-                os.symlink("gonvillealpha%d.svg" % size, "lilyfonts/svg/feta-alphabet%d.svg" % size)
-            except OSError as e:
-                pass # probably already existed, which we don't mind
-        for subid in range(1,subids):
-            run_ff("gonvillepart%d.sfd" % subid, "lilyfonts/type1/gonvillepart%d.pfa" % subid)
-            run_ff("gonvillepart%d.sfd" % subid, "lilyfonts/svg/gonvillepart%d.svg" % subid)
+            run_ff(sfd, "lilyfonts/otf/gonville-%d.otf" % size, tableprefix=prefix)
+            run_ff(sfd, "lilyfonts/svg/gonville-%d.svg" % size)
+            run_ff(sfd, "lilyfonts/svg/gonville-%d.woff" % size)
+
+            run_ff(sfd, "lilyfonts-old/otf/emmentaler-%d.otf" % size, fontname="Emmentaler-%d" % size, tableprefix=prefix)
+            run_ff(sfd, "lilyfonts-old/svg/emmentaler-%d.svg" % size, fontname="Emmentaler-%d" % size)
+            run_ff(sfd, "lilyfonts-old/svg/emmentaler-%d.woff" % size, fontname="Emmentaler-%d" % size)
 
     # Now do most of that all over again for the specialist brace
     # font, if we're doing that. (The "-lilymain" option doesn't
@@ -1167,41 +1136,23 @@ def lilypond_output(args, do_main_font=True, do_brace_font=True):
             yh = (y0+y1)/2.0
             bracelist.append((gid, gid, 0xe100+i, x1, yh, x1, yh))
 
-        # Split up the glyph list into appropriately sized chunks
-        # for the custom-encoded .pfas.
-        subid = -1
-        subcode = 256
-        subbracelists = [[]]
-        for i in range(len(bracelist)):
-            if subcode >= 256:
-                subid = subid + 1
-                subcode = 33
-                subbracelists.append([])
-            thissubid = subid
-            thissubcode = subcode
-            subcode = subcode + 1
-            subbracelists[thissubid].append(bracelist[i][:2] + (thissubcode,) + bracelist[i][3:])
-            bracelist[i] = bracelist[i] + (thissubid, thissubcode)
-        subids = subid + 1
+        prefix = "lilysrc/gonville-brace"
+        sfd = prefix + ".sfd"
 
-        writesfd("gonville-brace", "Gonville-Brace", "UnicodeBmp", 65537, outlines, bracelist)
-        subnames = ["gonville-bracepart%d" % subid for subid in range(subids)]
-        writetables("gonville-brace", 20, subids, subnames, outlines, bracelist, 1)
-        for subid in range(subids):
-            writesfd("gonville-bracepart%d" % subid, "Gonville-Brace-Part%d" % subid, "Custom", 256, outlines, subbracelists[subid])
+        writesfd(prefix, "Gonville-Brace", "UnicodeBmp", 65537, outlines, bracelist)
+        writetables(prefix, 20, "gonvillebrace", outlines, bracelist, 1)
 
-        run_ff("gonville-brace.sfd", "lilyfonts/otf/gonville-brace.otf", tableprefix="gonville-brace")
-        run_ff("gonville-brace.sfd", "lilyfonts/svg/gonville-brace.svg")
-        try:
-            os.symlink("gonville-brace.otf", "lilyfonts/otf/aybabtu.otf")
-            os.symlink("gonville-brace.svg", "lilyfonts/svg/aybabtu.svg")
-            os.symlink("gonville-brace.otf", "lilyfonts/otf/emmentaler-brace.otf")
-            os.symlink("gonville-brace.svg", "lilyfonts/svg/emmentaler-brace.svg")
-        except OSError as e:
-            pass # probably already existed, which we don't mind
-        for subid in range(subids):
-            run_ff("gonville-bracepart%d.sfd" % subid, "lilyfonts/type1/gonville-bracepart%d.pfa" % subid)
-            run_ff("gonville-bracepart%d.sfd" % subid, "lilyfonts/svg/gonville-bracepart%d.svg" % subid)
+        run_ff(sfd, "lilyfonts/otf/gonville-brace.otf", tableprefix=prefix)
+        run_ff(sfd, "lilyfonts/svg/gonville-brace.svg")
+        run_ff(sfd, "lilyfonts/svg/gonville-brace.woff")
+
+        run_ff(sfd, "lilyfonts-old/otf/emmentaler-brace.otf", fontname="Emmentaler-Brace", tableprefix=prefix)
+        run_ff(sfd, "lilyfonts-old/svg/emmentaler-brace.svg", fontname="Emmentaler-Brace")
+        run_ff(sfd, "lilyfonts-old/svg/emmentaler-brace.woff", fontname="Emmentaler-Brace")
+
+        symlink("emmentaler-brace.otf", "lilyfonts-old/otf/aybabtu.otf")
+        symlink("emmentaler-brace.svg", "lilyfonts-old/svg/aybabtu.svg")
+        symlink("emmentaler-brace.svg", "lilyfonts-old/svg/aybabtu.woff")
 
 def lilypond_output_main(args):
     return lilypond_output(args, do_brace_font=False)

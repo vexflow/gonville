@@ -7,12 +7,10 @@
 /*.bmp
 /*.pbm
 /lilydata
+/lilysrc
 /lilyfonts
+/lilyfonts-old
 /lilysetup.local
-/*.sfd
-/*.LILC
-/*.LILF
-/*.LILY
 /build.log
 /build.out
 /prologue.ps
