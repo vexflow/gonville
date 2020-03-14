@@ -3699,5 +3699,5 @@ def _(cont):
 def _(cont):
     cont.lx = 500
     cont.rx = 600
-    cont.by = 500
-    cont.ty = 600
+    cont.by = 600
+    cont.ty = 500
