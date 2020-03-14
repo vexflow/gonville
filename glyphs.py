@@ -1111,7 +1111,8 @@ def lilypond_output(args, do_main_font=True, do_brace_font=True):
         bracelist = []
         gidlist = []
         for i in range(576):
-            char = scaledbrace(525 * (151./150)**i)
+            char = GlyphContext()
+            scaledbrace(char, 525 * (151./150)**i)
             gid = "brace%d" % i
             gidlist.append(gid)
             setattr(font, gid, char)

@@ -154,6 +154,31 @@ def clippath(elements):
     coords.append("closepath")
     return " ".join(coords)
 
+def make_glyph(fn, args=(), postprocess=lambda x: x):
+    cont = GlyphContext()
+    fn(cont, *args)
+    return postprocess(cont)
+
+# Decorator to make it convenient to define a lot of glyphs inside
+# 'font' by actually writing a function that returns their
+# GlyphContext.
+def define_glyph(name, **kws):
+    def decorator(fn):
+        setattr(font, name, make_glyph(fn, **kws))
+        # Pass through the function itself unchanged, so that we can
+        # chain multiple decorators
+        return fn
+    return decorator
+
+# Another decorator that just defines a name in this module's global
+# namespace, for making subcomponents that are reused in glyphs but
+# are not glyphs in their own right.
+def define_component(name, **kws):
+    def decorator(fn):
+        globals()[name] = make_glyph(fn, **kws)
+        return fn
+    return decorator
+
 # ----------------------------------------------------------------------
 # G clef (treble).
 #
@@ -169,9 +194,10 @@ def clippath(elements):
 # main curve while the other tracks the curves in the secondary
 # context.
 
-def tmpfn():
+@define_glyph("clefG")
+def _(cont_main):
     # Secondary curves.
-    tmp = cont = GlyphContext()
+    cont = GlyphContext()
     # Saved data from gui.py
     c0 = CircleInvolute(cont, 603, 161, -0.33035, -0.943858, 563, 145, -0.943858, 0.33035)
     c1 = CircleInvolute(cont, 563, 145, -0.943858, 0.33035, 504.709, 289.062, 0.208758, 0.977967)
@@ -180,7 +206,7 @@ def tmpfn():
     tc0, tc1 = c0, c1
 
     # Main context.
-    cont = GlyphContext()
+    cont = cont_main
     # Saved data from gui.py
     c0 = CircleInvolute(cont, 528, 654, -0.90286, -0.429934, 569, 507, 1, 0)
     c1 = CircleInvolute(cont, 569, 507, 1, 0, 666, 607, 0, 1)
@@ -224,23 +250,18 @@ def tmpfn():
 
     cont.hy = 1000 - (cont.origin[1] * cont.scale / 3600.) # I should probably work this out better
 
-    return cont
-font.clefG = tmpfn()
-
-def tmpfn():
-    cont = GlyphContext()
+@define_glyph("clefGsmall")
+def _(cont):
     cont.extra = ".8 dup scale", font.clefG
     cont.scale = font.clefG.scale
     cont.origin = font.clefG.origin
     cont.hy = .8 * font.clefG.hy
-    return cont
-font.clefGsmall = tmpfn()
 
 # ----------------------------------------------------------------------
 # F clef (bass).
 
-def tmpfn():
-    cont = GlyphContext()
+@define_glyph("clefF")
+def _(cont):
     # Saved data from gui.py
     c0 = CircleInvolute(cont, 534, 761, 0.964764, -0.263117, 783, 479, 0, -1)
     c1 = CircleInvolute(cont, 783, 479, 0, -1, 662, 352, -0.999133, -0.0416305)
@@ -266,15 +287,10 @@ def tmpfn():
     # two dots.
     cont.hy = (417+542)/2.0
 
-    return cont
-font.clefF = tmpfn()
-
-def tmpfn():
-    cont = GlyphContext()
+@define_glyph("clefFsmall")
+def _(cont):
     cont.extra = ".8 dup scale", font.clefF
     cont.hy = .8 * font.clefF.hy
-    return cont
-font.clefFsmall = tmpfn()
 
 # ----------------------------------------------------------------------
 # C clef (alto, tenor).
@@ -294,7 +310,8 @@ font.clefFsmall = tmpfn()
 # cutoff occurs, the actual edge that ends up drawn will not run
 # precisely along tc0. Again, I don't care.)
 
-def tmpfn():
+@define_glyph("clefC")
+def _(cont_main):
     # Secondary context.
     cont = GlyphContext()
     # Saved data from gui.py
@@ -303,7 +320,7 @@ def tmpfn():
     # End saved data
     tc0, tc1 = c0, c1
 
-    cont = GlyphContext()
+    cont = cont_main
     # Saved data from gui.py
     c0 = CircleInvolute(cont, 698, 242, 0.707107, -0.707107, 762, 216, 1, 0)
     c1 = CircleInvolute(cont, 762, 216, 1, 0, 870, 324, 0, 1)
@@ -359,40 +376,31 @@ def tmpfn():
     "537 206 601 742 box " + \
     "625 206 641 742 box "
 
-    return cont
-font.clefC = tmpfn()
-
-def tmpfn():
-    cont = GlyphContext()
+@define_glyph("clefCsmall")
+def _(cont):
     cont.extra = ".8 dup scale", font.clefC
-    return cont
-font.clefCsmall = tmpfn()
 
 # ----------------------------------------------------------------------
 # Percussion 'clef'.
 
-def tmpfn():
-    cont = GlyphContext()
+@define_glyph("clefperc")
+def _(cont):
     cont.extra = \
     "newpath 410 368 moveto 410 632 lineto " + \
     "470 632 lineto 470 368 lineto closepath fill " + \
     "newpath 530 368 moveto 530 632 lineto " + \
     "590 632 lineto 590 368 lineto closepath fill "
-    return cont
-font.clefperc = tmpfn()
 
-def tmpfn():
-    cont = GlyphContext()
+@define_glyph("clefpercsmall")
+def _(cont):
     cont.extra = ".8 dup scale", font.clefperc
-    return cont
-font.clefpercsmall = tmpfn()
 
 # ----------------------------------------------------------------------
 # Tablature 'clef': just the letters "TAB", written vertically in a
 # vaguely calligraphic style.
 
-def tmpfn():
-    cont = GlyphContext()
+@define_glyph("clefTAB")
+def _(cont):
     # Saved data from gui.py
     c0 = StraightLine(cont, 100, 104, 900, 104)
     c1 = StraightLine(cont, 100, 368, 900, 368)
@@ -436,15 +444,10 @@ def tmpfn():
 
     cont.hy = (c1.compute_y(0) + c2.compute_y(0)) / 2.0
 
-    return cont
-font.clefTAB = tmpfn()
-
-def tmpfn():
-    cont = GlyphContext()
+@define_glyph("clefTABsmall")
+def _(cont):
     cont.extra = ".8 dup scale", font.clefTAB
     cont.hy = .8 * font.clefTAB.hy
-    return cont
-font.clefTABsmall = tmpfn()
 
 # ----------------------------------------------------------------------
 # Quaver tails.
@@ -483,23 +486,24 @@ def clipdn(tail):
     return cont
 
 def multiup(n, tail):
+    cont = GlyphContext()
     # Up-pointing multitail.
     short = clipup(tail)
-    cont = GlyphContext()
-    # To make room for the five-tailed quasihemidemisemiquaver, we
-    # translate downwards a bit. 95 (== 5*19) in glyph coordinates
-    # equals 128 (== 5*36) in output coordinates.
-    cont.extra = ("0 95 translate", tail,) + ("0 -%g translate" % quavertaildispup, short) * (n-1)
+    yextra = quavertaildispup*(n-1)
+    cont.canvas_size = 1000, 1000 + yextra
+    cont.extra = ("0 %g translate" % yextra, tail,) + ("0 -%g translate" % quavertaildispup, short) * (n-1)
     cont.ox = tail.ox
-    cont.oy = tail.oy - quavertaildispup*(n-1) + 95
+    cont.oy = tail.oy - quavertaildispup*(n-1) + yextra
     cont.origin = tail.origin
-    cont.origin = (cont.origin[0], cont.origin[1] + quavertaildispup*(n-1)*3600./cont.scale - 180)
+    cont.origin = (cont.origin[0], (cont.origin[1] + quavertaildispup*(n-1) - yextra) * 3600. / cont.scale - 180)
     return cont
 
 def multidn(n, tail):
     # Down-pointing multitail.
-    short = clipdn(tail)
     cont = GlyphContext()
+    short = clipdn(tail)
+    yextra = quavertaildispdn*(n-1)
+    cont.canvas_size = 1000, 1000 + yextra
     cont.extra = (tail,) + ("0 %g translate" % quavertaildispdn, short) * (n-1)
     cont.ox = tail.ox
     cont.oy = tail.oy + quavertaildispdn*(n-1)
@@ -507,9 +511,9 @@ def multidn(n, tail):
     cont.origin = (cont.origin[0], cont.origin[1] - quavertaildispdn*(n-1)*3600./cont.scale)
     return cont
 
-def tmpfn():
+@define_glyph("tailquaverup")
+def _(cont):
     # Full-size tail for a quaver with an up-pointing stem.
-    cont = GlyphContext()
     # Saved data from gui.py
     c0 = CircleInvolute(cont, 535, 567, 0.948683, 0.316228, 611, 607, 0.7282, 0.685365)
     c1 = CircleInvolute(cont, 611, 607, 0.7282, 0.685365, 606, 840, -0.661622, 0.749838)
@@ -538,12 +542,9 @@ def tmpfn():
 
     cont.origin = cx * 3600. / cont.scale - 12, (1000-cont.oy) * 3600. / cont.scale
 
-    return cont
-font.tailquaverup = tmpfn()
-
-def tmpfn():
+@define_glyph("tailsemiup", postprocess=lambda cont: multiup(2, cont))
+def _(cont):
     # Single tail for an up-pointing semiquaver.
-    cont = GlyphContext()
     # Saved data from gui.py
     c0 = CircleInvolute(cont, 535, 556, 1, 0, 602, 571, 0.825307, 0.564684)
     c1 = CircleInvolute(cont, 602, 571, 0.825307, 0.564684, 617, 779, -0.661622, 0.749838)
@@ -575,12 +576,9 @@ def tmpfn():
 
     cont.origin = cx * 3600. / cont.scale - 12, (1000-cont.oy) * 3600. / cont.scale
 
-    return cont
-font.tailsemiup = multiup(2, tmpfn())
-
-def tmpfn():
+@define_glyph("taildemiup", postprocess=lambda cont: multiup(3, cont))
+def _(cont):
     # Single tail for an up-pointing demisemiquaver.
-    cont = GlyphContext()
     # Saved data from gui.py
     c0 = CircleInvolute(cont, 535, 555, 0.998868, -0.0475651, 586, 561, 0.913812, 0.406138)
     c1 = CircleInvolute(cont, 586, 561, 0.913812, 0.406138, 621, 800, -0.536875, 0.843662)
@@ -612,12 +610,9 @@ def tmpfn():
 
     cont.origin = cx * 3600. / cont.scale - 12, (1000-cont.oy) * 3600. / cont.scale
 
-    return cont
-font.taildemiup = multiup(3, tmpfn())
-
-def tmpfn():
+@define_glyph("tailhemiup", postprocess=lambda cont: multiup(4, cont))
+def _(cont):
     # Single tail for an up-pointing hemidemisemiquaver.
-    cont = GlyphContext()
     # Saved data from gui.py
     c0 = CircleInvolute(cont, 535, 555, 0.853282, -0.52145, 577, 552, 0.894427, 0.447214)
     c1 = CircleInvolute(cont, 577, 552, 0.894427, 0.447214, 640, 753, -0.447214, 0.894427)
@@ -649,12 +644,9 @@ def tmpfn():
 
     cont.origin = cx * 3600. / cont.scale - 12, (1000-cont.oy) * 3600. / cont.scale
 
-    return cont
-font.tailhemiup = multiup(4, tmpfn())
-
-def tmpfn():
+@define_glyph("tailquasiup", postprocess=lambda cont: multiup(5, cont))
+def _(cont):
     # Single tail for an up-pointing quasihemidemisemiquaver.
-    cont = GlyphContext()
     # Saved data from gui.py
     c0 = CircleInvolute(cont, 535, 546, 0.996546, 0.0830455, 607, 575, 0.707107, 0.707107)
     c1 = CircleInvolute(cont, 607, 575, 0.707107, 0.707107, 629, 772, -0.611448, 0.791285)
@@ -686,12 +678,9 @@ def tmpfn():
 
     cont.origin = cx * 3600. / cont.scale - 12, (1000-cont.oy) * 3600. / cont.scale
 
-    return cont
-font.tailquasiup = multiup(5, tmpfn())
-
-def tmpfn():
+@define_glyph("tailquaverdn")
+def _(cont):
     # Full-size tail for a quaver with a down-pointing stem.
-    cont = GlyphContext()
     # Saved data from gui.py
     c0 = CircleInvolute(cont, 535, 363, 0.999201, -0.039968, 585, 354, 0.948683, -0.316228)
     c1 = CircleInvolute(cont, 585, 354, 0.948683, -0.316228, 635, 90, -0.563337, -0.826227)
@@ -720,12 +709,9 @@ def tmpfn():
 
     cont.origin = cx * 3600. / cont.scale - 12, (1000-cont.oy) * 3600. / cont.scale
 
-    return cont
-font.tailquaverdn = tmpfn()
-
-def tmpfn():
+@define_glyph("tailsemidn", postprocess=lambda cont: multidn(2, cont))
+def _(cont):
     # Single tail for a down-pointing semiquaver.
-    cont = GlyphContext()
     # Saved data from gui.py
     c0 = CircleInvolute(cont, 535, 378, 0.99083, -0.135113, 611, 356, 0.868243, -0.496139)
     c1 = CircleInvolute(cont, 611, 356, 0.868243, -0.496139, 663, 195, -0.447214, -0.894427)
@@ -757,12 +743,9 @@ def tmpfn():
 
     cont.origin = cx * 3600. / cont.scale - 12, (1000-cont.oy) * 3600. / cont.scale
 
-    return cont
-font.tailsemidn = multidn(2, tmpfn())
-
-def tmpfn():
+@define_glyph("taildemidn", postprocess=lambda cont: multidn(3, cont))
+def _(cont):
     # Single tail for a down-pointing demisemiquaver.
-    cont = GlyphContext()
     # Saved data from gui.py
     c0 = CircleInvolute(cont, 535, 380, 0.9916, -0.129339, 615, 354, 0.861934, -0.50702)
     c1 = CircleInvolute(cont, 615, 354, 0.861934, -0.50702, 653, 168, -0.536875, -0.843662)
@@ -794,12 +777,9 @@ def tmpfn():
 
     cont.origin = cx * 3600. / cont.scale - 12, (1000-cont.oy) * 3600. / cont.scale
 
-    return cont
-font.taildemidn = multidn(3, tmpfn())
-
-def tmpfn():
+@define_glyph("tailhemidn", postprocess=lambda cont: multidn(4, cont))
+def _(cont):
     # Single tail for a down-pointing hemidemisemiquaver.
-    cont = GlyphContext()
     # Saved data from gui.py
     c0 = CircleInvolute(cont, 534, 382, 0.999133, -0.0416305, 605, 369, 0.921635, -0.388057)
     c1 = CircleInvolute(cont, 605, 369, 0.921635, -0.388057, 646, 207, -0.784883, -0.619644)
@@ -831,12 +811,9 @@ def tmpfn():
 
     cont.origin = cx * 3600. / cont.scale - 12, (1000-cont.oy) * 3600. / cont.scale
 
-    return cont
-font.tailhemidn = multidn(4, tmpfn())
-
-def tmpfn():
+@define_glyph("tailquasidn", postprocess=lambda cont: multidn(5, cont))
+def _(cont):
     # Single tail for a down-pointing quasihemidemisemiquaver.
-    cont = GlyphContext()
     # Saved data from gui.py
     c0 = CircleInvolute(cont, 535, 384, 0.982007, -0.188847, 608, 357, 0.885547, -0.464549)
     c1 = CircleInvolute(cont, 608, 357, 0.885547, -0.464549, 653, 180, -0.606043, -0.795432)
@@ -868,17 +845,14 @@ def tmpfn():
 
     cont.origin = cx * 3600. / cont.scale - 12, (1000-cont.oy) * 3600. / cont.scale
 
-    return cont
-font.tailquasidn = multidn(5, tmpfn())
-
 # ----------------------------------------------------------------------
 # Minim note head.
 #
 # A minim head has an elliptical outline, and then a long thin
 # elliptical hole in the middle.
 
-def tmpfn():
-    cont = GlyphContext()
+@define_glyph("headminim")
+def _(cont):
     # Parameters: a unit vector giving the direction of the ellipse's
     # long axis, the squash ratio (short axis divided by long).
     angle = 37
@@ -993,31 +967,26 @@ def tmpfn():
     #sys.stderr.write("%.17f, %.17f\n" % (2*sqrt(c)/denom, -b/sqrt(c)/denom))
     cont.ay = 472 - b/sqrt(c)/denom
 
-    return cont
-font.headminim = tmpfn()
-
 # ----------------------------------------------------------------------
 # Filled note head, for crotchet/quaver/semiquaver/etc.
 #
 # This is identical to the minim head but without the inner hole.
 
-def tmpfn():
-    cont = GlyphContext()
+@define_glyph("headcrotchet")
+def _(cont):
     cont.extra = \
     "gsave 527 472 translate newpath " + \
     "matrix currentmatrix 76 67 scale [1 0 -.3 1 0 0] concat 1 0 moveto 0 0 1 0 360 arc closepath setmatrix " + \
     "gsave fill grestore 8 setlinewidth stroke grestore"
     cont.ay = font.headminim.ay
-    return cont
-font.headcrotchet = tmpfn()
 
 # ----------------------------------------------------------------------
 # Semibreve head. This is another nested pair of ellipses. The outer
 # ellipse is unskewed and half again as wide as the crotchet/minim
 # head; the inner one is at a totally different angle.
 
-def tmpfn():
-    cont = GlyphContext()
+@define_glyph("semibreve")
+def _(cont):
     angle = 120
     sq = 0.75
     # Everything below is repaated from the minim head.
@@ -1038,12 +1007,11 @@ def tmpfn():
     "matrix currentmatrix 116 67 scale 1 0 moveto 0 0 1 0 360 arc closepath setmatrix " + \
     "matrix currentmatrix -%g rotate 1 %g scale %g 0 moveto 0 0 %g 360 0 arcn closepath setmatrix " % (angle,sq,r,r) + \
     "gsave fill grestore 8 setlinewidth stroke grestore"
-    return cont
-font.semibreve = tmpfn()
 
 # A breve is just a semibreve with bars down the sides.
-def tmpfn():
-    cont = GlyphContext()
+
+@define_glyph("breve")
+def _(cont):
     # Saved data from gui.py
     c0 = StraightLine(cont, 398, 390, 398, 554)
     c1 = StraightLine(cont, 656, 390, 656, 554)
@@ -1054,14 +1022,12 @@ def tmpfn():
     cont.default_nib = 10
 
     cont.extra = font.semibreve
-    return cont
-font.breve = tmpfn()
 
 # ----------------------------------------------------------------------
 # Shaped note heads used for drum and other notation.
 
-def tmpfn():
-    cont = GlyphContext()
+@define_glyph("diamondsemi")
+def _(cont):
     # Saved data from gui.py
     c0 = CircleInvolute(cont, 411, 472, 0.970536, 0.240956, 527, 539, 0.633646, 0.773623)
     c1 = CircleInvolute(cont, 527, 539, 0.633646, -0.773623, 643, 472, 0.970536, -0.240956)
@@ -1075,10 +1041,8 @@ def tmpfn():
 
     cont.default_nib = lambda c,x,y,t,theta: (6, 0, (527-x)/3, 0)
 
-    return cont
-font.diamondsemi = tmpfn()
-def tmpfn():
-    cont = GlyphContext()
+@define_glyph("diamondminim")
+def _(cont):
     # Saved data from gui.py
     c0 = CircleInvolute(cont, 448, 472, 0.939517, 0.342501, 527, 539, 0.487147, 0.87332)
     c1 = CircleInvolute(cont, 527, 539, 0.487147, -0.87332, 606, 472, 0.939517, -0.342501)
@@ -1094,10 +1058,8 @@ def tmpfn():
     c1.nib = lambda c,x,y,t,theta: (6, 127*pi/180, min(12, 300*t, 100*(1-t)), 0)
     c3.nib = lambda c,x,y,t,theta: (6, -53*pi/180, min(12, 300*t, 100*(1-t)), 0)
 
-    return cont
-font.diamondminim = tmpfn()
-def tmpfn():
-    cont = GlyphContext()
+@define_glyph("diamondcrotchet")
+def _(cont):
     # Saved data from gui.py
     c0 = CircleInvolute(cont, 448, 472, 0.939517, 0.342501, 527, 539, 0.487147, 0.87332)
     c1 = CircleInvolute(cont, 527, 539, 0.487147, -0.87332, 606, 472, 0.939517, -0.342501)
@@ -1112,10 +1074,8 @@ def tmpfn():
     # Fill the diamond.
     cont.default_nib = lambda c,x,y,t,theta: ptp_nib(c,x,y,t,theta,527,472,6)
 
-    return cont
-font.diamondcrotchet = tmpfn()
-def tmpfn():
-    cont = GlyphContext()
+@define_glyph("trianglesemi")
+def _(cont):
     # Saved data from gui.py
     c0 = CircleInvolute(cont, 411, 550, 0.944497, -0.328521, 643, 550, 0.944497, 0.328521)
     c1 = CircleInvolute(cont, 643, 550, -0.784883, -0.619644, 527, 405, -0.519947, -0.854199)
@@ -1131,10 +1091,8 @@ def tmpfn():
     c1.nib = lambda c,x,y,t,theta: (6, 0, 0, min((x-527)/3, (ybase-y)*angle))
     c2.nib = lambda c,x,y,t,theta: (6, 0, min((527-x)/3, (ybase-y)*angle), 0)
 
-    return cont
-font.trianglesemi = tmpfn()
-def tmpfn():
-    cont = GlyphContext()
+@define_glyph("triangleminim")
+def _(cont):
     # Saved data from gui.py
     c0 = CircleInvolute(cont, 448, 550, 0.890571, -0.454844, 606, 550, 0.890571, 0.454844)
     c1 = CircleInvolute(cont, 606, 550, -0.65319, -0.757194, 527, 405, -0.382943, -0.923772)
@@ -1155,10 +1113,8 @@ def tmpfn():
     cont.ay = c0.compute_y(0)
     cont.iy = 2*472 - cont.ay
 
-    return cont
-font.triangleminim = tmpfn()
-def tmpfn():
-    cont = GlyphContext()
+@define_glyph("trianglecrotchet")
+def _(cont):
     # Saved data from gui.py
     c0 = CircleInvolute(cont, 448, 550, 0.890571, -0.454844, 606, 550, 0.890571, 0.454844)
     c1 = CircleInvolute(cont, 606, 550, -0.65319, -0.757194, 527, 405, -0.382943, -0.923772)
@@ -1173,10 +1129,9 @@ def tmpfn():
 
     cont.ay = c0.compute_y(0)
     cont.iy = 2*472 - cont.ay
-    return cont
-font.trianglecrotchet = tmpfn()
-def tmpfn():
-    cont = GlyphContext()
+
+@define_glyph("crosssemi")
+def _(cont):
     outerw = 9
     innerr = 12
     outerr = innerr + 2*outerw
@@ -1186,10 +1141,9 @@ def tmpfn():
     "gsave %g setlinewidth stroke grestore %g setlinewidth 1 setgray stroke" % (2*outerr, 2*innerr),
     "grestore"]
     cont.ay = ay
-    return cont
-font.crosssemi = tmpfn()
-def tmpfn():
-    cont = GlyphContext()
+
+@define_glyph("crossminim")
+def _(cont):
     outerw = 9
     innerr = 10
     outerr = innerr + 2*outerw
@@ -1199,10 +1153,9 @@ def tmpfn():
     "gsave %g setlinewidth stroke grestore %g setlinewidth 1 setgray stroke" % (2*outerr, 2*innerr),
     "grestore"]
     cont.ay = 472 - ay
-    return cont
-font.crossminim = tmpfn()
-def tmpfn():
-    cont = GlyphContext()
+
+@define_glyph("crosscrotchet")
+def _(cont):
     r = 12
     ax, ay = 79 - r, 70 - r
     cont.extra = ["gsave 527 472 translate",
@@ -1210,10 +1163,9 @@ def tmpfn():
     "%g setlinewidth stroke" % (2*r),
     "grestore"]
     cont.ay = 472 - ay
-    return cont
-font.crosscrotchet = tmpfn()
-def tmpfn():
-    cont = GlyphContext()
+
+@define_glyph("crosscircle")
+def _(cont):
     r = 12
     ax, ay = 70 - r, 70 - r
     cont.extra = ["gsave 527 472 translate",
@@ -1221,11 +1173,9 @@ def tmpfn():
     "%g dup 0 moveto 0 exch 0 exch 0 360 arc" % (sqrt(ax*ax+ay*ay)),
     "%g setlinewidth stroke" % (2*r),
     "grestore"]
-    return cont
-font.crosscircle = tmpfn()
 
-def tmpfn():
-    cont = GlyphContext()
+@define_glyph("slashsemi")
+def _(cont):
     r = 12
     xouter = 116 - r
     xwidth = 160
@@ -1235,10 +1185,9 @@ def tmpfn():
     "%g setlinewidth 1 setlinejoin stroke" % (2*r),
     "grestore"]
     cont.ay = 472 - ay
-    return cont
-font.slashsemi = tmpfn()
-def tmpfn():
-    cont = GlyphContext()
+
+@define_glyph("slashminim")
+def _(cont):
     r = 12
     xouter = 76 - r
     xwidth = 80
@@ -1248,10 +1197,9 @@ def tmpfn():
     "%g setlinewidth 1 setlinejoin stroke" % (2*r),
     "grestore"]
     cont.ay = 472 - ay
-    return cont
-font.slashminim = tmpfn()
-def tmpfn():
-    cont = GlyphContext()
+
+@define_glyph("slashcrotchet")
+def _(cont):
     r = 12
     xouter = 56 - r
     xwidth = 40
@@ -1261,8 +1209,6 @@ def tmpfn():
     "gsave %g setlinewidth 1 setlinejoin stroke grestore fill" % (2*r),
     "grestore"]
     cont.ay = 472 - ay
-    return cont
-font.slashcrotchet = tmpfn()
 
 # ----------------------------------------------------------------------
 # Trill sign. There seem to be two standard-ish designs for this:
@@ -1275,8 +1221,8 @@ font.slashcrotchet = tmpfn()
 # examples I've seen. (I drew it like that as an experiment and
 # found I liked it more than the one I was comparing to!)
 
-def tmpfn():
-    cont = GlyphContext()
+@define_glyph("trill")
+def _(cont):
     # Saved data from gui.py
     c0 = StraightLine(cont, 497, 274, 452, 425)
     c1 = CircleInvolute(cont, 452, 425, -0.285601, 0.958349, 488, 456, 0.860055, -0.510202)
@@ -1307,19 +1253,16 @@ def tmpfn():
     theta2 = c2.compute_theta(0)
     c1.nib = c2.nib = lambda c,x,y,t,theta: 14+6*cos(pi*(theta-theta0)/(theta2-theta0))
 
-    return cont
-font.trill = tmpfn()
-
 # ----------------------------------------------------------------------
 # Crotchet rest. The top section is done by curve-following, drawing
 # the two sides of the stroke independently; the bottom section is a
 # single curve on the right, with the nib width varying in such a
 # way as to present a nice curve on the left.
 
-def tmpfn():
-    cont = GlyphContext()
-
+@define_glyph("restcrotchet")
+def _(cont_main):
     # Secondary curve set.
+    cont = GlyphContext()
     # Saved data from gui.py
     c0 = StraightLine(cont, 502, 276, 589, 352)
     c1 = CircleInvolute(cont, 589, 352, -0.585491, 0.810679, 592, 535, 0.74783, 0.66389)
@@ -1327,7 +1270,7 @@ def tmpfn():
     # End saved data
     tc0, tc1 = c0, c1
 
-    cont = GlyphContext()
+    cont = cont_main
     # Primary curve set.
     # Saved data from gui.py
     c0 = CircleInvolute(cont, 502, 276, 0.753113, 0.657892, 494, 448, -0.613941, 0.789352)
@@ -1350,14 +1293,12 @@ def tmpfn():
     phia = (phi0 + phi1) / 2
     c2.nib = lambda c,x,y,t,theta: (6, phia, (1-(1-t)**2)*40, 0)
     c3.nib = lambda c,x,y,t,theta: (6, phia, (1-t**2)*40, 0)
-    return cont
-font.restcrotchet = tmpfn()
 
 # ----------------------------------------------------------------------
 # Quaver rest and friends.
 
-def tmpfn():
-    cont = GlyphContext()
+@define_glyph("restquaver")
+def _(cont):
     # Saved data from gui.py
     c0 = StraightLine(cont, 531, 271, 588, 81)
     c1 = CircleInvolute(cont, 588, 81, -0.347314, 0.937749, 480, 125, -0.784883, -0.619644)
@@ -1371,10 +1312,8 @@ def tmpfn():
 
     cont.origin = 1000, ((1000-cont.cy) * 3600 / cont.scale)
 
-    return cont
-font.restquaver = tmpfn()
-def tmpfn():
-    cont = GlyphContext()
+@define_glyph("restsemi")
+def _(cont):
     # Saved data from gui.py
     c0 = StraightLine(cont, 492, 401, 588, 81)
     c1 = CircleInvolute(cont, 588, 81, -0.347314, 0.937749, 480, 125, -0.784883, -0.619644)
@@ -1390,10 +1329,8 @@ def tmpfn():
 
     cont.origin = 1000-(39*1800/cont.scale), ((1000-cont.cy) * 3600 / cont.scale)
 
-    return cont
-font.restsemi = tmpfn()
-def tmpfn():
-    cont = GlyphContext()
+@define_glyph("restdemi")
+def _(cont):
     # Saved data from gui.py
     c0 = StraightLine(cont, 453, 531, 588, 81)
     c1 = CircleInvolute(cont, 588, 81, -0.347314, 0.937749, 480, 125, -0.784883, -0.619644)
@@ -1411,10 +1348,8 @@ def tmpfn():
 
     cont.origin = 1000-(39*2*1800/cont.scale), ((1000-cont.cy) * 3600 / cont.scale)
 
-    return cont
-font.restdemi = tmpfn()
-def tmpfn():
-    cont = GlyphContext()
+@define_glyph("resthemi")
+def _(cont):
     # Saved data from gui.py
     c0 = StraightLine(cont, 414, 661, 588, 81)
     c1 = CircleInvolute(cont, 588, 81, -0.347314, 0.937749, 480, 125, -0.784883, -0.619644)
@@ -1434,10 +1369,8 @@ def tmpfn():
 
     cont.origin = 1000-(39*3*1800/cont.scale), ((1000-cont.cy) * 3600 / cont.scale)
 
-    return cont
-font.resthemi = tmpfn()
-def tmpfn():
-    cont = GlyphContext()
+@define_glyph("restquasi")
+def _(cont):
     # Saved data from gui.py
     c0 = StraightLine(cont, 375, 791, 588, 81)
     c1 = CircleInvolute(cont, 588, 81, -0.347314, 0.937749, 480, 125, -0.784883, -0.619644)
@@ -1459,84 +1392,53 @@ def tmpfn():
 
     cont.origin = 1000-(39*4*1800/cont.scale), ((1000-cont.cy) * 3600 / cont.scale)
 
-    return cont
-font.restquasi = tmpfn()
-
-def tmpfn():
-    cont = GlyphContext()
-
+@define_glyph("restcrotchetx")
+def _(cont):
     cont.before = "1000 0 translate -1 1 scale"
     cont.extra = font.restquaver
-
-    return cont
-font.restcrotchetx = tmpfn()
 
 # ----------------------------------------------------------------------
 # Rectangular rests (minim/semibreve, breve, longa, double longa).
 
-def tmpfn():
-    cont = GlyphContext()
-
+@define_glyph("restminim")
+def _(cont):
     cont.extra = \
     "newpath 440 439 moveto 440 505 lineto 614 505 lineto 614 439 lineto closepath fill "
 
-    return cont
-font.restminim = tmpfn()
-
-def tmpfn():
-    cont = GlyphContext()
-
+@define_glyph("restbreve")
+def _(cont):
     cont.extra = \
     "newpath 452 406 moveto 452 538 lineto 602 538 lineto 602 406 lineto closepath fill "
 
-    return cont
-font.restbreve = tmpfn()
-
-def tmpfn():
-    cont = GlyphContext()
-
+@define_glyph("restlonga")
+def _(cont):
     cont.extra = \
     "newpath 452 406 moveto 452 670 lineto 602 670 lineto 602 406 lineto closepath fill "
 
-    return cont
-font.restlonga = tmpfn()
-
-def tmpfn():
-    cont = GlyphContext()
-
+@define_glyph("restdbllonga")
+def _(cont):
     cont.extra = (font.restlonga, "-300 0 translate",
                   font.restlonga)
 
-    return cont
-font.restdbllonga = tmpfn()
-
-def tmpfn():
-    cont = GlyphContext()
-
+@define_glyph("restminimo")
+def _(cont):
     cont.extra = font.restminim, \
     "newpath 390 505 moveto 664 505 lineto 12 setlinewidth 1 setlinecap stroke"
 
     cont.oy = 505
 
-    return cont
-font.restminimo = tmpfn()
-
-def tmpfn():
-    cont = GlyphContext()
-
+@define_glyph("restsemibreveo")
+def _(cont):
     cont.extra = font.restminim, \
     "newpath 390 439 moveto 664 439 lineto 12 setlinewidth 1 setlinecap stroke"
 
     cont.oy = 439
 
-    return cont
-font.restsemibreveo = tmpfn()
-
 # ----------------------------------------------------------------------
 # Digits for time signatures.
 
-def tmpfn(): # zero
-    cont = GlyphContext()
+@define_glyph("big0")
+def _(cont): # zero
     # Saved data from gui.py
     c0 = CircleInvolute(cont, 528, 253, 1, 0, 572, 273, 0.60745, 0.794358)
     c1 = CircleInvolute(cont, 572, 273, 0.60745, 0.794358, 597, 362, 0, 1)
@@ -1560,10 +1462,8 @@ def tmpfn(): # zero
     yext = abs(ymid - c0.compute_y(0))
     cont.default_nib = lambda c,x,y,t,theta: (6, 0, 25*(1-abs((y-ymid)/yext)**2.5), 25*(1-abs((y-ymid)/yext)**2.5))
 
-    return cont
-font.big0 = tmpfn()
-def tmpfn(): # one
-    cont = GlyphContext()
+@define_glyph("big1")
+def _(cont): # one
     # Saved data from gui.py
     c0 = StraightLine(cont, 467, 342, 513, 257)
     c1 = StraightLine(cont, 538, 257, 538, 467)
@@ -1576,12 +1476,11 @@ def tmpfn(): # one
     serif = lambda y: 0 if y<y1 else 26*((y-y1)/(y2-y1))**4
     c1.nib = lambda c,x,y,t,theta: (6, 0, 25+serif(y), 25+serif(y))
 
-    return cont
-font.big1 = tmpfn()
-def tmpfn(): # two
+@define_glyph("big2")
+def _(cont_main): # two
 
     # At the top of the 2 I use the same hack as I did for the 3 to
-    # get the inner curve. See below. 
+    # get the inner curve. See below.
 
     # Secondary context.
     cont = GlyphContext()
@@ -1593,7 +1492,7 @@ def tmpfn(): # two
     tc0, tc1 = c0, c1
 
     # Primary context.
-    cont = GlyphContext()
+    cont = cont_main
     # Saved data from gui.py
     c0 = CircleInvolute(cont, 615, 419, -0.26963, 0.962964, 548, 468, -0.83205, -0.5547)
     c1 = CircleInvolute(cont, 548, 468, -0.83205, -0.5547, 449, 467, -0.419058, 0.907959)
@@ -1622,11 +1521,8 @@ def tmpfn(): # two
 
     blob(c5, 1, 'l', 25, 4)
 
-    return cont
-font.big2 = tmpfn()
-def tmpfn(): # three
-    cont = GlyphContext()
-
+@define_glyph("big3")
+def _(cont): # three
     # Bit of a hack here. The x-based formula I use for the nib
     # thickness of the right-hand curves c1-c4 leaves a nasty corner
     # at the very top and bottom, which I solve by drawing an
@@ -1669,9 +1565,8 @@ def tmpfn(): # three
 
     blob(c5, 1, 'l', 25, 4)
 
-    return cont
-font.big3 = tmpfn()
-def tmpfn(): # four
+@define_glyph("big4")
+def _(cont_main): # four
     # Secondary context
     cont = GlyphContext()
     # Saved data from gui.py
@@ -1680,7 +1575,7 @@ def tmpfn(): # four
     tc0 = c0
 
     # Primary context
-    cont = GlyphContext()
+    cont = cont_main
     # Saved data from gui.py
     c0 = StraightLine(cont, 571, 257, 432, 413)
     c1 = StraightLine(cont, 432, 413, 514, 413)
@@ -1705,11 +1600,8 @@ def tmpfn(): # four
     # Icky glitch-handling stuff (see -lily section).
     cont.gy = (cont.ty + cont.by) / 2 + (250*cont.scale/3600.0)
 
-    return cont
-font.big4 = tmpfn()
-def tmpfn(): # five
-    cont = GlyphContext()
-
+@define_glyph("big5")
+def _(cont): # five
     # At the bottom of the 5 I use the same hack as I did for the 3
     # to get the inner curve. See below.
 
@@ -1742,10 +1634,8 @@ def tmpfn(): # five
 
     blob(c0, 0, 'r', 25, 4)
 
-    return cont
-font.big5 = tmpfn()
-def tmpfn(): # six
-    cont = GlyphContext()
+@define_glyph("big6")
+def _(cont): # six
     # Saved data from gui.py
     c0 = CircleInvolute(cont, 535, 471, -1, 0, 479, 408, 0, -1)
     c1 = CircleInvolute(cont, 479, 408, 0, -1, 535, 349, 1, 0)
@@ -1785,11 +1675,8 @@ def tmpfn(): # six
     # FIXME: consider redoing this using the x-based formula I used
     # on the 3.
 
-    return cont
-font.big6 = tmpfn()
-def tmpfn(): # seven
-
-    cont = GlyphContext()
+@define_glyph("big7")
+def _(cont): # seven
     # Saved data from gui.py
     c0 = CircleInvolute(cont, 538, 467, 0, -1, 568, 353, 0.544988, -0.838444)
     c1 = CircleInvolute(cont, 568, 353, 0.544988, -0.838444, 604, 257, 0.233373, -0.972387)
@@ -1820,9 +1707,8 @@ def tmpfn(): # seven
     xc7 = eval(c7.serialise())
     xc3.nib = xc7.nib = lambda c,x,y,t,theta: (lambda k: (6,pi/2,k,k))(serif(x))
 
-    return cont
-font.big7 = tmpfn()
-def tmpfn(): # eight
+@define_glyph("big8")
+def _(cont): # eight
 
     # The traditional 8 just contains _too_ many ellipse-like curves
     # to draw sensibly using involutes, so I resorted to squashing
@@ -1838,7 +1724,6 @@ def tmpfn(): # eight
     # Also, of course, c0 must join up precisely to c3 just as c4
     # does, and likewise c2 to c7 just like c6.
 
-    cont = GlyphContext()
     # Saved data from gui.py
     c0 = CircleInvolute(cont, 529, 255, -1, 0, 490, 293, 0.485643, 0.874157, mx=(0.75, 0, 0, 1))
     c1 = CircleInvolute(cont, 490, 293, 0.485643, 0.874157, 575, 353, 0.925547, 0.378633, mx=(0.75, 0, 0, 1))
@@ -1867,10 +1752,8 @@ def tmpfn(): # eight
     c3.nib = lambda c,x,y,t,theta: (lambda x1,x2: ((lambda k: (8, 0, 0, k))(9*((x-min(x1,x2))/abs(x2-x1)))))(c.compute_x(0),c.compute_x(1))
     c7.nib = lambda c,x,y,t,theta: (lambda x1,x2: ((lambda k: (8, 0, k, 0))(9*((max(x1,x2)-x)/abs(x2-x1)))))(c.compute_x(0),c.compute_x(1))
 
-    return cont
-font.big8 = tmpfn()
-def tmpfn(): # nine
-    cont = GlyphContext()
+@define_glyph("big9")
+def _(cont): # nine
     # Saved data from gui.py
     c0 = CircleInvolute(cont, 522, 253, 1, 0, 578, 316, 0, 1)
     c1 = CircleInvolute(cont, 578, 316, 0, 1, 522, 375, -1, 0)
@@ -1910,11 +1793,8 @@ def tmpfn(): # nine
     # FIXME: consider redoing this using the x-based formula I used
     # on the 3. (Well, recopying from the 6 if I do.)
 
-    return cont
-font.big9 = tmpfn()
-
-def tmpfn():
-    cont = GlyphContext()
+@define_glyph("asciiplus")
+def _(cont):
     # Saved data from gui.py
     c0 = StraightLine(cont, 500, 362, 600, 362)
     c1 = StraightLine(cont, 550, 312, 550, 412)
@@ -1922,20 +1802,16 @@ def tmpfn():
 
     cont.default_nib = 12
 
-    return cont
-font.asciiplus = tmpfn()
-def tmpfn():
-    cont = GlyphContext()
+@define_glyph("asciiminus")
+def _(cont):
     # Saved data from gui.py
     c0 = StraightLine(cont, 500, 362, 600, 362)
     # End saved data
 
     cont.default_nib = 12
 
-    return cont
-font.asciiminus = tmpfn()
-def tmpfn():
-    cont = GlyphContext()
+@define_glyph("asciicomma")
+def _(cont):
     # Saved data from gui.py
     c0 = CircleInvolute(cont, 573, 435, 0.843662, 0.536875, 548, 535, -0.894427, 0.447214)
     # End saved data
@@ -1944,15 +1820,9 @@ def tmpfn():
 
     blob(c0, 0, 'l', 5, 0)
 
-    return cont
-font.asciicomma = tmpfn()
-def tmpfn():
-    cont = GlyphContext()
-
+@define_glyph("asciiperiod")
+def _(cont):
     cont.extra = "newpath 500 439 34 0 360 arc fill"
-
-    return cont
-font.asciiperiod = tmpfn()
 for x in [getattr(font, name) for name in
           ['big0','big1','big2','big3','big5','big6','big7','big8','big9',
            'asciiplus','asciiminus','asciicomma','asciiperiod']]:
@@ -1963,62 +1833,51 @@ for x in [getattr(font, name) for name in
 # The small digits used for ntuplets and fingering marks. Scaled and
 # sheared versions of the big time-signature digits.
 
-def tmpfn():
-    cont = GlyphContext()
+@define_glyph("small0")
+def _(cont):
     cont.extra = "gsave 480 480 translate 0.6 0.72 scale [1 0 -.3 1 0 0] concat -480 -480 translate", font.big0, "grestore"
-    return cont
-font.small0 = tmpfn()
-def tmpfn():
-    cont = GlyphContext()
+
+@define_glyph("small1")
+def _(cont):
     cont.extra = "gsave 480 480 translate 0.6 0.72 scale [1 0 -.3 1 0 0] concat -480 -480 translate", font.big1, "grestore"
-    return cont
-font.small1 = tmpfn()
-def tmpfn():
-    cont = GlyphContext()
+
+@define_glyph("small2")
+def _(cont):
     cont.extra = "gsave 480 480 translate 0.6 0.72 scale [1 0 -.3 1 0 0] concat -480 -480 translate", font.big2, "grestore"
-    return cont
-font.small2 = tmpfn()
-def tmpfn():
-    cont = GlyphContext()
+
+@define_glyph("small3")
+def _(cont):
     cont.extra = "gsave 480 480 translate 0.6 0.72 scale [1 0 -.3 1 0 0] concat -480 -480 translate", font.big3, "grestore"
-    return cont
-font.small3 = tmpfn()
-def tmpfn():
-    cont = GlyphContext()
+
+@define_glyph("small4")
+def _(cont):
     cont.extra = "gsave 480 480 translate 0.6 0.72 scale [1 0 -.3 1 0 0] concat -480 -480 translate", font.big4, "grestore"
-    return cont
-font.small4 = tmpfn()
-def tmpfn():
-    cont = GlyphContext()
+
+@define_glyph("small5")
+def _(cont):
     cont.extra = "gsave 480 480 translate 0.6 0.72 scale [1 0 -.3 1 0 0] concat -480 -480 translate", font.big5, "grestore"
-    return cont
-font.small5 = tmpfn()
-def tmpfn():
-    cont = GlyphContext()
+
+@define_glyph("small6")
+def _(cont):
     cont.extra = "gsave 480 480 translate 0.6 0.72 scale [1 0 -.3 1 0 0] concat -480 -480 translate", font.big6, "grestore"
-    return cont
-font.small6 = tmpfn()
-def tmpfn():
-    cont = GlyphContext()
+
+@define_glyph("small7")
+def _(cont):
     cont.extra = "gsave 480 480 translate 0.6 0.72 scale [1 0 -.3 1 0 0] concat -480 -480 translate", font.big7, "grestore"
-    return cont
-font.small7 = tmpfn()
-def tmpfn():
-    cont = GlyphContext()
+
+@define_glyph("small8")
+def _(cont):
     cont.extra = "gsave 480 480 translate 0.6 0.72 scale [1 0 -.3 1 0 0] concat -480 -480 translate", font.big8, "grestore"
-    return cont
-font.small8 = tmpfn()
-def tmpfn():
-    cont = GlyphContext()
+
+@define_glyph("small9")
+def _(cont):
     cont.extra = "gsave 480 480 translate 0.6 0.72 scale [1 0 -.3 1 0 0] concat -480 -480 translate", font.big9, "grestore"
-    return cont
-font.small9 = tmpfn()
 
 # ----------------------------------------------------------------------
 # The big C for common time signature.
 
-def tmpfn():
-    cont = GlyphContext()
+@define_glyph("timeC")
+def _(cont):
     # Saved data from gui.py
     c0 = CircleInvolute(cont, 732, 391, -0.5547, -0.83205, 659, 353, -1, 0)
     c1 = CircleInvolute(cont, 659, 353, -1, 0, 538, 470, 0, 1)
@@ -2034,10 +1893,8 @@ def tmpfn():
 
     blob(c0, 0, 'r', 32, 8)
 
-    return cont
-font.timeC = tmpfn()
-def tmpfn():
-    cont = GlyphContext()
+@define_glyph("timeCbar")
+def _(cont):
     # Saved data from gui.py
     c0 = StraightLine(cont, 648, 272, 648, 672)
     # End saved data
@@ -2046,15 +1903,11 @@ def tmpfn():
 
     cont.extra = font.timeC
 
-    return cont
-font.timeCbar = tmpfn()
-
 # ----------------------------------------------------------------------
 # Dynamics marks (f,m,p,s,z).
 
-def tmpfn(): # m (we do this one first to define the baseline)
-    cont = GlyphContext()
-
+@define_glyph("dynamicm")
+def _(cont): # m (we do this one first to define the baseline)
     # Saved data from gui.py
     c0 = CircleInvolute(cont, 539, 378, 0.328521, -0.944497, 585, 331, 1, 0)
     c1 = CircleInvolute(cont, 585, 331, 1, 0, 606, 360, -0.287348, 0.957826)
@@ -2088,10 +1941,8 @@ def tmpfn(): # m (we do this one first to define the baseline)
     cont.lx = 557 + (-41.38 - 34.62) * cont.scale / 3600.0
     cont.rx = 751 - (-49.53 - -87.53) * cont.scale / 3600.0
 
-    return cont
-font.dynamicm = tmpfn()
-def tmpfn(): # f
-    cont = GlyphContext()
+@define_glyph("dynamicf")
+def _(cont): # f
     # Saved data from gui.py
     c0 = CircleInvolute(cont, 720, 269, -0.60745, -0.794358, 690, 254, -1, 0)
     c1 = CircleInvolute(cont, 690, 254, -1, 0, 600, 359, -0.21243, 0.977176)
@@ -2134,11 +1985,8 @@ def tmpfn(): # f
     cont.lx = 496.7 + (-81.74 - -86.74) * cont.scale / 3600.0
     cont.rx = 657.7 - (-139.36 - -165.36) * cont.scale / 3600.0
 
-    return cont
-font.dynamicf = tmpfn()
-def tmpfn(): # p
-    cont = GlyphContext()
-
+@define_glyph("dynamicp")
+def _(cont): # p
     # Saved data from gui.py
     c0 = CircleInvolute(cont, 539, 378, 0.328521, -0.944497, 585, 331, 1, 0)
     c1 = CircleInvolute(cont, 585, 331, 1, 0, 606, 360, -0.289177, 0.957276)
@@ -2171,11 +2019,8 @@ def tmpfn(): # p
     cont.lx = 510.4 + (-23.26 - -38.26) * cont.scale / 3600.0
     cont.rx = 690.615 - (-51.72 - -28.72) * cont.scale / 3600.0
 
-    return cont
-font.dynamicp = tmpfn()
-def tmpfn(): # r
-    cont = GlyphContext()
-
+@define_glyph("dynamicr")
+def _(cont): # r
     # Saved data from gui.py
     c0 = CircleInvolute(cont, 551, 348, 0.635707, -0.77193, 585, 331, 1, 0)
     c1 = CircleInvolute(cont, 585, 331, 1, 0, 606, 360, -0.287348, 0.957826)
@@ -2196,11 +2041,8 @@ def tmpfn(): # r
     cont.lx = 557 + (-18.93 - 58.07) * cont.scale / 3600.0
     cont.rx = 670.187 - (-66.39 - -57.39) * cont.scale / 3600.0
 
-    return cont
-font.dynamicr = tmpfn()
-def tmpfn(): # s
-
-    cont = GlyphContext()
+@define_glyph("dynamics")
+def _(cont): # s
     # Saved data from gui.py
     c0 = CircleInvolute(cont, 635, 341, -0.845489, -0.533993, 564, 361, 0, 1)
     c1 = CircleInvolute(cont, 564, 361, 0, 1, 592, 398, 0.885832, 0.464007)
@@ -2220,11 +2062,8 @@ def tmpfn(): # s
     cont.lx = 529 + (-0.36 - 52.64) * cont.scale / 3600.0
     cont.rx = 628.788 - (-36.35 - -51.35) * cont.scale / 3600.0
 
-    return cont
-font.dynamics = tmpfn()
-def tmpfn(): # z
-
-    cont = GlyphContext()
+@define_glyph("dynamicz")
+def _(cont): # z
     # Saved data from gui.py
     c0 = StraightLine(cont, 568, 338, 678, 338)
     c1 = StraightLine(cont, 678, 338, 539, 453)
@@ -2266,9 +2105,6 @@ def tmpfn(): # z
     cont.by = font.dynamicm.by
     cont.lx = 533 + (-0.2 - 22.8) * cont.scale / 3600.0
     cont.rx = 650.1 - (-65.44 - -42.44) * cont.scale / 3600.0
-
-    return cont
-font.dynamicz = tmpfn()
 for x in [getattr(font, "dynamic"+letter) for letter in "fmprsz"]:
     x.origin = (x.by * 3600. / x.scale, x.lx * 3600. / x.scale)
     x.width = x.rx - x.lx
@@ -2276,8 +2112,8 @@ for x in [getattr(font, "dynamic"+letter) for letter in "fmprsz"]:
 # ----------------------------------------------------------------------
 # Accent mark.
 
-def tmpfn():
-    cont = GlyphContext()
+@define_glyph("accent")
+def _(cont):
     # Saved data from gui.py
     c0 = StraightLine(cont, 421, 415, 633, 472)
     c1 = StraightLine(cont, 633, 472, 421, 529)
@@ -2286,23 +2122,16 @@ def tmpfn():
 
     cont.default_nib = 10
 
-    return cont
-font.accent = tmpfn()
-
-def tmpfn():
-    cont = GlyphContext()
-
+@define_glyph("espressivo")
+def _(cont):
     cont.extra = (font.accent, "800 0 translate -1 1 scale",
                   font.accent)
-
-    return cont
-font.espressivo = tmpfn()
 
 # ----------------------------------------------------------------------
 # Miscellaneous articulation marks.
 
-def tmpfn(): # stopping
-    cont = GlyphContext()
+@define_glyph("stopping")
+def _(cont): # stopping
     # Saved data from gui.py
     c0 = StraightLine(cont, 527, 316, 527, 466)
     c1 = StraightLine(cont, 453, 391, 601, 391)
@@ -2310,11 +2139,8 @@ def tmpfn(): # stopping
 
     cont.default_nib = 8
 
-    return cont
-font.stopping = tmpfn()
-
-def tmpfn(): # legato
-    cont = GlyphContext()
+@define_glyph("legato")
+def _(cont): # legato
     # Saved data from gui.py
     c0 = StraightLine(cont, 454, 461, 600, 461)
     # End saved data
@@ -2322,67 +2148,40 @@ def tmpfn(): # legato
     cont.default_nib = 8
     cont.ly = c0.compute_y(0.5)
 
-    return cont
-font.legato = tmpfn()
-
-def tmpfn(): # staccato
-    cont = GlyphContext()
-
+@define_glyph("staccato")
+def _(cont): # staccato
     cont.extra = "newpath 527 446 26 0 360 arc fill "
 
-    return cont
-font.staccato = tmpfn()
-
-def tmpfn(): # 'portato' - a staccato stacked on a legato
-    cont = GlyphContext()
-
+@define_glyph("portatoup")
+def _(cont): # 'portato' - a staccato stacked on a legato
     cont.extra = (font.legato, "0 -54 translate",
                   font.staccato)
 
     cont.ly = font.legato.ly
 
-    return cont
-font.portatoup = tmpfn()    
-
-def tmpfn(): # portato, the other way up
-    cont = GlyphContext()
-
+@define_glyph("portatodn")
+def _(cont): # portato, the other way up
     cont.extra = "0 1000 translate 1 -1 scale", font.portatoup
 
     cont.ly = 1000 - font.portatoup.ly
 
-    return cont
-font.portatodn = tmpfn()    
-
-def tmpfn(): # staccatissimo
-    cont = GlyphContext()
-
+@define_glyph("staccatissdn")
+def _(cont): # staccatissimo
     cont.extra = "newpath 498 381 moveto 526 478 lineto 554 381 lineto closepath fill "
 
-    return cont
-font.staccatissdn = tmpfn()
-
-def tmpfn(): # staccatissimo pointing the other way
-    cont = GlyphContext()
-
+@define_glyph("staccatissup")
+def _(cont): # staccatissimo pointing the other way
     cont.extra = "newpath 498 478 moveto 526 381 lineto 554 478 lineto closepath fill "
 
-    return cont
-font.staccatissup = tmpfn()
-
-def tmpfn(): # snap-pizzicato
-    cont = GlyphContext()
-
+@define_glyph("snappizz")
+def _(cont): # snap-pizzicato
     cont.extra = "newpath 500 500 50 0 360 arc 500 500 moveto 500 400 lineto 16 setlinewidth 1 setlinejoin 1 setlinecap stroke"
-
-    return cont
-font.snappizz = tmpfn()
 
 # ----------------------------------------------------------------------
 # The 'segno' sign (for 'D.S. al Fine' sort of stuff).
 
-def tmpfn():
-    cont = GlyphContext()
+@define_glyph("segno")
+def _(cont):
     # Saved data from gui.py
     c0 = CircleInvolute(cont, 504, 162, -0.284088, -0.958798, 420, 152, -0.393919, 0.919145)
     c1 = CircleInvolute(cont, 420, 152, -0.393919, 0.919145, 514, 295, 0.923077, 0.384615)
@@ -2411,14 +2210,11 @@ def tmpfn():
     "newpath 618 251 24 0 360 arc fill " + \
     "newpath 410 339 24 0 360 arc fill "
 
-    return cont
-font.segno = tmpfn()
-
 # ----------------------------------------------------------------------
 # The coda sign.
 
-def tmpfn():
-    cont = GlyphContext()
+@define_glyph("coda")
+def _(cont):
     # Saved data from gui.py
     c0 = StraightLine(cont, 528, 198, 528, 475)
     c1 = StraightLine(cont, 418, 337, 639, 337)
@@ -2435,11 +2231,8 @@ def tmpfn():
     c0.nib = c1.nib = 10
     cont.default_nib = lambda c,x,y,t,theta: 8+12*abs(sin(theta))**2.5
 
-    return cont
-font.coda = tmpfn()
-
-def tmpfn(): # variant square form used by Lilypond
-    cont = GlyphContext()
+@define_glyph("varcoda")
+def _(cont): # variant square form used by Lilypond
     # Saved data from gui.py
     c0 = StraightLine(cont, 528, 198, 528, 475)
     c1 = StraightLine(cont, 418, 337, 639, 337)
@@ -2460,14 +2253,11 @@ def tmpfn(): # variant square form used by Lilypond
     xdiff = xend - xmid
     c2.nib = c4.nib = lambda c,x,y,t,theta: (lambda k: (8, 0, k, k))(12.0*(x-xmid)/xdiff)
 
-    return cont
-font.varcoda = tmpfn()
-
 # ----------------------------------------------------------------------
 # The turn sign.
 
-def tmpfn():
-    cont = GlyphContext()
+@define_glyph("turn")
+def _(cont):
     # Saved data from gui.py
     c0 = CircleInvolute(cont, 443, 448, -0.860927, 0.508729, 370, 401, 0, -1)
     c1 = CircleInvolute(cont, 370, 401, 0, -1, 423, 347, 1, 0)
@@ -2493,11 +2283,8 @@ def tmpfn():
     c0.nibdir = c1.nibdir = c2.nibdir = c3.nibdir = c4.nibdir = c5.nibdir = \
     lambda theta: phi0 + (phi2-phi0)*(shift(theta)-theta0)/(theta2-theta0)
 
-    return cont
-font.turn = tmpfn()
-
-def tmpfn():
-    cont = GlyphContext()
+@define_glyph("invturn")
+def _(cont):
     # Saved data from gui.py
     c0 = StraightLine(cont, 525, 304, 525, 500)
     # End saved data
@@ -2506,14 +2293,11 @@ def tmpfn():
 
     cont.extra = font.turn
 
-    return cont
-font.invturn = tmpfn()
-
 # ----------------------------------------------------------------------
 # Mordent and its relatives.
 
-def tmpfn():
-    cont = GlyphContext()
+@define_glyph("mordentupper")
+def _(cont):
     # Saved data from gui.py
     c0 = StraightLine(cont, 397.935, 402, 426, 368)
     c1 = StraightLine(cont, 426, 368, 498, 439)
@@ -2531,10 +2315,8 @@ def tmpfn():
 
     cont.cy = c2.compute_y(.5)
 
-    return cont
-font.mordentupper = tmpfn()
-def tmpfn(): # and the same with a vertical line through it
-    cont = GlyphContext()
+@define_glyph("mordentlower")
+def _(cont): # and the same with a vertical line through it
     # Saved data from gui.py
     c0 = StraightLine(cont, 526, 264, 526, 466)
     # End saved data
@@ -2549,11 +2331,8 @@ def tmpfn(): # and the same with a vertical line through it
 
     cont.cy = font.mordentupper.cy - 43
 
-    return cont
-font.mordentlower = tmpfn()
-
-def tmpfn():
-    cont = GlyphContext()
+@define_glyph("mordentupperlong")
+def _(cont):
     # Saved data from gui.py
     c0 = StraightLine(cont, 397.935, 402, 426, 368)
     c1 = StraightLine(cont, 426, 368, 498, 439)
@@ -2575,10 +2354,8 @@ def tmpfn():
 
     cont.cy = font.mordentupper.cy
 
-    return cont
-font.mordentupperlong = tmpfn()
-def tmpfn(): # and the same with a vertical line through it
-    cont = GlyphContext()
+@define_glyph("mordentupperlower")
+def _(cont): # and the same with a vertical line through it
     # Saved data from gui.py
     c0 = StraightLine(cont, 656, 264, 656, 466)
     # End saved data
@@ -2593,11 +2370,8 @@ def tmpfn(): # and the same with a vertical line through it
 
     cont.cy = font.mordentupper.cy - 43
 
-    return cont
-font.mordentupperlower = tmpfn()
-
-def tmpfn():
-    cont = GlyphContext()
+@define_glyph("upmordentupperlong")
+def _(cont):
     # Saved data from gui.py
     c0 = StraightLine(cont, 397.935, 402, 426, 368)
     c1 = StraightLine(cont, 426, 368, 498, 439)
@@ -2622,10 +2396,8 @@ def tmpfn():
 
     cont.cy = font.mordentupper.cy
 
-    return cont
-font.upmordentupperlong = tmpfn()
-def tmpfn(): # and the same with a vertical line through it
-    cont = GlyphContext()
+@define_glyph("upmordentupperlower")
+def _(cont): # and the same with a vertical line through it
     # Saved data from gui.py
     c0 = StraightLine(cont, 656, 264, 656, 466)
     # End saved data
@@ -2640,11 +2412,8 @@ def tmpfn(): # and the same with a vertical line through it
 
     cont.cy = font.mordentupper.cy - 43
 
-    return cont
-font.upmordentupperlower = tmpfn()
-
-def tmpfn():
-    cont = GlyphContext()
+@define_glyph("downmordentupperlong")
+def _(cont):
     # Saved data from gui.py
     c0 = StraightLine(cont, 378.602, 425.667, 426, 368)
     c1 = StraightLine(cont, 426, 368, 498, 439)
@@ -2669,10 +2438,8 @@ def tmpfn():
 
     cont.cy = font.mordentupper.cy
 
-    return cont
-font.downmordentupperlong = tmpfn()
-def tmpfn(): # and the same with a vertical line through it
-    cont = GlyphContext()
+@define_glyph("downmordentupperlower")
+def _(cont): # and the same with a vertical line through it
     # Saved data from gui.py
     c0 = StraightLine(cont, 656, 264, 656, 466)
     # End saved data
@@ -2687,11 +2454,8 @@ def tmpfn(): # and the same with a vertical line through it
 
     cont.cy = font.mordentupper.cy - 43
 
-    return cont
-font.downmordentupperlower = tmpfn()
-
-def tmpfn():
-    cont = GlyphContext()
+@define_glyph("straightmordentupperlong")
+def _(cont):
     # Saved data from gui.py
     c0 = StraightLine(cont, 378.602, 425.667, 426, 368)
     c1 = StraightLine(cont, 426, 368, 498, 439)
@@ -2716,35 +2480,29 @@ def tmpfn():
 
     cont.cy = font.mordentupper.cy
 
-    return cont
-font.straightmordentupperlong = tmpfn()
-
-def tmpfn():
+@define_glyph("mordentupperlongdown")
+def _(cont):
     # Lilypond renders this glyph as a reflection of
     # upmordentupperlong, but it seems obviously preferable to me to
     # render it as a rotation of downmordentupperlong, so as to get
     # the mordent zigzag itself the same way round.
-    cont = GlyphContext()
     cont.extra = ("gsave 1000 1000 translate -1 -1 scale",
                   font.downmordentupperlong)
     cont.cy = 1000 - font.mordentupper.cy
-    return cont
-font.mordentupperlongdown = tmpfn()
-def tmpfn():
+
+@define_glyph("mordentupperlongup")
+def _(cont):
     # Likewise, Lilypond uses a reflection of downmordentupperlong,
     # whereas I rotate upmordentupperlong.
-    cont = GlyphContext()
     cont.extra = ("gsave 1000 1000 translate -1 -1 scale",
                   font.upmordentupperlong)
     cont.cy = 1000 - font.mordentupper.cy
-    return cont
-font.mordentupperlongup = tmpfn()
 
 # ----------------------------------------------------------------------
 # Fermata signs.
 
-def tmpfn():
-    cont = GlyphContext()
+@define_glyph("fermata")
+def _(cont):
     # Saved data from gui.py
     c0 = CircleInvolute(cont, 364, 465, 0, -1, 527, 313, 1, 0)
     c1 = CircleInvolute(cont, 527, 313, 1, 0, 690, 465, 0, 1)
@@ -2756,11 +2514,9 @@ def tmpfn():
     # Draw the dot.
     cont.extra = "newpath 527 446 24 0 360 arc fill "
 
-    return cont
-font.fermata = tmpfn()
 
-def tmpfn():
-    cont = GlyphContext()
+@define_glyph("fermata0")
+def _(cont):
     # Saved data from gui.py
     c0 = StraightLine(cont, 384, 465, 527, 234)
     c1 = StraightLine(cont, 527, 233, 670, 465)
@@ -2773,11 +2529,8 @@ def tmpfn():
     # Draw the dot.
     cont.extra = "newpath 527 446 24 0 360 arc fill "
 
-    return cont
-font.fermata0 = tmpfn()
-
-def tmpfn():
-    cont = GlyphContext()
+@define_glyph("fermata2")
+def _(cont):
     # Saved data from gui.py
     c0 = StraightLine(cont, 384, 441, 384, 313)
     c1 = StraightLine(cont, 384, 313, 670, 313)
@@ -2791,11 +2544,8 @@ def tmpfn():
     # Draw the dot.
     cont.extra = "newpath 527 446 24 0 360 arc fill "
 
-    return cont
-font.fermata2 = tmpfn()
-
-def tmpfn():
-    cont = GlyphContext()
+@define_glyph("fermata3")
+def _(cont):
     # Saved data from gui.py
     c0 = StraightLine(cont, 424, 447, 424, 370)
     c1 = StraightLine(cont, 424, 370, 630, 370)
@@ -2815,35 +2565,27 @@ def tmpfn():
     # Draw the dot.
     cont.extra = "newpath 527 446 24 0 360 arc fill "
 
-    return cont
-font.fermata3 = tmpfn()
-
-def tmpfn():
-    cont = GlyphContext()
+@define_glyph("fermataup")
+def _(cont):
     cont.extra = '0 1000 translate 1 -1 scale', font.fermata
-    return cont
-font.fermataup = tmpfn()
-def tmpfn():
-    cont = GlyphContext()
+
+@define_glyph("fermata0up")
+def _(cont):
     cont.extra = '0 1000 translate 1 -1 scale', font.fermata0
-    return cont
-font.fermata0up = tmpfn()
-def tmpfn():
-    cont = GlyphContext()
+
+@define_glyph("fermata2up")
+def _(cont):
     cont.extra = '0 1000 translate 1 -1 scale', font.fermata2
-    return cont
-font.fermata2up = tmpfn()
-def tmpfn():
-    cont = GlyphContext()
+
+@define_glyph("fermata3up")
+def _(cont):
     cont.extra = '0 1000 translate 1 -1 scale', font.fermata3
-    return cont
-font.fermata3up = tmpfn()
 
 # ----------------------------------------------------------------------
 # Parentheses to go round accidentals.
 
-def tmpfn():
-    cont = GlyphContext()
+@define_glyph("acclparen")
+def _(cont):
     # Saved data from gui.py
     c0 = CircleInvolute(cont, 367, 334, -0.478852, 0.877896, 367, 604, 0.478852, 0.877896)
     # End saved data
@@ -2852,25 +2594,18 @@ def tmpfn():
 
     cont.rx = c0.compute_x(0) + c0.compute_nib(0) + 10
 
-    return cont
-font.acclparen = tmpfn()
-
-def tmpfn():
-    cont = GlyphContext()
-
+@define_glyph("accrparen")
+def _(cont):
     cont.extra = ("gsave 1000 0 translate -1 1 scale",
                   font.acclparen, "grestore")
 
     cont.lx = 1000 - font.acclparen.rx
 
-    return cont
-font.accrparen = tmpfn()
-
 # ----------------------------------------------------------------------
 # Braces between staves.
 
-def tmpfn():
-    cont = GlyphContext()
+@define_glyph("braceupper")
+def _(cont):
     # Saved data from gui.py
     c0 = CircleInvolute(cont, 442, 109, -0.490261, 0.871576, 401, 692, 0.33035, 0.943858)
     c1 = CircleInvolute(cont, 401, 692, 0.33035, 0.943858, 313, 994, -0.810679, 0.585491)
@@ -2883,11 +2618,8 @@ def tmpfn():
     cont.scale = 1600
     cont.origin = 1000, 10
 
-    return cont
-font.braceupper = tmpfn()
-
-def tmpfn():
-    cont = GlyphContext()
+@define_glyph("bracelower")
+def _(cont):
     # Saved data from gui.py
     c0 = CircleInvolute(cont, 442, 919, -0.490261, -0.871576, 401, 336, 0.33035, -0.943858)
     c1 = CircleInvolute(cont, 401, 336, 0.33035, -0.943858, 313, 34, -0.810679, -0.585491)
@@ -2900,11 +2632,8 @@ def tmpfn():
     cont.scale = 1600
     cont.origin = 1000, 2170
 
-    return cont
-font.bracelower = tmpfn()
-
-def scaledbrace(span): # arbitrarily sized brace
-    cont = GlyphContext()
+@define_glyph("fixedbrace", args=(3982,)) # should be 'braceupper'+'bracelower'
+def scaledbrace(cont, span): # arbitrarily sized brace
     # Saved data from gui.py
     c0 = CircleInvolute(cont, 87, 20, -0.490261, 0.871576, 64, 313, 0.33035, 0.943858)
     c1 = CircleInvolute(cont, 64, 313, 0.33035, 0.943858, 20, 464, -0.810679, 0.585491)
@@ -2943,16 +2672,12 @@ def scaledbrace(span): # arbitrarily sized brace
     cont.trace_res = max(8, int(ceil(8*sqrt(1600.0/cont.scale))))
     cont.curve_res = max(1001, int(span))
 
-    return cont
-
-# Should be equivalent to 'braceupper'+'bracelower'
-font.fixedbrace = scaledbrace(3982)
-
 # ----------------------------------------------------------------------
 # End pieces for an arbitrary-sized bracket between two staves.
 
-def tmpfn(vwid):
-    cont = GlyphContext()
+@define_glyph("bracketlower", args=(75,))
+@define_glyph("bracketlowerlily", args=(-1,)) # omit the vertical
+def _(cont, vwid):
     # Saved data from gui.py
     c0 = CircleInvolute(cont, 616, 615, -0.808736, -0.588172, 407, 541, -1, 0)
     c1 = StraightLine(cont, 407, 541, 407, 441)
@@ -2969,26 +2694,19 @@ def tmpfn(vwid):
 
     cont.hy = c1.compute_y(0)
 
-    return cont
-font.bracketlower = tmpfn(75)
-font.bracketlowerlily = tmpfn(-1) # omit the vertical
-def tmpfn(x):
-    cont = GlyphContext()
-
+@define_glyph("bracketupper", args=(font.bracketlower,))
+@define_glyph("bracketupperlily", args=(font.bracketlowerlily,))
+def _(cont, x):
     cont.extra = "0 946 translate 1 -1 scale", x
 
     cont.hy = 946 - x.hy
-
-    return cont
-font.bracketupper = tmpfn(font.bracketlower)
-font.bracketupperlily = tmpfn(font.bracketlowerlily)
 
 # ----------------------------------------------------------------------
 # Note head indicating an artificial harmonic above another base
 # note.
 
-def tmpfn():
-    cont = GlyphContext()
+@define_glyph("harmart")
+def _(cont):
     # Saved data from gui.py
     c0 = CircleInvolute(cont, 526, 402, 0.526355, 0.850265, 609, 476, 0.884918, 0.465746)
     c1 = CircleInvolute(cont, 609, 476, -0.850265, 0.526355, 528, 541, -0.613941, 0.789352)
@@ -3005,11 +2723,8 @@ def tmpfn():
 
     cont.ay = c1.compute_y(0)
 
-    return cont
-font.harmart = tmpfn()
-
-def tmpfn():
-    cont = GlyphContext()
+@define_glyph("harmartfilled")
+def _(cont):
     # Saved data from gui.py
     c0 = CircleInvolute(cont, 526, 402, 0.526355, 0.850265, 609, 476, 0.884918, 0.465746)
     c1 = CircleInvolute(cont, 609, 476, -0.850265, 0.526355, 528, 541, -0.613941, 0.789352)
@@ -3025,22 +2740,16 @@ def tmpfn():
 
     cont.ay = c1.compute_y(0)
 
-    return cont
-font.harmartfilled = tmpfn()
-
 # ----------------------------------------------------------------------
 # Natural harmonic mark and a couple of other miscellaneous note flags.
 
-def tmpfn():
-    cont = GlyphContext()
-
+@define_glyph("harmnat")
+def _(cont):
     cont.extra = "newpath 527 439 40 0 360 arc 6 setlinewidth stroke "
 
-    return cont
-font.harmnat = tmpfn()
-
-def tmpfn(thumb):
-    cont = GlyphContext()
+@define_glyph("flagopen", args=(0,))
+@define_glyph("flagthumb", args=(1,))
+def _(cont, thumb):
     # Saved data from gui.py
     c0 = CircleInvolute(cont, 500, 450, 1, 0, 537, 500, 0, 1)
     c1 = CircleInvolute(cont, 537, 500, 0, 1, 500, 550, -1, 0)
@@ -3061,15 +2770,11 @@ def tmpfn(thumb):
 
     cont.cy = c0.compute_y(1)
 
-    return cont
-font.flagopen = tmpfn(0)
-font.flagthumb = tmpfn(1)
-
 # ----------------------------------------------------------------------
 # Ditto (same as previous bar) mark.
 
-def tmpfn():
-    cont = GlyphContext()
+@define_glyph("ditto")
+def _(cont):
     # Saved data from gui.py
     c0 = StraightLine(cont, 425, 604, 630, 339)
     # End saved data
@@ -3080,14 +2785,11 @@ def tmpfn():
     "newpath 423 397 35 0 360 arc fill " + \
     "newpath 632 546 35 0 360 arc fill "
 
-    return cont
-font.ditto = tmpfn()
-
 # ----------------------------------------------------------------------
 # Breath mark and related stuff.
 
-def tmpfn():
-    cont = GlyphContext()
+@define_glyph("breath")
+def _(cont):
     # Saved data from gui.py
     c0 = CircleInvolute(cont, 577, 341, 0.843661, 0.536875, 548, 466, -0.894427, 0.447214)
     # End saved data
@@ -3096,57 +2798,50 @@ def tmpfn():
 
     blob(c0, 0, 'l', 5, 0)
 
-    return cont
-font.breath = tmpfn()
-
-def tmpfn():
-    cont = GlyphContext()
+@define_glyph("varbreath")
+def _(cont):
     # Saved data from gui.py
     c0 = StraightLine(cont, 547, 466, 587, 341)
     # End saved data
 
     c0.nib = lambda c,x,y,t,theta: 4+14*t
 
-    return cont
-font.varbreath = tmpfn()
-
-def tmpfn():
-    cont = GlyphContext()
+@define_glyph("revbreath")
+def _(cont):
     cont.extra = "1000 1000 translate -1 -1 scale", font.breath
-    return cont
-font.revbreath = tmpfn()
 
-def tmpfn():
-    cont = GlyphContext()
+@define_glyph("revvarbreath")
+def _(cont):
     cont.extra = "1000 1000 translate -1 -1 scale", font.varbreath
-    return cont
-font.revvarbreath = tmpfn()
 
-def tmpfn():
-    cont = GlyphContext()
+@define_glyph("caesura")
+def _(cont):
     # Saved data from gui.py
     c0 = StraightLine(cont, 400, 625, 550, 375)
     c1 = StraightLine(cont, 475, 625, 625, 375)
     # End saved data
     cont.default_nib = 8
-    return cont
-font.caesura = tmpfn()
 
-def tmpfn():
-    cont = GlyphContext()
+@define_glyph("caesuracurved")
+def _(cont):
     # Saved data from gui.py
     c0 = CircleInvolute(cont, 400, 625, 550-400, 375-625, 500, 375, 0, -1)
     c1 = CircleInvolute(cont, 475, 625, 625-475, 375-625, 575, 375, 0, -1)
     # End saved data
     cont.default_nib = lambda c,x,y,t,theta: 8+4.0*(x-c.compute_x(0))/(c.compute_x(1)-c.compute_x(0))
-    return cont
-font.caesuracurved = tmpfn()
 
 # ----------------------------------------------------------------------
 # Random functional stuff like arrowheads.
 
-def tmpfn(rotate, is_open):
-    cont = GlyphContext()
+@define_glyph("openarrowright", args=(0,1))
+@define_glyph("closearrowright", args=(0,0))
+@define_glyph("openarrowleft", args=(180,1))
+@define_glyph("closearrowleft", args=(180,0))
+@define_glyph("openarrowup", args=(270,1))
+@define_glyph("closearrowup", args=(270,0))
+@define_glyph("openarrowdown", args=(90,1))
+@define_glyph("closearrowdown", args=(90,0))
+def _(cont, rotate, is_open):
     # Saved data from gui.py
     c0 = CircleInvolute(cont, 375, 450, 0.83205, 0.5547, 500, 500, 0.977802, 0.209529)
     c1 = CircleInvolute(cont, 500, 500, -0.977802, 0.209529, 375, 550, -0.83205, 0.5547)
@@ -3169,21 +2864,11 @@ def tmpfn(rotate, is_open):
     cont.cx = cont.cy = 500
     cont.extent = abs(c0.compute_y(0) - cont.cy) + 6
 
-    return cont
-font.openarrowright = tmpfn(0,1)
-font.closearrowright = tmpfn(0,0)
-font.openarrowleft = tmpfn(180,1)
-font.closearrowleft = tmpfn(180,0)
-font.openarrowup = tmpfn(270,1)
-font.closearrowup = tmpfn(270,0)
-font.openarrowdown = tmpfn(90,1)
-font.closearrowdown = tmpfn(90,0)
-
 # ----------------------------------------------------------------------
 # Flat (and multiples of flat).
 
-def tmpfn():
-    cont = GlyphContext()
+@define_glyph("flat")
+def _(cont):
     # Saved data from gui.py
     c0 = StraightLine(cont, 430, 236, 430, 548)
     c1 = Bezier(cont, 430, 548, 481, 499, 515.999, 458, 505, 424)
@@ -3201,11 +2886,8 @@ def tmpfn():
     cont.ox = c0.compute_x(0.5)
     cont.hy = 469 # no sensible way to specify this except manually
 
-    return cont
-font.flat = tmpfn()
-
-def tmpfn():
-    cont = GlyphContext()
+@define_glyph("flatup")
+def _(cont):
     # Saved data from gui.py
     c0 = StraightLine(cont, 430, 236, 430, 548)
     c1 = Bezier(cont, 430, 548, 481, 499, 515.999, 458, 505, 424)
@@ -3225,11 +2907,8 @@ def tmpfn():
 
     cont.extra = "gsave 430 236 16 add translate 0.7 dup scale -500 dup 150 sub translate", font.closearrowup, "grestore"
 
-    return cont
-font.flatup = tmpfn()
-
-def tmpfn():
-    cont = GlyphContext()
+@define_glyph("flatdn")
+def _(cont):
     # Saved data from gui.py
     c0 = StraightLine(cont, 430, 236, 430, 568)
     c1 = Bezier(cont, 430, 548, 481, 499, 515.999, 458, 505, 424)
@@ -3248,11 +2927,8 @@ def tmpfn():
 
     cont.extra = "gsave 430 568 16 sub translate 0.7 dup scale -500 dup 150 add translate", font.closearrowdown, "grestore"
 
-    return cont
-font.flatdn = tmpfn()
-
-def tmpfn():
-    cont = GlyphContext()
+@define_glyph("flatupdn")
+def _(cont):
     # Saved data from gui.py
     c0 = StraightLine(cont, 430, 236, 430, 568)
     c1 = Bezier(cont, 430, 548, 481, 499, 515.999, 458, 505, 424)
@@ -3271,43 +2947,32 @@ def tmpfn():
 
     cont.extra = font.flatup.extra + font.flatdn.extra
 
-    return cont
-font.flatupdn = tmpfn()
-
-def tmpfn():
-    cont = GlyphContext()
+@define_glyph("doubleflat")
+def _(cont):
     cont.extra = (font.flat, "gsave -90 0 translate",
                   font.flat, "grestore")
     cont.ox = font.flat.ox - 90
     cont.hy = font.flat.hy
-    return cont
-font.doubleflat = tmpfn()
 
-def tmpfn():
-    cont = GlyphContext()
+@define_glyph("semiflat")
+def _(cont):
     reflectpt = font.flat.ox - 20
     cont.extra = ("gsave %g 0 translate -1 1 scale" % (2*reflectpt),
                   font.flat, "grestore")
     cont.hy = font.flat.hy
-    return cont
-font.semiflat = tmpfn()
 
-def tmpfn():
-    cont = GlyphContext()
+@define_glyph("sesquiflat")
+def _(cont):
     cont.extra = font.flat, font.semiflat
     cont.hy = font.flat.hy
-    return cont
-font.sesquiflat = tmpfn()
 
-def tmpfn():
-    cont = GlyphContext()
+@define_glyph("smallflat")
+def _(cont):
     cont.extra = ("gsave 580 380 translate 0.5 dup scale -580 -380 translate",
                   font.flat, "grestore")
-    return cont
-font.smallflat = tmpfn()
 
-def tmpfn():
-    cont = GlyphContext()
+@define_glyph("flatslash")
+def _(cont):
     # Saved data from gui.py
     c0 = StraightLine(cont, 370, 363, 490, 303)
     # End saved data
@@ -3319,11 +2984,8 @@ def tmpfn():
 
     cont.extra = font.flat
 
-    return cont
-font.flatslash = tmpfn()
-
-def tmpfn():
-    cont = GlyphContext()
+@define_glyph("flatslash2")
+def _(cont):
     # Saved data from gui.py
     c0 = StraightLine(cont, 372, 373, 490, 333)
     c1 = StraightLine(cont, 372, 313, 490, 273)
@@ -3336,20 +2998,15 @@ def tmpfn():
 
     cont.extra = font.flat
 
-    return cont
-font.flatslash2 = tmpfn()
-
-def tmpfn():
-    cont = GlyphContext()
+@define_glyph("semiflatslash")
+def _(cont):
     reflectpt = font.flat.ox - 20
     cont.extra = ("gsave %g 0 translate -1 1 scale" % (2*reflectpt),
                   font.flatslash, "grestore")
     cont.hy = font.flatslash.hy
-    return cont
-font.semiflatslash = tmpfn()
 
-def tmpfn():
-    cont = GlyphContext()
+@define_glyph("doubleflatslash")
+def _(cont):
     # Saved data from gui.py
     c0 = StraightLine(cont, 282, 361, 490, 281)
     # End saved data
@@ -3361,14 +3018,11 @@ def tmpfn():
 
     cont.extra = font.doubleflat
 
-    return cont
-font.doubleflatslash = tmpfn()
-
 # ----------------------------------------------------------------------
 # Natural.
 
-def tmpfn():
-    cont = GlyphContext()
+@define_glyph("natural")
+def _(cont):
     # Saved data from gui.py
     c0 = StraightLine(cont, 519, 622, 519, 399)
     c1 = StraightLine(cont, 519, 399, 442, 418)
@@ -3382,11 +3036,8 @@ def tmpfn():
 
     cont.cy = (c0.compute_y(0) + c2.compute_y(0)) / 2.0
 
-    return cont
-font.natural = tmpfn()
-
-def tmpfn():
-    cont = GlyphContext()
+@define_glyph("naturalup")
+def _(cont):
     # Saved data from gui.py
     c0 = StraightLine(cont, 519, 622, 519, 399)
     c1 = StraightLine(cont, 519, 399, 442, 418)
@@ -3402,11 +3053,8 @@ def tmpfn():
 
     cont.cy = font.natural.cy
 
-    return cont
-font.naturalup = tmpfn()
-
-def tmpfn():
-    cont = GlyphContext()
+@define_glyph("naturaldn")
+def _(cont):
     # Saved data from gui.py
     c0 = StraightLine(cont, 519, 622, 519, 399)
     c1 = StraightLine(cont, 519, 399, 442, 418)
@@ -3422,11 +3070,8 @@ def tmpfn():
 
     cont.cy = font.natural.cy
 
-    return cont
-font.naturaldn = tmpfn()
-
-def tmpfn():
-    cont = GlyphContext()
+@define_glyph("naturalupdn")
+def _(cont):
     # Saved data from gui.py
     c0 = StraightLine(cont, 519, 622, 519, 399)
     c1 = StraightLine(cont, 519, 399, 442, 418)
@@ -3442,20 +3087,15 @@ def tmpfn():
 
     cont.cy = font.natural.cy
 
-    return cont
-font.naturalupdn = tmpfn()
-
-def tmpfn():
-    cont = GlyphContext()
+@define_glyph("smallnatural")
+def _(cont):
     cont.extra = "gsave 580 280 translate 0.5 dup scale -580 -280 translate", font.natural, "grestore"
-    return cont
-font.smallnatural = tmpfn()
 
 # ----------------------------------------------------------------------
 # Sharp.
 
-def tmpfn():
-    cont = GlyphContext()
+@define_glyph("sharp")
+def _(cont):
     # Saved data from gui.py
     c0 = StraightLine(cont, 442, 306, 442, 652)
     c1 = StraightLine(cont, 493, 291, 493, 637)
@@ -3467,11 +3107,8 @@ def tmpfn():
 
     cont.cy = (c2.compute_y(0) + c3.compute_y(1))/2.0
 
-    return cont
-font.sharp = tmpfn()
-
-def tmpfn():
-    cont = GlyphContext()
+@define_glyph("sharpup")
+def _(cont):
     # Saved data from gui.py
     c0 = StraightLine(cont, 442, 306, 442, 652)
     c1 = StraightLine(cont, 493, 271, 493, 637)
@@ -3485,11 +3122,8 @@ def tmpfn():
 
     cont.cy = font.sharp.cy
 
-    return cont
-font.sharpup = tmpfn()
-
-def tmpfn():
-    cont = GlyphContext()
+@define_glyph("sharpdn")
+def _(cont):
     # Saved data from gui.py
     c0 = StraightLine(cont, 442, 306, 442, 672)
     c1 = StraightLine(cont, 493, 291, 493, 637)
@@ -3503,11 +3137,8 @@ def tmpfn():
 
     cont.cy = font.sharp.cy
 
-    return cont
-font.sharpdn = tmpfn()
-
-def tmpfn():
-    cont = GlyphContext()
+@define_glyph("sharpupdn")
+def _(cont):
     # Saved data from gui.py
     c0 = StraightLine(cont, 442, 306, 442, 672)
     c1 = StraightLine(cont, 493, 271, 493, 637)
@@ -3521,17 +3152,12 @@ def tmpfn():
 
     cont.cy = font.sharp.cy
 
-    return cont
-font.sharpupdn = tmpfn()
-
-def tmpfn():
-    cont = GlyphContext()
+@define_glyph("smallsharp")
+def _(cont):
     cont.extra = "gsave 580 280 translate 0.5 dup scale -580 -280 translate", font.sharp, "grestore"
-    return cont
-font.smallsharp = tmpfn()
 
-def tmpfn():
-    cont = GlyphContext()
+@define_glyph("semisharp")
+def _(cont):
     # Saved data from gui.py
     c0 = StraightLine(cont, 442, 306, 442, 652)
     c1 = StraightLine(cont, 413, 421, 472, 401.518)
@@ -3540,11 +3166,8 @@ def tmpfn():
 
     cont.default_nib = (8, pi/2, 16, 16)
 
-    return cont
-font.semisharp = tmpfn()
-
-def tmpfn():
-    cont = GlyphContext()
+@define_glyph("sesquisharp")
+def _(cont):
     # Saved data from gui.py
     c0 = StraightLine(cont, 442, 300.351, 442, 646.351)
     c1 = StraightLine(cont, 493, 291, 493, 637)
@@ -3555,11 +3178,8 @@ def tmpfn():
 
     cont.default_nib = (8, pi/2, 16, 16)
 
-    return cont
-font.sesquisharp = tmpfn()
-
-def tmpfn():
-    cont = GlyphContext()
+@define_glyph("sharp3")
+def _(cont):
     # Saved data from gui.py
     c0 = StraightLine(cont, 442, 306, 442, 652)
     c1 = StraightLine(cont, 493, 291, 493, 637)
@@ -3572,11 +3192,8 @@ def tmpfn():
 
     cont.cy = (c2.compute_y(0) + c3.compute_y(1))/2.0
 
-    return cont
-font.sharp3 = tmpfn()
-
-def tmpfn():
-    cont = GlyphContext()
+@define_glyph("semisharp3")
+def _(cont):
     # Saved data from gui.py
     c0 = StraightLine(cont, 442, 306, 442, 652)
     c1 = StraightLine(cont, 413, 399, 472, 379.518)
@@ -3588,14 +3205,11 @@ def tmpfn():
 
     cont.cy = (c2.compute_y(0) + c3.compute_y(1))/2.0
 
-    return cont
-font.semisharp3 = tmpfn()
-
 # ----------------------------------------------------------------------
 # Double sharp.
 
-def tmpfn():
-    cont = GlyphContext()
+@define_glyph("doublesharp")
+def _(cont):
     # Saved data from gui.py
     c0 = StraightLine(cont, 409, 426, 504, 521)
     c1 = StraightLine(cont, 409, 521, 504, 426)
@@ -3611,14 +3225,11 @@ def tmpfn():
     "newpath 504 426 24 square " + \
     "newpath 504 521 24 square "
 
-    return cont
-font.doublesharp = tmpfn()
-
 # ----------------------------------------------------------------------
 # Arpeggio mark and friends.
 
-def tmpfn():
-    cont = GlyphContext()
+@define_glyph("arpeggio")
+def _(cont):
     # Saved data from gui.py
     c0 = Bezier(cont, 491, 334, 516, 359, 516, 378, 491, 403)
     c1 = Bezier(cont, 491, 403, 466, 428, 466, 447, 491, 472)
@@ -3631,11 +3242,8 @@ def tmpfn():
 
     cont.default_nib = lambda c,x,y,t,theta: 4+14*abs(cos(theta + 3*pi/4))**1.5
 
-    return cont
-font.arpeggio = tmpfn()
-
-def tmpfn():
-    cont = GlyphContext()
+@define_glyph("arpeggioshort")
+def _(cont):
     # Saved data from gui.py
     c0 = Bezier(cont, 491, 334, 516, 359, 516, 378, 491, 403)
     c1 = Bezier(cont, 491, 403, 466, 428, 466, 447, 491, 472)
@@ -3649,11 +3257,8 @@ def tmpfn():
     cont.lx = c0.compute_x(0) - font.closearrowdown.extent
     cont.rx = c0.compute_x(0) + font.closearrowdown.extent
 
-    return cont
-font.arpeggioshort = tmpfn()
-
-def tmpfn():
-    cont = GlyphContext()
+@define_glyph("arpeggioarrowdown")
+def _(cont):
     # Saved data from gui.py
     c0 = Bezier(cont, 491, 334, 516, 359, 491, 370, 491, 403)
     # End saved data
@@ -3666,40 +3271,29 @@ def tmpfn():
     cont.rx = font.arpeggioshort.rx
     cont.ey = c0.compute_y(0)
 
-    return cont
-font.arpeggioarrowdown = tmpfn()
-
-def tmpfn():
-    cont = GlyphContext()
-
+@define_glyph("arpeggioarrowup")
+def _(cont):
     cont.extra = "1000 1000 translate -1 -1 scale", font.arpeggioarrowdown
 
     cont.ey = 1000 - font.arpeggioarrowdown.ey
     cont.lx = 1000 - font.arpeggioshort.rx
     cont.rx = 1000 - font.arpeggioshort.lx
 
-    return cont
-font.arpeggioarrowup = tmpfn()
-
-def tmpfn():
+@define_glyph("trillwiggle")
+def _(cont):
     # Rotate the arpeggio mark by 90 degrees and use it as the wavy
     # line after 'tr' to indicate an extended trill.
-    cont = GlyphContext()
-
     cont.extra = ("500 500 translate -90 rotate -500 -500 translate",
                   font.arpeggioshort)
 
     cont.lx = font.arpeggioshort.ty
     cont.rx = font.arpeggioshort.oy
 
-    return cont
-font.trillwiggle = tmpfn()
-
 # ----------------------------------------------------------------------
 # Downbow and upbow marks.
 
-def tmpfn():
-    cont = GlyphContext()
+@define_glyph("bowdown")
+def _(cont):
     # Saved data from gui.py
     c0 = StraightLine(cont, 447, 430, 447, 330)
     c1 = StraightLine(cont, 447, 330, 608, 330)
@@ -3710,11 +3304,8 @@ def tmpfn():
 
     cont.default_nib = 8, pi/2, 35, 35
 
-    return cont
-font.bowdown = tmpfn()
-
-def tmpfn():
-    cont = GlyphContext()
+@define_glyph("bowup")
+def _(cont):
     # Saved data from gui.py
     c0 = StraightLine(cont, 475, 256, 535, 460)
     c1 = StraightLine(cont, 535, 460, 595, 256)
@@ -3724,14 +3315,11 @@ def tmpfn():
     c0.nib = lambda c,x,y,t,theta: (6, 0, min(25, (1-t)*100), 0)
     c1.nib = 6
 
-    return cont
-font.bowup = tmpfn()
-
 # ----------------------------------------------------------------------
 # Sforzando / marcato is an inverted upbow mark.
 
-def tmpfn():
-    cont = GlyphContext()
+@define_glyph("sforzando")
+def _(cont):
     # Saved data from gui.py
     c0 = StraightLine(cont, 475, 460, 535, 256)
     c1 = StraightLine(cont, 535, 256, 595, 460)
@@ -3741,36 +3329,24 @@ def tmpfn():
     c0.nib = 6
     c1.nib = lambda c,x,y,t,theta: (6, pi, min(25, t*100), 0)
 
-    return cont
-font.sforzando = tmpfn()
-
-def tmpfn():
-    cont = GlyphContext()
-
+@define_glyph("sforzandodn")
+def _(cont):
     cont.extra = "1000 1000 translate -1 -1 scale", font.sforzando
-
-    return cont
-font.sforzandodn = tmpfn()
 
 # ----------------------------------------------------------------------
 # Repeat mark (just a pair of dots).
 
-def tmpfn():
-    cont = GlyphContext()
-
+@define_glyph("repeatmarks")
+def _(cont):
     cont.extra = \
     "newpath 561 401 32 0 360 arc fill " + \
     "newpath 561 542 32 0 360 arc fill "
 
-    return cont
-font.repeatmarks = tmpfn()
-
 # ----------------------------------------------------------------------
 # Grace notes.
 
-def tmpfn():
-    cont = GlyphContext()
-
+@define_glyph("appoggiatura")
+def _(cont):
     cont.extra = [
     "gsave 495 472 translate 0.45 dup scale -527 -472 translate",
     "gsave 602.346 452.748 -450 add translate -535 -465 translate",
@@ -3781,12 +3357,8 @@ def tmpfn():
     "grestore",
     ]
 
-    return cont
-font.appoggiatura = tmpfn()
-
-def tmpfn():
-    cont = GlyphContext()
-
+@define_component("accslashup")
+def _(cont):
     # Saved data from gui.py
     c0 = StraightLine(cont, 502, 394, 601, 327)
     # End saved data
@@ -3796,44 +3368,29 @@ def tmpfn():
     cont.ox = 532
     cont.oy = 261
 
-    return cont
-accslashup = tmpfn()
-
-def tmpfn():
-    cont = GlyphContext()
-
+@define_glyph("acciaccatura")
+def _(cont):
     cont.extra = font.appoggiatura, accslashup
 
-    return cont
-font.acciaccatura = tmpfn()
-
-def tmpfn():
-    cont = GlyphContext()
-
+@define_glyph("accslashbigup")
+def _(cont):
     cont.extra = "-500 0 translate 1 .45 div dup scale", accslashup
 
     cont.ox = -500 + accslashup.ox / .45
     cont.oy = accslashup.oy / .45
 
-    return cont
-font.accslashbigup = tmpfn()
-
-def tmpfn():
-    cont = GlyphContext()
-
+@define_glyph("accslashbigdn")
+def _(cont):
     cont.extra = '0 1000 translate 1 -1 scale', font.accslashbigup
 
     cont.ox = font.accslashbigup.ox
     cont.oy = 1000 - font.accslashbigup.oy
 
-    return cont
-font.accslashbigdn = tmpfn()
-
 # ----------------------------------------------------------------------
 # Piano pedal marks.
 
-def tmpfn():
-    cont = GlyphContext()
+@define_glyph("pedP")
+def _(cont):
     # Saved data from gui.py
     c0 = CircleInvolute(cont, 340, 451, 0.039968, 0.999201, 293, 487, -0.664364, -0.747409)
     c1 = CircleInvolute(cont, 293, 487, -0.664364, -0.747409, 399, 373, 1, 0)
@@ -3883,11 +3440,8 @@ def tmpfn():
 
     cont.by = c5.compute_y(1) + c5.compute_nib(1)
 
-    return cont
-font.pedP = tmpfn()
-
-def tmpfn():
-    cont = GlyphContext()
+@define_glyph("pede")
+def _(cont):
     # Saved data from gui.py
     c0 = CircleInvolute(cont, 482, 580, 0.786318, -0.617822, 533, 541, 0.804176, -0.594391)
     c1 = CircleInvolute(cont, 533, 541, 0.804176, -0.594391, 520, 496, -1, 0)
@@ -3907,11 +3461,8 @@ def tmpfn():
 
     cont.by = font.pedP.by
 
-    return cont
-font.pede = tmpfn()
-
-def tmpfn():
-    cont = GlyphContext()
+@define_glyph("pedd")
+def _(cont):
     # Saved data from gui.py
     c0 = CircleInvolute(cont, 638, 484, -0.91707, 0.398726, 580, 567, 0, 1)
     c1 = CircleInvolute(cont, 580, 567, 0, 1, 623, 625, 1, 0)
@@ -3930,44 +3481,30 @@ def tmpfn():
 
     cont.by = font.pedP.by
 
-    return cont
-font.pedd = tmpfn()
-
-def tmpfn():
-    cont = GlyphContext()
-
+@define_glyph("peddot")
+def _(cont):
     cont.extra = "newpath 708 611 20 0 360 arc fill "
 
     cont.by = font.pedP.by
 
-    return cont
-font.peddot = tmpfn()
-
-def tmpfn():
-    cont = GlyphContext()
-
+@define_glyph("pedPed")
+def _(cont):
     cont.extra = font.pedP, font.pede, font.pedd
 
     cont.by = font.pedP.by
 
-    return cont
-font.pedPed = tmpfn()
-
-def tmpfn():
-    cont = GlyphContext()
-
+@define_glyph("pedPeddot")
+def _(cont):
     cont.extra = (font.pedP, font.pede,
                   font.pedd, font.peddot)
 
     cont.by = font.pedP.by
 
-    return cont
-font.pedPeddot = tmpfn()
-
 # The pedal-up asterisk is drawn by drawing a single curved edge and
 # repeating it around the circle eight times.
-def tmpfn():
-    cont = GlyphContext()
+
+@define_component("pedstarcomponent")
+def _(cont):
     # Saved data from gui.py
     c0 = CircleInvolute(cont, 411, 448, 0.92388, -0.382683, 425, 425, 0, -1)
     c1 = CircleInvolute(cont, 425, 425, 0, -1, 413, 405, -0.747409, -0.664364)
@@ -3983,12 +3520,8 @@ def tmpfn():
     cont.cy = c0.compute_y(0) + (x0 - c0.compute_x(0)) / tan(pi/8)
     cont.r = sqrt((c0.compute_x(0) - cont.cx)**2 + (c0.compute_y(0) - cont.cy)**2)
 
-    return cont
-pedstarcomponent = tmpfn()
-
-def tmpfn():
-    cont = GlyphContext()
-
+@define_glyph("pedstar")
+def _(cont):
     cx, cy, r = pedstarcomponent.cx, pedstarcomponent.cy, pedstarcomponent.r
 
     cont.extra = "8 {", pedstarcomponent, \
@@ -3997,11 +3530,8 @@ def tmpfn():
 
     cont.by = font.pedP.by
 
-    return cont
-font.pedstar = tmpfn()
-
-def tmpfn():
-    cont = GlyphContext()
+@define_glyph("peddash")
+def _(cont):
     # Saved data from gui.py
     c0 = Bezier(cont, 463, 538, 493, 518, 540, 544, 570, 524)
     # End saved data
@@ -4010,54 +3540,45 @@ def tmpfn():
 
     cont.by = font.pedP.by
 
-    return cont
-font.peddash = tmpfn()
-
 # ----------------------------------------------------------------------
 # Some note flags I don't really understand, but which Lilypond's
 # font supports so I must too.
 
-def tmpfn():
-    cont = GlyphContext()
+@define_glyph("upedalheel")
+def _(cont):
     cont.extra = \
     "newpath 450 420 moveto 500 500 50 180 0 arcn 550 420 lineto " + \
     "16 setlinewidth 1 setlinecap stroke"
     cont.cy = 500
-    return cont
-font.upedalheel = tmpfn()
 
-def tmpfn():
-    cont = GlyphContext()
+@define_glyph("dpedalheel")
+def _(cont):
     cont.extra = \
     "newpath 450 580 moveto 500 500 50 180 0 arc 550 580 lineto " + \
     "16 setlinewidth 1 setlinecap stroke"
     cont.cy = 500
-    return cont
-font.dpedalheel = tmpfn()
 
-def tmpfn():
-    cont = GlyphContext()
+@define_glyph("upedaltoe")
+def _(cont):
     cont.extra = \
     "newpath 450 420 moveto 500 550 lineto 550 420 lineto " + \
     "16 setlinewidth 1 setlinecap 1 setlinejoin stroke"
     cont.cy = 500
-    return cont
-font.upedaltoe = tmpfn()
 
-def tmpfn():
-    cont = GlyphContext()
+@define_glyph("dpedaltoe")
+def _(cont):
     cont.extra = \
     "newpath 450 580 moveto 500 450 lineto 550 580 lineto " + \
     "16 setlinewidth 1 setlinecap 1 setlinejoin stroke"
     cont.cy = 500
-    return cont
-font.dpedaltoe = tmpfn()
 
 # ----------------------------------------------------------------------
 # Accordion-specific markings.
 
-def tmpfn(n):
-    cont = GlyphContext()
+@define_glyph("acc2", args=(2,))
+@define_glyph("acc3", args=(3,))
+@define_glyph("acc4", args=(4,))
+def _(cont, n):
     cont.scale = 1440 # make life easier: one stave space is now 100px
     r = 50*n
     cont.extra = "newpath 500 500 %g 0 360 arc " % r
@@ -4066,13 +3587,9 @@ def tmpfn(n):
         x = sqrt(r*r - y*y)
         cont.extra = cont.extra + "%g %g moveto %g %g lineto " % (500-x, 500+y, 500+x, 500+y)
     cont.extra = cont.extra + "8 setlinewidth stroke"
-    return cont
-font.acc2 = tmpfn(2)
-font.acc3 = tmpfn(3)
-font.acc4 = tmpfn(4)
 
-def tmpfn(w,h):
-    cont = GlyphContext()
+@define_glyph("accr", args=(2,3))
+def _(cont, w,h):
     cont.scale = 1440 # make life easier: one stave space is now 100px
     ww = 50*w
     hh = 50*h
@@ -4083,18 +3600,14 @@ def tmpfn(w,h):
         y = 100*i - hh
         cont.extra = cont.extra + "%g %g moveto %g %g lineto " % (500-ww, 500+y, 500+ww, 500+y)
     cont.extra = cont.extra + "8 setlinewidth stroke"
-    return cont
-font.accr = tmpfn(2,3)
 
-def tmpfn():
-    cont = GlyphContext()
+@define_glyph("accdot")
+def _(cont):
     cont.scale = 1440 # make life easier: one stave space is now 100px
     cont.extra = "newpath 500 500 25 0 360 arc fill "
-    return cont
-font.accdot = tmpfn()
 
-def tmpfn():
-    cont = GlyphContext()
+@define_glyph("accstar")
+def _(cont):
     cont.scale = 1440 # make life easier: one stave space is now 100px
     cont.extra = "500 500 translate " + \
     "newpath 0 0 100 0 360 arc 8 setlinewidth stroke " + \
@@ -4104,17 +3617,13 @@ def tmpfn():
     "  " + \
     "  45 rotate" + \
     "} repeat"
-    return cont
-font.accstar = tmpfn()
 
 # ----------------------------------------------------------------------
 # A blank glyph!
 
-def tmpfn():
-    cont = GlyphContext()
+@define_glyph("blank")
+def _(cont):
     cont.lx = 500
     cont.rx = 600
     cont.by = 500
     cont.ty = 600
-    return cont
-font.blank = tmpfn()
