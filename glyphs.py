@@ -301,6 +301,7 @@ lilyglyphlist = [
 ("varcoda",      "scripts.varcoda",        0, 0.5,0.5, 1,0.5),
 ("dynamicf",     "f",                      0x0066, 'lx','by', 'rx','by', {"x0":"lx", "x1":"rx", "xw":"rx"}),
 ("dynamicm",     "m",                      0x006d, 'lx','by', 'rx','by', {"x0":"lx", "x1":"rx", "xw":"rx"}),
+("dynamicn",     "n",                      0x006e, 'lx','by', 'rx','by', {"x0":"lx", "x1":"rx", "xw":"rx"}),
 ("dynamicp",     "p",                      0x0070, 'lx','by', 'rx','by', {"x0":"lx", "x1":"rx", "xw":"rx"}),
 ("dynamicr",     "r",                      0x0072, 'lx','by', 'rx','by', {"x0":"lx", "x1":"rx", "xw":"rx"}),
 ("dynamics",     "s",                      0x0073, 'lx','by', 'rx','by', {"x0":"lx", "x1":"rx", "xw":"rx"}),

@@ -1955,6 +1955,36 @@ def _(cont): # m (we do this one first to define the baseline)
     cont.lx = 557 + (-41.38 - 34.62) * cont.scale / 3600.0
     cont.rx = 751 - (-49.53 - -87.53) * cont.scale / 3600.0
 
+@define_glyph("dynamicn")
+def _(cont): # n
+    # Saved data from gui.py
+    c0 = CircleInvolute(cont, 539, 378, 0.328521, -0.944497, 585, 331, 1, 0)
+    c1 = CircleInvolute(cont, 585, 331, 1, 0, 606, 360, -0.287348, 0.957826)
+    c2 = StraightLine(cont, 606, 360, 576, 460)
+    c3 = CircleInvolute(cont, 621, 360, 0.287348, -0.957826, 648, 331, 1, 0)
+    c4 = CircleInvolute(cont, 648, 331, 1, 0, 669, 360, -0.286206, 0.958168)
+    c5 = StraightLine(cont, 669, 360, 646, 437)
+    c6 = CircleInvolute(cont, 646, 437, -0.286206, 0.958168, 663, 463, 1, 0)
+    c7 = CircleInvolute(cont, 663, 463, 1, 0, 710, 415, 0.328521, -0.944497)
+    c0.weld_to(1, c1, 0)
+    c1.weld_to(1, c2, 0)
+    c3.weld_to(1, c4, 0)
+    c4.weld_to(1, c5, 0)
+    c5.weld_to(1, c6, 0)
+    c6.weld_to(1, c7, 0)
+    # End saved data
+
+    cont.default_nib = 4
+    c2.nib = c5.nib = (4,0,15,15)
+    phi = c1.compute_theta(1)
+    psi = c0.compute_theta(0)
+    c0.nib = c1.nib = c3.nib = c4.nib = c6.nib = c7.nib = lambda c,x,y,t,theta: (lambda k: 4+k)(15*cos(pi/2*(theta-phi)/(psi-phi))**2)
+
+    cont.lby = c2.compute_y(1)
+    cont.by = c2.compute_y(1) + c2.compute_nib(1)[0]
+    cont.lx = 557 + (-41.38 - 34.62) * cont.scale / 3600.0
+    cont.rx = 688 - (-49.53 - -87.53) * cont.scale / 3600.0
+
 @define_glyph("dynamicf")
 def _(cont): # f
     # Saved data from gui.py
