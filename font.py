@@ -322,7 +322,7 @@ def _(cont):
                   "0 %g translate" % font.clefG.hy,
                   "%g dup scale" % (cont.scale / clefCstraightright.scale),
                   "0 %g translate" % (-clefCstraightright.hy),
-                  "40 -268 translate", clefCstraightright, "grestore")
+                  "40 -263.888 translate", clefCstraightright, "grestore")
     cont.origin = font.clefG.origin
     cont.hy = font.clefG.hy
 
