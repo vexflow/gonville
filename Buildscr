@@ -5,8 +5,6 @@ module gonville
 
 set Version $(!builddate).$(vcsid)
 
-ifeq "$(SHARE_LILYPOND)" "" set SHARE_LILYPOND /usr/share/lilypond
-
 # Construct the source archive, before we create any new files.
 in . do mkdir gonville-$(Version)
 in gonville-$(Version) do cp -r ../gonville/* .
