@@ -2340,7 +2340,6 @@ def _(cont):
 def _(cont):
     cont.extra = ("0 -100 translate", varsegnoend, varsegnomiddle,
                   "0 177 translate", varsegnomiddle,
-                  "0 177 translate", varsegnomiddle,
                   "%g %g translate 180 rotate %g %g translate" % (
                       varsegnomiddle.centre[0], varsegnomiddle.centre[1],
                       -varsegnomiddle.centre[0], -varsegnomiddle.centre[1]),
