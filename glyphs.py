@@ -1425,6 +1425,9 @@ def lilypond_list_missing_glyphs(args):
     # guess is that it's a legacy version of trill_element used in
     # older versions.
     "scripts.trilelement",
+    # Similarly with this one, which was introduced _more_ recently
+    # than trill_element.
+    "scripts.trillelement",
     # Longa notes are not supported.
     re.compile(r'noteheads\.[ud]M2'),
     # Solfa note heads are not supported.
