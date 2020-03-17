@@ -392,6 +392,7 @@ lilyglyphlist = [
 ("restminim",    "rests.0",                0, 0,1, 1,1), # reuse restminim as semibreve rest
 ("restsemibreveo", "rests.0o",             0, 0,'oy', 1,'oy'),
 ("segno",        "scripts.segno",          0, 0.5,0.5, 1,0.5),
+("varsegno",     "scripts.varsegno",       0, 0.5,0.5, 1,0.5),
 ("semibreve",    "noteheads.s0",           0, 0,0.5, 1,0.5),
 ("sforzando",    "scripts.umarcato",       0, 0.5,0, 1,0),
 ("sforzandodn",  "scripts.dmarcato",       0, 0.5,1, 1,1),
