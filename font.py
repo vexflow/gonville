@@ -188,9 +188,10 @@ def define_component(name, **kws):
 # ----------------------------------------------------------------------
 # Postprocessor for making small clefs.
 
+smallclef_scale = 0.8
 def makesmallclef(clef):
     cont = GlyphContext()
-    cont.extra = ".8 dup scale", clef
+    cont.extra = "%g dup scale" % smallclef_scale, clef
     cont.scale = clef.scale
     cont.origin = clef.origin
     for attr in ['hy', 'ox']:
@@ -310,21 +311,26 @@ def _(cont):
     cont.hy = font.clefG.hy
 
 @define_glyph("clefGtenorised")
-@define_glyph("clefGtenorisedsmall", postprocess=makesmallclef)
-def _(cont):
+@define_glyph("clefGtenorisedsmall", args=(smallclef_scale,))
+def _(cont, scale = 1.0):
+    # This clef has to mark two specific stave lines, so we can't do
+    # the usual thing of making its small version by scaling down the
+    # larger one. Instead we must make the large and small versions of
+    # this clef in the same way, starting from larger and smaller
+    # versions of the component pieces.
     clip = clippath(font.clefG.left_side_path +
                     [(559, 0), (1000, 0), (1000, 1000), (598, 1000)] +
                     font.clefG.right_side_path +
                     [(559, 0), (1000, 0), (1000, 1000), (666, 1000)])
     cont.scale = font.clefG.scale
-    cont.extra = (font.clefG,
+    cont.extra = ("%g dup scale" % scale, font.clefG,
                   "gsave newpath", clip, "clip",
                   "0 %g translate" % font.clefG.hy,
                   "%g dup scale" % (cont.scale / clefCstraightright.scale),
                   "0 %g translate" % (-clefCstraightright.hy),
-                  "40 -263.888 translate", clefCstraightright, "grestore")
-    cont.origin = font.clefG.origin
-    cont.hy = font.clefG.hy
+                  "40 %g translate" % (-2375/18 * 2 / scale),
+                  clefCstraightright, "grestore")
+    cont.hy = font.clefG.hy * scale
 
 # ----------------------------------------------------------------------
 # F clef (bass).
