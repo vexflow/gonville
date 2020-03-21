@@ -15,46 +15,36 @@ in . do tar czvf gonville-$(Version)-src.tar.gz gonville-$(Version)
 set Lilybuildopt --lily
 ifeq "$(FASTBRACE)" "yes" set Lilybuildopt --lily --fastbrace
 
-# Build the font set, and construct the distribution archive
-# containing the output fonts directory and only the necessary
-# source files.
-in . do rm -rf gonville-$(Version)
-in . do mkdir gonville-$(Version)
-in gonville do cp LICENCE README gonville.ily ../gonville-$(Version)
+# Build the font.
 in gonville/svgfilter do make
 in gonville do ./glyphs.py --ver=$(Version) --svgfilter=./svgfilter/svgfilter $(Lilybuildopt) -j$(nproc)
-in gonville-$(Version) do mv ../gonville/lilyfonts .
-in gonville-$(Version) do mv ../gonville/lilyfonts-old .
-in . do tar czvf gonville-$(Version).tar.gz gonville-$(Version)
-# And build a zip file for Windows users, which will of course store
-# copies instead of symlinks, and which (in what I think is still
-# Windows's normal convention) doesn't contain everything inside a
-# subdirectory.
-in gonville-$(Version) do zip -r ../gonville-$(Version).zip *
 
-# Move the lilyfonts directories back to somewhere more convenient.
-in gonville-$(Version) do mv lilyfonts ../gonville
-in gonville-$(Version) do mv lilyfonts-old ../gonville
+# Make the 'new' distribution archives, for Lilypond >= 2.20
+in . do rm -rf gonville-$(Version)
+in . do mkdir gonville-$(Version)
+in gonville do cp LICENCE lilyfonts/* ../gonville-$(Version)
+in gonville do cp README.post-2.20 ../gonville-$(Version)/README
+in . do tar czvf gonville-$(Version).tar.gz gonville-$(Version)
+in . do zip -r gonville-$(Version).zip gonville-$(Version)
+
+# Make the 'old' distribution archive, for Lilypond < 2.20.
+in . do rm -rf gonville-$(Version)-old
+in . do mkdir gonville-$(Version)-old
+in gonville do cp LICENCE ../gonville-$(Version)-old
+in gonville do cp README.pre-2.20 ../gonville-$(Version)-old/README
+in gonville do cp -rT lilyfonts-old ../gonville-$(Version)-old/fontdir
+in . do tar czvf gonville-$(Version)-old.tar.gz gonville-$(Version)-old
+in . do zip -r gonville-$(Version)-old.zip gonville-$(Version)-old
 
 # Build the demo images.
-in gonville do lilypond --ps lilydemo.ly
-in gonville do gs -sDEVICE=pngmono -sPAPERSIZE=a4 -r720 -sOutputFile=before0.png -dBATCH -dNOPAUSE lilydemo.ps
-in gonville do convert -resize 1400x- -trim -bordercolor white -border 10 before0.png before.png
-in gonville do lilypond -dbackend=svg lilydemo.ly
-in gonville do inkscape -D lilydemo.svg --export-margin=2 --export-plain-svg=before.svg
-
-in gonville do lilypond -s -e "(display (ly:get-option 'datadir))" /dev/null > datadir
-in gonville do cp -rT "$$(cat datadir)"/fonts lilyfonts/"$$i"
-
-in gonville do unshare -mr bash -c 'mount --bind lilyfonts "$$(cat datadir)"/fonts && lilypond --ps -d include-settings=gonville.ily lilydemo.ly'
-in gonville do gs -sDEVICE=pngmono -sPAPERSIZE=a4 -r720 -sOutputFile=after0.png -dBATCH -dNOPAUSE lilydemo.ps
-in gonville do convert -resize 1400x- -trim -bordercolor white -border 10 after0.png after.png
-in gonville do unshare -mr bash -c 'mount --bind lilyfonts "$$(cat datadir)"/fonts && lilypond --ps -d include-settings=gonville.ily -d backend=svg lilydemo.ly'
-in gonville do inkscape -D lilydemo.svg --export-margin=2 --export-plain-svg=after.svg
+in gonville do ./demo.sh before
+in gonville do ./demo.sh after -I lilyfonts -d include-settings=gonville.ily
 
 deliver gonville-$(Version)-src.tar.gz $@
 deliver gonville-$(Version).tar.gz $@
 deliver gonville-$(Version).zip $@
+deliver gonville-$(Version)-old.tar.gz $@
+deliver gonville-$(Version)-old.zip $@
 deliver gonville/before.png $@
 deliver gonville/after.png $@
 deliver gonville/before.svg $@

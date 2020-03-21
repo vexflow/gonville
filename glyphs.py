@@ -9,6 +9,7 @@ import base64
 import subprocess
 import multiprocessing
 import argparse
+import shutil
 from curves import *
 from font import font, scaledbrace, GlyphContext
 
@@ -1092,9 +1093,15 @@ def lilypond_output(args, do_main_font=True, do_brace_font=True):
             lilyglyphlist[i] = tuple(g)
 
         mkdir("lilysrc")
-        for topdir in "lilyfonts", "lilyfonts-old":
-            for suffix in "", "/otf", "/svg":
-                mkdir(topdir + suffix)
+        mkdir("lilyfonts")
+        mkdir("lilyfonts-old")
+        mkdir("lilyfonts-old/otf")
+        mkdir("lilyfonts-old/svg")
+
+        # Copy gonville.ily into the new-style output directory.
+        here = os.path.dirname(os.path.abspath(__file__))
+        shutil.copyfile(os.path.join(here, "gonville.ily"),
+                        "lilyfonts/gonville.ily")
 
         for size in [11, 13, 14, 16, 18, 20, 23, 26]:
             prefix = "lilysrc/gonville-%d" % size
@@ -1103,9 +1110,9 @@ def lilypond_output(args, do_main_font=True, do_brace_font=True):
             writesfd(prefix, "Gonville-%d" % size, "UnicodeBmp", 65537, outlines, lilyglyphlist)
             writetables(prefix, size, "gonville%d" % size, outlines, lilyglyphlist)
 
-            run_ff(sfd, "lilyfonts/otf/gonville-%d.otf" % size, tableprefix=prefix)
-            run_ff(sfd, "lilyfonts/svg/gonville-%d.svg" % size)
-            run_ff(sfd, "lilyfonts/svg/gonville-%d.woff" % size)
+            run_ff(sfd, "lilyfonts/gonville-%d.otf" % size, tableprefix=prefix)
+            run_ff(sfd, "lilyfonts/gonville-%d.svg" % size)
+            run_ff(sfd, "lilyfonts/gonville-%d.woff" % size)
 
             run_ff(sfd, "lilyfonts-old/otf/emmentaler-%d.otf" % size, fontname="Emmentaler-%d" % size, tableprefix=prefix)
             run_ff(sfd, "lilyfonts-old/svg/emmentaler-%d.svg" % size, fontname="Emmentaler-%d" % size)
@@ -1143,9 +1150,9 @@ def lilypond_output(args, do_main_font=True, do_brace_font=True):
         writesfd(prefix, "Gonville-Brace", "UnicodeBmp", 65537, outlines, bracelist)
         writetables(prefix, 20, "gonvillebrace", outlines, bracelist, 1)
 
-        run_ff(sfd, "lilyfonts/otf/gonville-brace.otf", tableprefix=prefix)
-        run_ff(sfd, "lilyfonts/svg/gonville-brace.svg")
-        run_ff(sfd, "lilyfonts/svg/gonville-brace.woff")
+        run_ff(sfd, "lilyfonts/gonville-brace.otf", tableprefix=prefix)
+        run_ff(sfd, "lilyfonts/gonville-brace.svg")
+        run_ff(sfd, "lilyfonts/gonville-brace.woff")
 
         run_ff(sfd, "lilyfonts-old/otf/emmentaler-brace.otf", fontname="Emmentaler-Brace", tableprefix=prefix)
         run_ff(sfd, "lilyfonts-old/svg/emmentaler-brace.svg", fontname="Emmentaler-Brace")
