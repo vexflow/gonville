@@ -33,8 +33,8 @@ Lilypond data directory, and replace its 'fonts' subdirectory with
 
 For example, on Linux, you might do something like this:
 
-  mv /usr/share/lilypond/2.18/fonts /usr/share/lilypond/2.18/fonts.orig
-  cp -r fontdir /usr/share/lilypond/2.18/fonts
+  mv /usr/share/lilypond/2.18.2/fonts /usr/share/lilypond/2.18.2/fonts.orig
+  cp -r fontdir /usr/share/lilypond/2.18.2/fonts
 
 Once you've done that, you can run Lilypond in the normal way, and it
 will typeset music in Gonville instead of its default font. But if you
@@ -51,6 +51,14 @@ and feeding it to 'lilypond -s':
   #(display (ly:get-option 'datadir))
   #(display "\n")
 
+For example, on Linux, this might report
+
+  $ lilypond -s datadir.ly
+  /usr/share/lilypond/2.18.2
+
+and then you can append 'fonts' to that directory to find the place to
+copy Gonville over.
+
 Using 'unshare' on Linux
 ------------------------
 
@@ -62,7 +70,7 @@ which the directory looks different.
 For example, this works on Ubuntu 18.04:
 
   $ unshare -mr
-  # mount --bind lilyfonts-old /usr/share/lilypond/2.18/fonts
+  # mount --bind lilyfonts-old /usr/share/lilypond/2.18.2/fonts
   # lilypond my-input-file.ly
   # exit
   $
