@@ -2674,7 +2674,7 @@ def _(cont):
     cont.default_nib = lambda c,x,y,t,theta: 8+18*cos(theta)**2
 
     # Draw the dot.
-    cont.extra = "newpath 527 446 24 0 360 arc fill "
+    cont.extra = "newpath 527 437 36 0 360 arc fill "
 
     cont.ox = c1.compute_x(0)
     cont.ax = c1.compute_x(1) + c1.compute_nib(1)
@@ -2688,7 +2688,7 @@ def _(cont):
     cont.default_nib = lambda c,x,y,t,theta: 8+18*cos(theta)**2
 
     # Draw the dot.
-    cont.extra = "newpath 527 446 24 0 360 arc fill "
+    cont.extra = "newpath 527 437 36 0 360 arc fill "
 
     cont.ox = font.fermata.ox
     cont.ax = font.fermata.ax
@@ -2704,8 +2704,8 @@ def _(cont):
     cont.default_nib = lambda c,x,y,t,theta: 8+18*cos(theta)**2
 
     # Draw the dots.
-    cont.extra = ("newpath 477 446 24 0 360 arc fill "
-                  "newpath 577 446 24 0 360 arc fill ")
+    cont.extra = ("newpath 477 437 36 0 360 arc fill "
+                  "newpath 577 437 36 0 360 arc fill ")
 
 @define_glyph("fermata0")
 def _(cont):
@@ -2719,7 +2719,7 @@ def _(cont):
     c1.nib = lambda c,x,y,t,theta: (8, pi, min(24, t*250), 0)
 
     # Draw the dot.
-    cont.extra = "newpath 527 446 24 0 360 arc fill "
+    cont.extra = "newpath 527 437 36 0 360 arc fill "
 
 @define_glyph("fermata00")
 def _(cont):
@@ -2737,7 +2737,7 @@ def _(cont):
     c3.nib = lambda c,x,y,t,theta: (8, pi, min(24, t*150), 0)
 
     # Draw the dot.
-    cont.extra = "newpath 522 446 24 0 360 arc fill "
+    cont.extra = "newpath 522 437 36 0 360 arc fill "
 
 @define_glyph("fermata2")
 def _(cont):
@@ -2752,17 +2752,17 @@ def _(cont):
     cont.default_nib = 8, pi/2, 24, 24
 
     # Draw the dot.
-    cont.extra = "newpath 527 446 24 0 360 arc fill "
+    cont.extra = "newpath 527 437 36 0 360 arc fill "
 
 @define_glyph("fermata3")
 def _(cont):
     # Saved data from gui.py
-    c0 = StraightLine(cont, 424, 447, 424, 370)
-    c1 = StraightLine(cont, 424, 370, 630, 370)
-    c2 = StraightLine(cont, 630, 370, 630, 447)
-    c3 = StraightLine(cont, 384, 441, 384, 286)
-    c4 = StraightLine(cont, 384, 286, 670, 286)
-    c5 = StraightLine(cont, 670, 286, 670, 441)
+    c0 = StraightLine(cont, 424, 447, 424, 358)
+    c1 = StraightLine(cont, 424, 358, 630, 358)
+    c2 = StraightLine(cont, 630, 358, 630, 447)
+    c3 = StraightLine(cont, 384, 441, 384, 274)
+    c4 = StraightLine(cont, 384, 274, 670, 274)
+    c5 = StraightLine(cont, 670, 274, 670, 441)
     c0.weld_to(1, c1, 0, 1)
     c1.weld_to(1, c2, 0, 1)
     c3.weld_to(1, c4, 0, 1)
@@ -2773,7 +2773,7 @@ def _(cont):
     c3.nib = c4.nib = c5.nib = 8, pi/2, 24, 24
 
     # Draw the dot.
-    cont.extra = "newpath 527 446 24 0 360 arc fill "
+    cont.extra = "newpath 527 437 36 0 360 arc fill "
 
 @define_glyph("fermataup")
 def _(cont):
