@@ -32,7 +32,7 @@ The simplest way to try out Gonville, without having to modify either
 your Lilypond installation or your score file, is to do both these
 steps on the command line. You can run a command like this (replacing
 '/path/to/gonville' with wherever you put the files unpacked from this
-archive, and 'score.ily' with your real input file):
+archive, and 'score.ly' with your real input file):
 
   lilypond -I /path/to/gonville -d include-settings=gonville.ily score.ly
 
