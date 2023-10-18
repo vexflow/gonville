@@ -2795,7 +2795,7 @@ def _(cont):
 
 @define_glyph("fermata00up")
 def _(cont):
-    cont.extra = '0 1000 translate 1 -1 scale', font.fermata0
+    cont.extra = '0 1000 translate 1 -1 scale', font.fermata00
 
 @define_glyph("fermata2up")
 def _(cont):
