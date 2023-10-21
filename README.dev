@@ -47,7 +47,7 @@ Generating the font files
 
 To generate the full Gonville font in a Lilypond-ready form, run
 
-  ./glyphs.py -lily
+  ./glyphs.py --lily
 
 This takes about half an hour on my 2.4GHz Core 2 Duo, of which two
 minutes are spent generating the main glyph set and the rest of the
@@ -68,7 +68,7 @@ Other modes of glyphs.py
 
 Other command-line modes in which glyphs.py can be run include:
 
-./glyphs.py -test <symbol>
+./glyphs.py --test <symbol>
 
   This generates the PostScript code to draw a given glyph, just as
   described above, and then writes it on standard output. It's
@@ -78,7 +78,7 @@ Other command-line modes in which glyphs.py can be run include:
   which automatically pipes the output of this mode through
   Ghostscript to produce a .png of the glyph.
 
-./glyphs.py -testps <symbol>
+./glyphs.py --testps <symbol>
 
   This runs a bit more of the build process for a given glyph:
   instead of stopping at the original PostScript drawing code, this
@@ -93,14 +93,14 @@ in the output file for compatibility with Lilypond. Hence, for
 instance, 'clefG' instead of 'clefs.G', and 'taildemidn' instead of
 'flags.d5'.
 
-There is also '-testpsunscaled', which is just like '-testps' except
+There is also '--testpsunscaled', which is just like '--testps' except
 that it omits the final scaling of the outline to the final font
 coordinate system (in which each character is given a sensible
 origin point, and the distance between adjacent stave lines is 250
 font units), and instead keeps the coordinates exactly as they
 appear in the output of potrace.
 
-(Finally, '-mus' generates a version of this font suitable for use
+(Finally, '--mus' generates a version of this font suitable for use
 in my personal music typesetting software. I don't recommend using
 that; it was something I wrote when I was very young and from which
 I have now migrated to using Lilypond. I don't intend to maintain
