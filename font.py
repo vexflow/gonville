@@ -2253,11 +2253,16 @@ def _(cont): # staccatissimo
 def _(cont): # staccatissimo pointing the other way
     cont.extra = "newpath 498 478 moveto 526 381 lineto 554 478 lineto closepath fill "
 
-@define_glyph("snappizz")
+@define_glyph("snappizzup")
 def _(cont): # snap-pizzicato
     cont.extra = "newpath 500 500 50 0 360 arc 500 500 moveto 500 400 lineto 16 setlinewidth 1 setlinejoin 1 setlinecap stroke"
 
     cont.oy = 500
+
+@define_glyph("snappizzdn")
+def _(cont): # snap-pizzicato, the other way up
+    cont.extra = "0 1000 translate 1 -1 scale", font.snappizzup
+    cont.oy = 1000 - font.snappizzup.oy
 
 # ----------------------------------------------------------------------
 # The 'segno' sign (for 'D.S. al Fine' sort of stuff).
