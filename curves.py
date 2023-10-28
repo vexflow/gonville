@@ -126,6 +126,25 @@ class Curve:
         else:
             return nibfn
 
+    def compute_nib_bounds(self, t):
+        x, y = self.compute_point(t)
+        nib = self.compute_nib(t)
+        if type(nib) == tuple:
+            radius, angle, fdist, bdist = nib
+            c = cos(angle)
+            s = -sin(angle)
+            xs = [x + sign*radius + c*dist
+                  for sign in [-1,+1] for dist in [fdist, -bdist]]
+            ys = [y + sign*radius + s*dist
+                  for sign in [-1,+1] for dist in [fdist, -bdist]]
+        elif nib != 0:
+            xs = [x-nib, x+nib]
+            ys = [y-nib, y+nib]
+        else:
+            xs = [x]
+            ys = [y]
+        return (min(xs), min(ys), max(xs), max(ys))
+
     def compute_x(self, t):
         return self.compute_point(t)[0]
 
