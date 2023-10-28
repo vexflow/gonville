@@ -36,6 +36,11 @@ in gonville do cp -rT lilyfonts-old ../gonville-$(Version)-old/fontdir
 in . do tar czvf gonville-$(Version)-old.tar.gz gonville-$(Version)-old
 in . do zip -r gonville-$(Version)-old.zip gonville-$(Version)-old
 
+# Make the SMuFL-compliant font files, and zip them together into a
+# single download.
+in gonville do ./glyphs.py --smufl
+in gonville do zip gonville-smufl.zip gonville-smufl.otf gonville-smufl.woff
+
 # Build the demo images.
 in gonville do ./demo.sh before
 in gonville do ./demo.sh after -I lilyfonts -d include-settings=gonville.ily
@@ -49,3 +54,6 @@ deliver gonville/before.png $@
 deliver gonville/after.png $@
 deliver gonville/before.svg $@
 deliver gonville/after.svg $@
+deliver gonville/gonville-smufl.otf $@
+deliver gonville/gonville-smufl.woff $@
+deliver gonville/gonville-smufl.zip $@

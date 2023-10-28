@@ -469,6 +469,7 @@ def _(cont):
     "590 632 lineto 590 368 lineto closepath fill "
 
     cont.ox = 320
+    cont.smufl_ox = 410
 
 @define_glyph("clefpercbox")
 @define_glyph("clefpercboxsmall", postprocess=makesmallclef)
@@ -585,6 +586,8 @@ def multiup(n, tail):
     cont.extra = ("0 %g translate" % yextra, tail,) + ("0 -%g translate" % quavertaildispup, short) * (n-1)
     cont.ox = tail.ox
     cont.oy = tail.oy - quavertaildispup*(n-1) + yextra
+    stem_extend = max(0, n * 200 - 500) * (cont.scale / 3600)
+    cont.smufl_oy = cont.oy + stem_extend
     cont.origin = tail.origin
     cont.origin = (cont.origin[0], (cont.origin[1] + quavertaildispup*(n-1) - yextra) * 3600. / cont.scale - 180)
     return cont
@@ -598,6 +601,8 @@ def multidn(n, tail):
     cont.extra = (tail,) + ("0 %g translate" % quavertaildispdn, short) * (n-1)
     cont.ox = tail.ox
     cont.oy = tail.oy + quavertaildispdn*(n-1)
+    stem_extend = max(0, n * 200 - 500) * (cont.scale / 3600)
+    cont.smufl_oy = cont.oy - stem_extend
     cont.origin = tail.origin
     cont.origin = (cont.origin[0], cont.origin[1] - quavertaildispdn*(n-1)*3600./cont.scale)
     return cont
@@ -1426,6 +1431,7 @@ def _(cont, n):
 def _(cont):
     cont.before = "1000 0 translate -1 1 scale"
     cont.extra = font.restquaver
+    cont.cy = font.restquaver.cy
 
 @define_glyph("restcrotchetz")
 def _(cont):
@@ -1448,6 +1454,7 @@ def _(cont):
 def _(cont):
     cont.extra = \
     "newpath 440 439 moveto 440 505 lineto 614 505 lineto 614 439 lineto closepath fill "
+    cont.ox = 440
 
 @define_glyph("restbreve")
 def _(cont):
@@ -1469,6 +1476,7 @@ def _(cont):
     cont.extra = font.restminim, \
     "newpath 390 505 moveto 664 505 lineto 12 setlinewidth 1 setlinecap stroke"
 
+    cont.ox = font.restminim.ox
     cont.oy = 505
 
 @define_glyph("restbreveo")
@@ -1482,6 +1490,7 @@ def _(cont):
     cont.extra = font.restminim, \
     "newpath 390 439 moveto 664 439 lineto 12 setlinewidth 1 setlinecap stroke"
 
+    cont.ox = font.restminim.ox
     cont.oy = 439
 
 # ----------------------------------------------------------------------
@@ -1649,6 +1658,8 @@ def _(cont_main): # four
     cont.by = c2.compute_y(1) + c2.compute_nib(1)[0]
     # Icky glitch-handling stuff (see -lily section).
     cont.gy = (cont.ty + cont.by) / 2 + (250*cont.scale/3600.0)
+    # SMuFL wants to put the baseline in the centre
+    cont.smufl_oy = (cont.ty + cont.by) / 2
 
 @define_glyph("big5")
 def _(cont): # five
@@ -1876,8 +1887,8 @@ def _(cont):
 for x in [getattr(font, name) for name in
           ['big0','big1','big2','big3','big5','big6','big7','big8','big9',
            'asciiplus','asciiminus','asciicomma','asciiperiod']]:
-    x.ty,x.by,x.gy = (font.big4.ty, font.big4.by,
-                      font.big4.gy)
+    for field in ['ty', 'by', 'gy', 'smufl_oy']:
+        setattr(x, field, getattr(font.big4, field))
 
 # ----------------------------------------------------------------------
 # The small digits used for ntuplets and fingering marks. Scaled and
@@ -2297,6 +2308,8 @@ def _(cont):
     "newpath 618 251 24 0 360 arc fill " + \
     "newpath 410 339 24 0 360 arc fill "
 
+    cont.smufl_oy = c4.compute_y(1)
+
 @define_component("varsegnoend")
 def _(cont):
     # Saved data from gui.py
@@ -2378,6 +2391,8 @@ def _(cont):
     c0.nib = c1.nib = 10
     cont.default_nib = lambda c,x,y,t,theta: 8+12*abs(sin(theta))**2.5
 
+    cont.smufl_oy = c3.compute_y(1)
+
 @define_glyph("varcoda")
 def _(cont): # variant square form used by Lilypond
     # Saved data from gui.py
@@ -2399,6 +2414,8 @@ def _(cont): # variant square form used by Lilypond
     xend = c2.compute_x(0)
     xdiff = xend - xmid
     c2.nib = c4.nib = lambda c,x,y,t,theta: (lambda k: (8, 0, k, k))(12.0*(x-xmid)/xdiff)
+
+    cont.smufl_oy = c4.compute_y(0.5)
 
 # ----------------------------------------------------------------------
 # The turn sign.
@@ -2430,6 +2447,8 @@ def _(cont):
     c0.nibdir = c1.nibdir = c2.nibdir = c3.nibdir = c4.nibdir = c5.nibdir = \
     lambda theta: phi0 + (phi2-phi0)*(shift(theta)-theta0)/(theta2-theta0)
 
+    cont.by = c4.compute_nib_bounds(0)[3]
+
 @define_glyph("invturn")
 def _(cont):
     # Saved data from gui.py
@@ -2440,10 +2459,13 @@ def _(cont):
 
     cont.extra = font.turn
 
+    cont.by = font.turn.by
+
 @define_glyph("mirrorturn")
 def _(cont):
     cont.before = "1000 0 translate -1 1 scale"
     cont.extra = font.turn
+    cont.by = font.turn.by
 
 @define_glyph("turnhaydn")
 def _(cont):
@@ -2459,6 +2481,7 @@ def _(cont):
     c2.nib = 10
 
     cont.curve_res *= 10
+    cont.by = c0.compute_nib_bounds(1)[3]
 
 # ----------------------------------------------------------------------
 # Mordent and its relatives.
@@ -2481,6 +2504,8 @@ def _(cont):
     cont.default_nib = (8, alpha, 30, 30)
 
     cont.cy = c2.compute_y(.5)
+    cont.by = c2.compute_nib_bounds(0)[3]
+    cont.ty = c2.compute_nib_bounds(1)[1]
 
 @define_glyph("mordentlower")
 def _(cont): # and the same with a vertical line through it
@@ -2497,6 +2522,7 @@ def _(cont): # and the same with a vertical line through it
                   "grestore")
 
     cont.cy = font.mordentupper.cy - 43
+    cont.by = font.mordentupper.by - 43
 
 @define_glyph("mordentupperlong")
 def _(cont):
@@ -2520,6 +2546,7 @@ def _(cont):
     cont.default_nib = (8, alpha, 30, 30)
 
     cont.cy = font.mordentupper.cy
+    cont.by = c2.compute_nib_bounds(0)[3]
 
 @define_glyph("mordentupperlower")
 def _(cont): # and the same with a vertical line through it
@@ -2536,6 +2563,7 @@ def _(cont): # and the same with a vertical line through it
                   "grestore")
 
     cont.cy = font.mordentupper.cy - 43
+    cont.by = font.mordentupper.by - 43
 
 @define_glyph("upmordentupperlong")
 def _(cont):
@@ -2562,6 +2590,7 @@ def _(cont):
     c0.nib = c7.nib = 8
 
     cont.cy = font.mordentupper.cy
+    cont.by = font.mordentupper.by
 
 @define_glyph("upmordentupperlower")
 def _(cont): # and the same with a vertical line through it
@@ -2578,6 +2607,7 @@ def _(cont): # and the same with a vertical line through it
                   "grestore")
 
     cont.cy = font.mordentupper.cy - 43
+    cont.by = font.mordentupper.by - 43
 
 @define_glyph("downmordentupperlong")
 def _(cont):
@@ -2604,6 +2634,7 @@ def _(cont):
     c0.nib = c7.nib = 8
 
     cont.cy = font.mordentupper.cy
+    cont.by = font.mordentupper.by
 
 @define_glyph("downmordentupperlower")
 def _(cont): # and the same with a vertical line through it
@@ -2620,6 +2651,7 @@ def _(cont): # and the same with a vertical line through it
                   "grestore")
 
     cont.cy = font.mordentupper.cy - 43
+    cont.by = font.mordentupper.by - 43
 
 @define_glyph("straightmordentupperlong")
 def _(cont):
@@ -2646,6 +2678,7 @@ def _(cont):
     c0.nib = c7.nib = 8
 
     cont.cy = font.mordentupper.cy
+    cont.by = font.mordentupper.by
 
 @define_glyph("mordentupperlongdown")
 def _(cont):
@@ -2656,6 +2689,7 @@ def _(cont):
     cont.extra = ("gsave 1000 1000 translate -1 -1 scale",
                   font.downmordentupperlong)
     cont.cy = 1000 - font.mordentupper.cy
+    cont.by = 1000 - font.mordentupper.ty
 
 @define_glyph("mordentupperlongup")
 def _(cont):
@@ -2664,6 +2698,7 @@ def _(cont):
     cont.extra = ("gsave 1000 1000 translate -1 -1 scale",
                   font.upmordentupperlong)
     cont.cy = 1000 - font.mordentupper.cy
+    cont.by = 1000 - font.mordentupper.ty
 
 # ----------------------------------------------------------------------
 # Fermata signs.
@@ -2919,9 +2954,11 @@ def _(cont, vwid):
         c1.nib = (4,0,vwid,0)
     y0 = c0.compute_y(0)
     y1 = c0.compute_y(1)
-    c0.nib = lambda c,x,y,t,theta: (4,pi/2,45*(y-y0)/(y1-y0),0)
+    height = 45
+    c0.nib = lambda c,x,y,t,theta: (4,pi/2,height*(y-y0)/(y1-y0),0)
 
     cont.hy = c1.compute_y(0)
+    cont.smufl_hy = cont.hy - height
 
 @define_glyph("bracketupper", args=(font.bracketlower,))
 @define_glyph("bracketupperlily", args=(font.bracketlowerlily,))
@@ -2929,6 +2966,7 @@ def _(cont, x):
     cont.extra = "0 946 translate 1 -1 scale", x
 
     cont.hy = 946 - x.hy
+    cont.smufl_hy = 946 - x.smufl_hy
 
 # ----------------------------------------------------------------------
 # Note head indicating an artificial harmonic above another base
@@ -3630,6 +3668,9 @@ def _(cont):
     cont.ox = 532
     cont.oy = 261
 
+    cont.smufl_ox = c0.compute_x(0.55)
+    cont.smufl_oy = c0.compute_y(0.55)
+
 @define_glyph("acciaccatura")
 def _(cont):
     cont.extra = font.appoggiatura, accslashup
@@ -3640,6 +3681,9 @@ def _(cont):
 
     cont.ox = -500 + accslashup.ox / .45
     cont.oy = accslashup.oy / .45
+
+    cont.smufl_ox = -500 + accslashup.smufl_ox / .45
+    cont.smufl_oy = accslashup.smufl_oy / .45
 
 @define_glyph("accslashbigdn")
 def _(cont):

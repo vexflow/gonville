@@ -6,6 +6,9 @@
 /*.pdf
 /*.bmp
 /*.pbm
+/*.otf
+/*.woff
+/*.sfd
 /lilydata
 /lilysrc
 /lilyfonts

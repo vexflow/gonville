@@ -484,6 +484,208 @@ lilyglyphlist = [
 ("lyrictieshort", "ties.lyric.short",      0, 'ox','oy', 'ox','oy', {"x0":"ox", "x1":"ox", "y1":"oy"}),
 ]
 
+# Reference for SMuFL: https://w3c.github.io/smufl/latest/
+smuflglyphlist = [
+("bracketupperlily",           "bracketTop",                                      0xe003, 0, 'smufl_hy'),
+("bracketlowerlily",           "bracketBottom",                                   0xe004, 0, 'smufl_hy'),
+("segno",                      "segno",                                           0xe047, 0, 'smufl_oy'),
+("coda",                       "coda",                                            0xe048, 0, 'smufl_oy'),
+("varcoda",                    "codaSquare",                                      0xe049, 0, 'smufl_oy'),
+("varsegno",                   "segnoSerpent1",                                   0xe04a, 0, 0),
+("clefG",                      "gClef",                                           0xe050, 0, 'hy'),
+("clefGdouble",                "gClef8vbOld",                                     0xe055, 0, 'hy'),
+("clefGtenorised",             "gClef8vbCClef",                                   0xe056, 0, 'hy'),
+("clefC",                      "cClef",                                           0xe05c, 0, 0.5),
+("clefCstraight",              "cClefCombining",                                  0xe061, 0, 0.5),
+("clefF",                      "fClef",                                           0xe062, 0, 'hy'),
+("clefperc",                   "unpitchedPercussionClef1",                        0xe069, 0, 0.5),
+("clefpercbox",                "unpitchedPercussionClef2",                        0xe06a, 0, 0.5),
+("clefTAB",                    "6stringTabClef",                                  0xe06d, 0, 'hy'),
+("clefTABsmall",               "4stringTabClef",                                  0xe06e, 0, 'hy'),
+("clefGsmall",                 "gClefChange",                                     0xe07a, 0, 'hy'),
+("clefCsmall",                 "cClefChange",                                     0xe07b, 0, 0.5),
+("clefFsmall",                 "fClefChange",                                     0xe07c, 0, 'hy'),
+("big0",                       "timeSig0",                                        0xe080, 0, 'smufl_oy'),
+("big1",                       "timeSig1",                                        0xe081, 0, 'smufl_oy'),
+("big2",                       "timeSig2",                                        0xe082, 0, 'smufl_oy'),
+("big3",                       "timeSig3",                                        0xe083, 0, 'smufl_oy'),
+("big4",                       "timeSig4",                                        0xe084, 0, 'smufl_oy'),
+("big5",                       "timeSig5",                                        0xe085, 0, 'smufl_oy'),
+("big6",                       "timeSig6",                                        0xe086, 0, 'smufl_oy'),
+("big7",                       "timeSig7",                                        0xe087, 0, 'smufl_oy'),
+("big8",                       "timeSig8",                                        0xe088, 0, 'smufl_oy'),
+("big9",                       "timeSig9",                                        0xe089, 0, 'smufl_oy'),
+("timeC",                      "timeSigCommon",                                   0xe08a, 0, 0.5),
+("timeCbar",                   "timeSigCutCommon",                                0xe08b, 0, 0.5),
+("asciiplus",                  "timeSigPlus",                                     0xe08c, 0, 'smufl_oy'),
+("asciiplus",                  "timeSigPlusSmall",                                0xe08d, 0, 'smufl_oy'),
+("asciiminus",                 "timeSigMinus",                                    0xe090, 0, 'smufl_oy'),
+("acclparen",                  "timeSigParensLeftSmall",                          0xe092, 0, 0.5),
+("accrparen",                  "timeSigParensRightSmall",                         0xe093, 0, 0.5),
+("acclparen",                  "timeSigParensLeft",                               0xe094, 0, 0.5),
+("accrparen",                  "timeSigParensRight",                              0xe095, 0, 0.5),
+("breve",                      "noteheadDoubleWhole",                             0xe0a0, 0, 0.5),
+("semibreve",                  "noteheadWhole",                                   0xe0a2, 0, 0.5),
+("headminim",                  "noteheadHalf",                                    0xe0a3, 0, 0.5),
+("headcrotchet",               "noteheadBlack",                                   0xe0a4, 0, 0.5),
+("crosssemi",                  "noteheadXWhole",                                  0xe0a7, 0, 0.5),
+("crossminim",                 "noteheadXHalf",                                   0xe0a8, 0, 0.5),
+("crosscrotchet",              "noteheadXBlack",                                  0xe0a9, 0, 0.5),
+("crosscircle",                "noteheadCircleX",                                 0xe0b3, 0, 0.5),
+("trianglesemi",               "noteheadTriangleUpWhole",                         0xe0bb, 0, 0.5),
+("triangleminim",              "noteheadTriangleUpHalf",                          0xe0bc, 0, 0.5),
+("triangleminim",              "noteheadTriangleUpWhite",                         0xe0bd, 0, 0.5),
+("trianglecrotchet",           "noteheadTriangleUpBlack",                         0xe0be, 0, 0.5),
+("diamondsemi",                "noteheadDiamondWhole",                            0xe0d8, 0, 0.5),
+("diamondminim",               "noteheadDiamondHalf",                             0xe0d9, 0, 0.5),
+("diamondcrotchet",            "noteheadDiamondBlack",                            0xe0db, 0, 0.5),
+("accdot",                     "augmentationDot",                                 0xe1e7, 0.5, 0.5),
+("accslashbigup",              "tremolo1",                                        0xe220, 'smufl_ox', 'smufl_oy'),
+("tailquaverup",               "flag8thUp",                                       0xe240, 0, 'oy'),
+("tailquaverdn",               "flag8thDown",                                     0xe241, 0, 'oy'),
+("tailsemiup",                 "flag16thUp",                                      0xe242, 0, 'smufl_oy'),
+("tailsemidn",                 "flag16thDown",                                    0xe243, 0, 'smufl_oy'),
+("taildemiup",                 "flag32ndUp",                                      0xe244, 0, 'smufl_oy'),
+("taildemidn",                 "flag32ndDown",                                    0xe245, 0, 'smufl_oy'),
+("tailhemiup",                 "flag64thUp",                                      0xe246, 0, 'smufl_oy'),
+("tailhemidn",                 "flag64thDown",                                    0xe247, 0, 'smufl_oy'),
+("tailquasiup",                "flag128thUp",                                     0xe248, 0, 'smufl_oy'),
+("tailquasidn",                "flag128thDown",                                   0xe249, 0, 'smufl_oy'),
+("tail6up",                    "flag256thUp",                                     0xe24a, 0, 'smufl_oy'),
+("tail6dn",                    "flag256thDown",                                   0xe24b, 0, 'smufl_oy'),
+("tail7up",                    "flag512thUp",                                     0xe24c, 0, 'smufl_oy'),
+("tail7dn",                    "flag512thDown",                                   0xe24d, 0, 'smufl_oy'),
+("tail8up",                    "flag1024thUp",                                    0xe24e, 0, 'smufl_oy'),
+("tail8dn",                    "flag1024thDown",                                  0xe24f, 0, 'smufl_oy'),
+("flat",                       "accidentalFlat",                                  0xe260, 'ox', 'hy'),
+("natural",                    "accidentalNatural",                               0xe261, 0, 'cy'),
+("sharp",                      "accidentalSharp",                                 0xe262, 0, 'cy'),
+("doublesharp",                "accidentalDoubleSharp",                           0xe263, 0, 0.5),
+("doubleflat",                 "accidentalDoubleFlat",                            0xe264, 'ox', 'hy'),
+("acclparen",                  "accidentalParensLeft",                            0xe26a, 0, 0.5),
+("accrparen",                  "accidentalParensRight",                           0xe26b, 0, 0.5),
+("flatup",                     "accidentalQuarterToneFlatArrowUp",                0xe270, 'ox', 'hy'),
+("flatdn",                     "accidentalThreeQuarterTonesFlatArrowDown",        0xe271, 'ox', 'hy'),
+("naturalup",                  "accidentalQuarterToneSharpNaturalArrowUp",        0xe272, 0, 'cy'),
+("naturaldn",                  "accidentalQuarterToneFlatNaturalArrowDown",       0xe273, 0, 'cy'),
+("sharpup",                    "accidentalThreeQuarterTonesSharpArrowUp",         0xe274, 0, 'cy'),
+("sharpdn",                    "accidentalQuarterToneSharpArrowDown",             0xe275, 0, 'cy'),
+("semiflat",                   "accidentalQuarterToneFlatStein",                  0xe280, 0, 'hy'),
+("sesquiflat",                 "accidentalThreeQuarterTonesFlatZimmermann",       0xe281, 0, 'hy'),
+("semisharp",                  "accidentalQuarterToneSharpStein",                 0xe282, 0, 0.5),
+("sesquisharp",                "accidentalThreeQuarterTonesSharpStein",           0xe283, 0, 0.5),
+("flatslash2",                 "accidentalBuyukMucennebFlat",                     0xe440, 0, 'hy'),
+("flatslash",                  "accidentalBakiyeFlat",                            0xe442, 0, 'hy'),
+("semisharp",                  "accidentalKomaSharp",                             0xe444, 0, 0.5),
+("semisharp3",                 "accidentalKucukMucennebSharp",                    0xe446, 0, 0.5),
+("sharp3",                     "accidentalBuyukMucennebSharp",                    0xe447, 0, 'cy'),
+("openarrowright",             "articAccentAbove",                                0xe4a0, 0, 0),
+("openarrowright",             "articAccentBelow",                                0xe4a1, 0, 1),
+("staccato",                   "articStaccatoAbove",                              0xe4a2, 0, 0.5),
+("staccato",                   "articStaccatoBelow",                              0xe4a3, 0, 0.5),
+("legato",                     "articTenutoAbove",                                0xe4a4, 0, 0.5),
+("legato",                     "articTenutoBelow",                                0xe4a5, 0, 0.5),
+("staccatissdn",               "articStaccatissimoAbove",                         0xe4a6, 0, 0),
+("staccatissup",               "articStaccatissimoBelow",                         0xe4a7, 0, 1),
+("openarrowup",                "articMarcatoAbove",                               0xe4ac, 0, 0),
+("openarrowdown",              "articMarcatoBelow",                               0xe4ad, 0, 1),
+("fermata",                    "fermataAbove",                                    0xe4c0, 0, 0),
+("fermataup",                  "fermataBelow",                                    0xe4c1, 0, 1),
+("fermata00",                  "fermataVeryShortAbove",                           0xe4c2, 0, 0),
+("fermata00up",                "fermataVeryShortBelow",                           0xe4c3, 0, 1),
+("fermata0",                   "fermataShortAbove",                               0xe4c4, 0, 0),
+("fermata0up",                 "fermataShortBelow",                               0xe4c5, 0, 1),
+("fermata2",                   "fermataLongAbove",                                0xe4c6, 0, 0),
+("fermata2up",                 "fermataLongBelow",                                0xe4c7, 0, 1),
+("fermata3",                   "fermataVeryLongAbove",                            0xe4c8, 0, 0),
+("fermata3up",                 "fermataVeryLongBelow",                            0xe4c9, 0, 1),
+("fermatadbldot",              "fermataLongHenzeAbove",                           0xe4ca, 0, 0),
+("fermatadbldotup",            "fermataLongHenzeBelow",                           0xe4cb, 0, 1),
+("fermataleft",                "fermataShortHenzeAbove",                          0xe4cc, 0, 0),
+("fermataleftup",              "fermataShortHenzeBelow",                          0xe4cd, 0, 1),
+("breath",                     "breathMarkComma",                                 0xe4ce, 0, 0),
+("tickmark",                   "breathMarkTick",                                  0xe4cf, 0, 0),
+("bowup",                      "breathMarkUpbow",                                 0xe4d0, 0, 0),
+("caesura",                    "caesura",                                         0xe4d1, 0, 0),
+("caesuracurved",              "caesuraCurved",                                   0xe4d4, 0, 0),
+("restdbllonga",               "restMaxima",                                      0xe4e0, 0, 0.5),
+("restlonga",                  "restLonga",                                       0xe4e1, 0, 0.5),
+("restbreve",                  "restDoubleWhole",                                 0xe4e2, 0, 0),
+("restminim",                  "restWhole",                                       0xe4e3, 0, 1), # reuse restminim as semibreve rest
+("restminim",                  "restHalf",                                        0xe4e4, 0, 0),
+("restcrotchet",               "restQuarter",                                     0xe4e5, 0, 0.5),
+("restquaver",                 "rest8th",                                         0xe4e6, 0, 'cy'),
+("restsemi",                   "rest16th",                                        0xe4e7, 0, 'cy'),
+("restdemi",                   "rest32nd",                                        0xe4e8, 0, 'cy'),
+("resthemi",                   "rest64th",                                        0xe4e9, 0, 'cy'),
+("restquasi",                  "rest128th",                                       0xe4ea, 0, 'cy'),
+("rest6",                      "rest256th",                                       0xe4eb, 0, 'cy'),
+("rest7",                      "rest512th",                                       0xe4ec, 0, 'cy'),
+("rest8",                      "rest1024th",                                      0xe4ed, 0, 'cy'),
+("restcrotchetx",              "restQuarterOld",                                  0xe4f2, 0, 'cy'),
+("restbreveo",                 "restDoubleWholeLegerLine",                        0xe4f3, 0, 0),
+("restsemibreveo",             "restWholeLegerLine",                              0xe4f4, 'ox', 'oy'),
+("restminimo",                 "restHalfLegerLine",                               0xe4f5, 'ox', 'oy'),
+("restcrotchetz",              "restQuarterZ",                                    0xe4f6, 0, 0.5),
+("dynamicp",                   "dynamicPiano",                                    0xe520, 'lx', 'by'),
+("dynamicm",                   "dynamicMezzo",                                    0xe521, 'lx', 'by'),
+("dynamicf",                   "dynamicForte",                                    0xe522, 'lx', 'by'),
+("dynamicr",                   "dynamicRinforzando",                              0xe523, 'lx', 'by'),
+("dynamics",                   "dynamicSforzando",                                0xe524, 'lx', 'by'),
+("dynamicz",                   "dynamicZ",                                        0xe525, 'lx', 'by'),
+("dynamicn",                   "dynamicNiente",                                   0xe526, 'lx', 'by'),
+("accslashbigup",              "graceNoteSlashStemUp",                            0xe564, 0, 0),
+("accslashbigdn",              "graceNoteSlashStemDown",                          0xe565, 0, 1),
+("trill",                      "ornamentTrill",                                   0xe566, 0, 0),
+("turn",                       "ornamentTurn",                                    0xe567, 0, 'by'),
+("mirrorturn",                 "ornamentTurnInverted",                            0xe568, 0, 'by'),
+("invturn",                    "ornamentTurnSlash",                               0xe569, 0, 'by'),
+("mordentupper",               "ornamentShortTrill",                              0xe56c, 0, 'by'),
+("mordentlower",               "ornamentMordent",                                 0xe56d, 0, 'by'),
+("mordentupperlong",           "ornamentTremblement",                             0xe56e, 0, 'by'),
+("turnhaydn",                  "ornamentHaydn",                                   0xe56f, 0, 'by'),
+("straightmordentupperlong",   "ornamentPrecompAppoggTrill",                      0xe5b2, 0, 'by'),
+("upmordentupperlong",         "ornamentPrecompSlideTrillDAnglebert",             0xe5b5, 0, 'by'),
+("upmordentupperlower",        "ornamentPrecompSlideTrillBach",                   0xe5b8, 0, 'by'),
+("mordentupperlongup",         "ornamentPrecompTrillSuffixDandrieu",              0xe5bb, 0, 'by'),
+("mordentupperlower",          "ornamentPrecompTrillWithMordent",                 0xe5bd, 0, 'by'),
+("downmordentupperlong",       "ornamentPrecompDoubleCadenceUpperPrefix",         0xe5c3, 0, 'by'),
+("downmordentupperlower",      "ornamentPrecompDoubleCadenceUpperPrefixTurn",     0xe5c4, 0, 'by'),
+("mordentupperlongdown",       "ornamentPrecompTrillLowerSuffix",                 0xe5c8, 0, 'by'),
+("bowdown",                    "stringsDownBow",                                  0xe610, 0, 0),
+("upedaltoe",                  "stringsUpBow",                                    0xe612, 0, 0),
+("harmnat",                    "stringsHarmonic",                                 0xe614, 0, 0),
+("snappizzdn",                 "pluckedSnapPizzicatoBelow",                       0xe630, 0, 0),
+("snappizzup",                 "pluckedSnapPizzicatoAbove",                       0xe631, 0, 0),
+("stopping",                   "pluckedLeftHandPizzicato",                        0xe633, 0, 0),
+("pedPed",                     "keyboardPedalPed",                                0xe650, 0, 'by'),
+("pedP",                       "keyboardPedalP",                                  0xe651, 0, 'by'),
+("pede",                       "keyboardPedalE",                                  0xe652, 0, 'by'),
+("pedd",                       "keyboardPedalD",                                  0xe653, 0, 'by'),
+("peddot",                     "keyboardPedalDot",                                0xe654, 0, 'by'),
+("pedstar",                    "keyboardPedalUp",                                 0xe655, 0, 'by'),
+("breath",                     "pictChokeCymbal",                                 0xe805, 0, 0),
+("acc3",                       "accdnCombRH3RanksEmpty",                          0xe8c6, 0, 0),
+("acc4",                       "accdnCombRH4RanksEmpty",                          0xe8c7, 0, 0),
+("acc2",                       "accdnCombLH2RanksEmpty",                          0xe8c8, 0, 0),
+("accr",                       "accdnCombLH3RanksEmptySquare",                    0xe8c9, 0, 0),
+("accdot",                     "accdnCombDot",                                    0xe8ca, 0, 0.5),
+("accpush",                    "accdnPush",                                       0xe8cb, 0, 0),
+("accpull",                    "accdnPull",                                       0xe8cc, 0, 0),
+("trillwiggle",                "wiggleArpeggiatoUp",                              0xeaa9, 'lx', 0),
+("trillwiggle",                "wiggleArpeggiatoDown",                            0xeaaa, 'lx', 0),
+("arpeggioarrowup",            "arrowBlackUp",                                    0xeb60, 0, 0),
+("arpeggioarrowdown",          "arrowBlackDown",                                  0xeb64, 0, 0),
+("closearrowup",               "arrowheadBlackUp",                                0xeb78, 0, 0),
+("closearrowright",            "arrowheadBlackRight",                             0xeb7a, 0, 0),
+("closearrowdown",             "arrowheadBlackDown",                              0xeb7c, 0, 0),
+("closearrowleft",             "arrowheadBlackLeft",                              0xeb7e, 0, 0),
+("openarrowup",                "arrowheadOpenUp",                                 0xeb88, 0, 0),
+("openarrowright",             "arrowheadOpenRight",                              0xeb8a, 0, 0),
+("openarrowdown",              "arrowheadOpenDown",                               0xeb8c, 0, 0),
+("openarrowleft",              "arrowheadOpenLeft",                               0xeb8e, 0, 0),
+]
+
 def writesfd(filepfx, fontname, encodingname, encodingsize, outlines, glyphlist):
     fname = filepfx + ".sfd"
     f = open(fname, "w")
@@ -1167,6 +1369,44 @@ def lilypond_output_main(args):
 def lilypond_output_brace(args):
     return lilypond_output(args, do_main_font=False)
 
+def smufl_output(args):
+    # Generate .sfd files which we process with FontForge into a
+    # SMuFL-compliant version of Gonville.
+
+    def run_ff(infile, outfile, fontname=None):
+        ffscript = "Open($1); CorrectDirection(); "
+        if fontname is not None:
+            ffscript += 'SetFontNames("{n}","{n}","{n}"); '.format(n=fontname)
+        ffscript += "Generate($2)"
+        check_call_devnull(["fontforge", "-lang=ff", "-c",
+                            ffscript, infile, outfile])
+
+    # Construct the PS outlines via potrace, once for each glyph
+    # we're actually using.
+    pool = multiprocessing.Pool(args.jobs)
+    outlines = dict(pool.imap_unordered(get_ps_path_map_function,
+                                        set(g[0] for g in smuflglyphlist)))
+
+    # Go through the SMuFL glyph list and transform the origin into
+    # coordinates in the potrace coordinate system.
+    glyphlist = []
+    for i, (gid, theirname, encoding, xo, yo) in enumerate(smuflglyphlist):
+        glyph = getattr(font, gid)
+        x0, y0, x1, y1 = outlines[gid][0]
+        if isinstance(xo, str):
+            xo = getattr(glyph, xo) * 40
+        else:
+            xo = x0 + (x1-x0) * xo
+        if isinstance(yo, str):
+            yo = (glyph.canvas_size[1] - getattr(glyph, yo)) * 40
+        else:
+            yo = y0 + (y1-y0) * yo
+        glyphlist.append((gid, theirname, encoding, xo, yo))
+
+    writesfd("gonville-smufl", "Gonville", "UnicodeBmp", 65537, outlines, glyphlist)
+    run_ff("gonville-smufl.sfd", "gonville-smufl.otf")
+    run_ff("gonville-smufl.sfd", "gonville-smufl.woff")
+
 def simple_output(args):
     # Generate an .sfd file which can be compiled into a really
     # simple binary font in which all the glyphs are in the bottom
@@ -1532,6 +1772,9 @@ def main():
         "--mus", action="store_const", dest="action", const=mus_output,
         help="Generate a Postscript prologue suitable for SGT's legacy 'mus' "
         "score formatter.")
+    group.add_argument(
+        "--smufl", action="store_const", dest="action", const=smufl_output,
+        help="Generate a SMuFL-compliant font file.")
     group.add_argument(
         "--simple", action="store_const", dest="action", const=simple_output,
         help="Generate a simple font file you could use in running text.")
