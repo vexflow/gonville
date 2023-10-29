@@ -38,8 +38,8 @@ in . do zip -r gonville-$(Version)-old.zip gonville-$(Version)-old
 
 # Make the SMuFL-compliant font files, and zip them together into a
 # single download.
-in gonville do ./glyphs.py --smufl
-in gonville do zip gonville-smufl.zip gonville-smufl.otf gonville-smufl.woff
+in gonville do ./glyphs.py --smufl --ver=$(Version)
+in gonville do zip gonville-$(Version)-smufl.zip gonville-smufl.otf gonville-smufl.woff
 
 # Build the demo images.
 in gonville do ./demo.sh before
@@ -54,6 +54,4 @@ deliver gonville/before.png $@
 deliver gonville/after.png $@
 deliver gonville/before.svg $@
 deliver gonville/after.svg $@
-deliver gonville/gonville-smufl.otf $@
-deliver gonville/gonville-smufl.woff $@
-deliver gonville/gonville-smufl.zip $@
+deliver gonville/gonville-$(Version)-smufl.zip $@
