@@ -1730,7 +1730,7 @@ def lilypond_list_our_glyphs(args):
 def main():
     parser = argparse.ArgumentParser(description='')
     parser.add_argument(
-        "--ver", "--version-string",
+        "--ver", "--version-string", default="version unavailable",
         help="Version string to put in output font files")
     parser.add_argument(
         "--svgfilter", help="Postprocessing filter for SVG font output")
@@ -1783,11 +1783,10 @@ def main():
     parser.add_argument("--fastbrace", action="store_true",
                         help="Only build a small fraction of the brace sizes, "
                         "to speed up dev builds.")
-    parser.set_defaults(verstring="version unavailable")
     args = parser.parse_args()
 
     global verstring
-    verstring = args.verstring
+    verstring = args.ver
 
     args.action(args)
 
