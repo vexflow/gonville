@@ -239,7 +239,7 @@ def get_ps_path_map_function(glyphname):
     # tuples directly to dict().
     return glyphname, get_ps_path(getattr(font, glyphname))
 
-verstring = "version unavailable"
+verstring = ""
 
 lilyglyphlist = [
 ("accent",       "scripts.sforzato",       0, 0.5,0.5, 1,0.5),
@@ -1406,6 +1406,7 @@ def smufl_output(args):
     writesfd("gonville-smufl", "Gonville", "UnicodeBmp", 65537, outlines, glyphlist)
     run_ff("gonville-smufl.sfd", "gonville-smufl.otf")
     run_ff("gonville-smufl.sfd", "gonville-smufl.woff")
+    run_ff("gonville-smufl.sfd", "gonville-smufl.woff2")
 
 def simple_output(args):
     # Generate an .sfd file which can be compiled into a really
@@ -1727,10 +1728,18 @@ def lilypond_list_our_glyphs(args):
     for name in names:
         print(name)
 
+def version_string(v):
+    global verstring
+    if v != "":
+        verstring = v
+    else: # --ver is not provided. Generate a version string formatted as YYYYMMDD.SHORT_GIT_HASH
+        verstring = subprocess.check_output("git log -1 --date=format:%Y%m%d --pretty=format:%ad.%h",
+                                            shell=True, universal_newlines=True).strip()
+
 def main():
     parser = argparse.ArgumentParser(description='')
     parser.add_argument(
-        "--ver", "--version-string", default="version unavailable",
+        "--ver", "--version-string", default="",
         help="Version string to put in output font files")
     parser.add_argument(
         "--svgfilter", help="Postprocessing filter for SVG font output")
@@ -1785,8 +1794,7 @@ def main():
                         "to speed up dev builds.")
     args = parser.parse_args()
 
-    global verstring
-    verstring = args.ver
+    version_string(args.ver)
 
     args.action(args)
 
