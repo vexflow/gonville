@@ -3589,6 +3589,16 @@ def _(cont):
     cont.lx = font.arpeggioshort.ty
     cont.rx = font.arpeggioshort.oy
 
+@define_glyph("trillwiggledown")
+def _(cont):
+    # Rotate the arpeggio mark by 90 degrees and use it as the wavy
+    # line after 'tr' to indicate an extended trill.
+    cont.extra = ("500 500 translate -90 rotate -1.0 1.0 scale -500 -500 translate",
+                  font.arpeggioshort)
+
+    cont.lx = font.arpeggioshort.ty
+    cont.rx = font.arpeggioshort.oy
+
 # ----------------------------------------------------------------------
 # Downbow and upbow marks.
 

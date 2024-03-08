@@ -11,3 +11,16 @@ Run this command to make a SMuFL compliant build of Gonville (with an autogenera
 
 Or you can specify an exact version number:
 ./glyphs.py --smufl --ver 20231029.21a541e
+
+
+Dependencies:
+    sudo port install ghostscript
+    sudo port install lilypond
+    sudo port install potrace
+    sudo port install fontforge
+
+
+Note: this installs a startup daemon.
+dbus has the following notes:
+    Startup items (named 'dbus-system, dbus-session') have been generated that will aid in starting dbus with launchd. They are disabled by default. Execute the following command to start them, and to cause them to launch at startup:
+        sudo port load dbus
